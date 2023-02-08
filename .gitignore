@@ -1,0 +1,5 @@
+build
+GoldyBot.egg-info
+dist
+env
+__pycache__
