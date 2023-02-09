@@ -24,8 +24,10 @@ dependencies = [
     "requests",
     "importlib-metadata; python_version<'3.8'",
 
-    "devgoldyutils>=2.0",
+    "devgoldyutils>=2.0.1",
     "nextcore@git+https://github.com/nextsnake/nextcore",
+    "click",
+    "python-decouple"
 ]
 
 dynamic = ["version"]
