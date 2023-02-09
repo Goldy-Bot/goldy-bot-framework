@@ -80,7 +80,9 @@ class Goldy():
         try:
             asyncio.run(self.__start_async())
         except KeyboardInterrupt:
-            self.stop("Keyboard interrupt detected!")
+            asyncio.run(
+                self.stop("Keyboard interrupt detected!")
+            )
 
     async def __start_async(self):
         await self.http_client.setup()
@@ -97,10 +99,15 @@ class Goldy():
         # Raise a error and exit whenever a critical error occurs
         error = await self.shard_manager.dispatcher.wait_for(lambda: True, "critical")
 
+        print(Colours.YELLOW.apply_to_string(error))
+
         raise cast(Exception, error)
 
-    def stop(self, reason:str = "Unknown Reason"):
+    async def stop(self, reason:str = "Unknown Reason"):
         """Shuts down goldy bot right away incase anything sussy wussy is going on. 😳"""
         self.logger.warn(Colours.YELLOW.apply_to_string("Goldy Bot is shutting down..."))
         self.logger.info(Colours.BLUE.apply_to_string(f"Reason: {reason}"))
+        
+        await self.http_client.close()
+        await self.shard_manager.close()
         sys.exit(0)
