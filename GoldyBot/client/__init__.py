@@ -18,11 +18,16 @@ from ..errors import GoldyBotError
 from .token import Token
 from .presence import Status
 
+# Fixes this https://github.com/nextsnake/nextcore/issues/189.
+if sys.platform == "win32":
+    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+
 class Goldy():
     """The main Goldy Bot client class that controls the whole framework and let's you start an instance of Goldy Bot."""
     def __init__(self, token:Token = None):
         self.token = None
         self.logger = LoggerAdapter(goldy_bot_logger, Colours.ORANGE.apply_to_string("Goldy"))
+        self.async_loop = asyncio.get_event_loop()
 
         if token is None:
             self.token = Token()
@@ -78,11 +83,15 @@ class Goldy():
     def start(self):
         """🧡🌆 Awakens Goldy Bot from her hibernation. 😴 Shortcut to ``asyncio.run(goldy.__start_async())`` and also handles various exceptions carefully."""
         try:
-            asyncio.run(self.__start_async())
+            self.async_loop.run_until_complete(
+                self.__start_async()
+            )
         except KeyboardInterrupt:
-            asyncio.run(
+            self.async_loop.run_until_complete(
                 self.stop("Keyboard interrupt detected!")
             )
+
+            self.async_loop.close()
 
     async def __start_async(self):
         await self.http_client.setup()
@@ -98,8 +107,6 @@ class Goldy():
 
         # Raise a error and exit whenever a critical error occurs
         error = await self.shard_manager.dispatcher.wait_for(lambda: True, "critical")
-
-        print(Colours.YELLOW.apply_to_string(error))
 
         raise cast(Exception, error)
 
