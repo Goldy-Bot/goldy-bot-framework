@@ -4,6 +4,7 @@
   
   <sub>Yet another another rewrite of Goldy Bot, a discord bot framework for my own bots.</sub>
   
+  [![Codacy Badge](https://app.codacy.com/project/badge/Grade/ba2409ee9b524e99a01344f208a74a7e)](https://www.codacy.com?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Goldy-Bot/Goldy-Bot-V5&amp;utm_campaign=Badge_Grade)
   [![Pypi Badge](https://img.shields.io/pypi/v/GoldyBot?style=flat)](https://pypi.org/project/GoldyBot/ "We're on pypi!")
   [![Python Badge](https://img.shields.io/pypi/pyversions/GoldyBot?style=flat)](https://pypi.org/project/GoldyBot/ "Supported python versions.")
   [![Docs Badge](https://img.shields.io/static/v1?label=docs&message=Available&color=light-green)](https://goldybot.devgoldy.me/)
