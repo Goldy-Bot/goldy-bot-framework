@@ -7,6 +7,8 @@ from . import goldy_bot, goldy_bot_logger
 @click.pass_context
 def setup(ctx:Context):
     """Creates a goldy bot environment in the directory your currently in for you to run your bot in."""
+    goldy_bot_logger.info("Creating template and environment...")
+
     if ctx.invoked_subcommand is not None:
         pass
     else:
@@ -14,7 +16,7 @@ def setup(ctx:Context):
 
 @setup.command()
 def normal():
-    goldy_bot_logger.info("Creating template and environment...")
+    # TODO: Place code that generates environment here.
     ...
 
 @setup.command()

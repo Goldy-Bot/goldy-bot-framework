@@ -10,6 +10,7 @@ O = Colours.ORANGE.apply_to_string
 def goldy_bot(ctx:click.Context):
 
     if ctx.invoked_subcommand is None:
+
         # Splash title from https://patorjk.com/software/taag/#p=display&f=Big%20Money-ne&t=Goldy%20Bot
         print(G("  /$$$$$$            /$$       /$$") + O("                 /$$$$$$$              /$$    "))
         print(G(" /$$__  $$          | $$      | $$") + O("                | $$__  $$            | $$    "))
@@ -30,6 +31,7 @@ def goldy_bot(ctx:click.Context):
         )
 
     else:
+
         goldy_bot_logger.info(
             Colours.ORANGE.apply_to_string(
                 f"Running command {ctx.invoked_subcommand}..."

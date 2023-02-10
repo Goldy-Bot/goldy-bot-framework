@@ -18,6 +18,7 @@ class Status(Enum):
     # Aliases
     # ---------
     AWAY = IDLE
+    DO_NOT_DISTURB = DND
 
     # TODO: Create some sort of class to pass into presence methods for changing all status so we can handle the arguments in the methods better.
 
