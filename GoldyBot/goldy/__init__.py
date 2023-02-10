@@ -8,7 +8,7 @@ from nextcore.http.client import HTTPClient
 from nextcore.http import BotAuthentication, UnauthorizedError
 from nextcore.gateway import ShardManager
 
-from typing import cast
+from typing import cast, Dict, Any, TypedDict
 from discord_typings import MessageData, UpdatePresenceData, ChannelData
 from devgoldyutils import Colours
 
@@ -16,19 +16,24 @@ from .. import LoggerAdapter, goldy_bot_logger
 from ..errors import GoldyBotError
 
 from .token import Token
-from .presence import Status
 
 # Fixes this https://github.com/nextsnake/nextcore/issues/189.
 if sys.platform == "win32":
     asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
+cache:Dict[str, Any] = {
+    "goldy_core_instance": None,
+}
+
 class Goldy():
-    """The main Goldy Bot client class that controls the whole framework and let's you start an instance of Goldy Bot."""
+    """The main Goldy Bot class that controls the whole framework and let's you start an instance of Goldy Bot. Also known as the core."""
     def __init__(self, token:Token = None):
         self.token = None
         self.logger = LoggerAdapter(goldy_bot_logger, Colours.ORANGE.apply_to_string("Goldy"))
         self.async_loop = asyncio.get_event_loop()
 
+        # Initializing stuff
+        # -------------------
         if token is None:
             self.token = Token()
         else:
@@ -52,33 +57,12 @@ class Goldy():
             )
         )
 
+        # Add to cache.
+        cache["goldy_core_instance"] = self
 
-    async def change_presence(self, status:Status=None, afk:bool=None) -> bool|None:
-        """Allows you to update the presence of Goldy Bot. Like e.g ``online, idle, dnd``."""
-        if status is None and afk is None:
-            return None
-
-        self.logger.debug("Changing Goldy Bot presence...")
-
-        for shard in self.shard_manager.active_shards:
-            presence = shard.presence
-            new_presence = presence
-
-            if not status is None:
-                if isinstance(status, Status):
-                    presence["status"] = status.value
-                else:
-                    presence["status"] = status
-            
-            if not afk is None:
-                presence["afk"] = afk
-
-            await shard.presence_update(presence)
-            self.logger.debug(f"Updated presence for shard {shard.shard_id} from '{presence}' to '{new_presence}'!")
-
-        self.logger.info("Goldy Bot presence changed successfully!")
-        return True
-
+        # Adding shortcuts to sub classes to core class.
+        # --------------------------------
+        self.presence = Presence(self)
 
     def start(self):
         """🧡🌆 Awakens Goldy Bot from her hibernation. 😴 Shortcut to ``asyncio.run(goldy.__start_async())`` and also handles various exceptions carefully."""
@@ -105,6 +89,8 @@ class Goldy():
                 f"Nextcord shard manager failed to connect! We got '{e.message}' from nextcord. This might mean your discord token is incorrect!"
             )
 
+        # TODO: Run Goldy Bot setup method here.
+
         # Raise a error and exit whenever a critical error occurs
         error = await self.shard_manager.dispatcher.wait_for(lambda: True, "critical")
 
@@ -118,3 +104,18 @@ class Goldy():
         await self.http_client.close()
         await self.shard_manager.close()
         sys.exit(0)
+
+
+# Root imports.
+# -------------
+from .presence import Presence, Status
+
+
+# Get goldy instance method.
+# ---------------------------
+def get_goldy_instance() -> Goldy | None:
+    """Returns instance of goldy core class."""
+    return cache["goldy_core_instance"]
+
+get_core = get_goldy_instance
+get_goldy = get_goldy_instance
