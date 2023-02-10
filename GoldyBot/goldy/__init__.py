@@ -8,8 +8,8 @@ from nextcore.http.client import HTTPClient
 from nextcore.http import BotAuthentication, UnauthorizedError
 from nextcore.gateway import ShardManager
 
-from typing import cast, Dict, Any, TypedDict
-from discord_typings import MessageData, UpdatePresenceData, ChannelData
+from typing import cast, Dict, Any
+from discord_typings import UpdatePresenceData
 from devgoldyutils import Colours
 
 from .. import LoggerAdapter, goldy_bot_logger

@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from enum import Enum
-from typing import Literal
 from devgoldyutils import Colours
 
 from . import Goldy

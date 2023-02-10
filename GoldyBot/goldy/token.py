@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import os
 from dataclasses import dataclass, field
-from typing import Literal, Tuple
-from decouple import config, AutoConfig
+from typing import Tuple
+from decouple import AutoConfig
 from devgoldyutils import Colours
 
 from .. import goldy_bot_logger, LoggerAdapter

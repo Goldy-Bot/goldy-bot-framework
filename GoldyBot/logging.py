@@ -1,5 +1,3 @@
-import os
-import sys
 import logging as log
 from devgoldyutils import Colours
 
