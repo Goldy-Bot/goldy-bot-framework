@@ -25,8 +25,14 @@ def goldy_bot(ctx:click.Context):
         print(f"    {O('Version: [')} {G(VERSION)} {O(']')}")
         print("")
 
-        print(Colours.BLUE.apply_to_string("Do 'goldybot --help' for a list of available commands."))
+        print(
+            Colours.BLUE.apply_to_string("Do 'goldybot --help' for a list of available commands.")
+        )
 
     else:
-        goldy_bot_logger.info(Colours.ORANGE.apply_to_string(f"Running command {ctx.invoked_subcommand}..."))
+        goldy_bot_logger.info(
+            Colours.ORANGE.apply_to_string(
+                f"Running command {ctx.invoked_subcommand}..."
+            )
+        )
         print("")
