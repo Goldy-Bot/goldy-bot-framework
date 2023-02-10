@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 from enum import Enum
+from typing import Literal
+from devgoldyutils import Colours
 
 from . import Goldy
 from ..errors import InvalidTypeInMethod
@@ -23,12 +25,16 @@ class Presence():
     """Class that allows you to control the status, game activity and more of Goldy Bot"""
     def __init__(self, goldy:Goldy) -> None:
         self.goldy = goldy
-        self.logger = LoggerAdapter(goldy_bot_logger, prefix="Presence")
 
-    async def change(self, status:Status=None, afk:bool=None) -> bool|None:
+        self.logger = LoggerAdapter(
+            goldy_bot_logger, 
+            prefix = Colours.BLUE.apply_to_string("Presence")
+        )
+
+    async def change(self, status:Status=None, afk:bool=None) -> None:
         """Updates the presence of Goldy Bot. Like e.g ``online, idle, dnd``."""
         if status is None and afk is None:
-            return None
+            raise InvalidTypeInMethod("arguments status and afk in 'presence.change()' cannot both be None.")
 
         self.logger.debug("Changing Goldy Bot presence...")
 
@@ -54,4 +60,4 @@ class Presence():
             self.logger.debug(f"Updated presence for shard {shard.shard_id}!")
 
         self.logger.info(f"Goldy Bot presence changed successfully from {old_presence} to {self.goldy.shard_manager.presence}!")
-        return True
+        return None

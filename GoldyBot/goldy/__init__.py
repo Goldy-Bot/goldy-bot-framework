@@ -71,11 +71,9 @@ class Goldy():
                 self.__start_async()
             )
         except KeyboardInterrupt:
-            self.async_loop.run_until_complete(
-                self.stop("Keyboard interrupt detected!")
-            )
+            self.stop("Keyboard interrupt detected!")
 
-            self.async_loop.close()
+        return None
 
     async def __start_async(self):
         await self.http_client.setup()
@@ -84,10 +82,17 @@ class Goldy():
         # This does not mean they are connected.
         try:
             await self.shard_manager.connect()
+            self.logger.debug("Nextcore shard manager connecting...")
         except UnauthorizedError as e:
             raise GoldyBotError(
                 f"Nextcord shard manager failed to connect! We got '{e.message}' from nextcord. This might mean your discord token is incorrect!"
             )
+
+        # Log when shards are ready.
+        self.shard_manager.event_dispatcher.add_listener(
+            lambda x: self.logger.info(f"Nextcore shards are {Colours.GREEN.apply_to_string('connected')} and {Colours.BLUE.apply_to_string('READY!')}"), 
+            event_name="READY"
+        )
 
         # TODO: Run Goldy Bot setup method here.
 
@@ -96,14 +101,17 @@ class Goldy():
 
         raise cast(Exception, error)
 
-    async def stop(self, reason:str = "Unknown Reason"):
-        """Shuts down goldy bot right away incase anything sussy wussy is going on. 😳"""
+    def stop(self, reason:str = "Unknown Reason"):
+        """Shuts down goldy bot right away and safely incase anything sussy wussy is going on. 😳"""
         self.logger.warn(Colours.YELLOW.apply_to_string("Goldy Bot is shutting down..."))
         self.logger.info(Colours.BLUE.apply_to_string(f"Reason: {reason}"))
         
-        await self.http_client.close()
-        await self.shard_manager.close()
-        sys.exit(0)
+        self.async_loop.run_until_complete(self.http_client.close())
+        self.async_loop.run_until_complete(self.shard_manager.close())
+
+        self.async_loop.stop()
+
+        return None
 
 
 # Root imports.

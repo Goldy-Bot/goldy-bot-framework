@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import os
 from dataclasses import dataclass, field
-from typing import Tuple
+from typing import Literal, Tuple
 from decouple import config, AutoConfig
 from devgoldyutils import Colours
 
@@ -12,23 +12,13 @@ from ..errors import GoldyBotError
 
 class NoDiscordToken(GoldyBotError):
     def __init__(self):
-        if not ".env" in os.listdir("."):
-            goldy_bot_logger.debug("Creating .env file in root dir...")
+        super().__init__("No Discord token was entered! Enter your discord token into the .env file at root or pass it in when initializing Goldy class with the Token class. See '' for more info."
+        )
 
-            # Open template env file.
-            template_env_file = open(Paths.TOKEN_ENV, mode="r")
-            template_env_file.seek(0)
-
-            # Create .env at root.
-            env_file = open(".env", mode="w")
-            
-            # Copy template to it.
-            env_file.write(template_env_file.read())
-
-            goldy_bot_logger.info(Colours.GREEN.apply_to_string("Created .env file in root dir!"))
-
+class NoDatabaseToken(GoldyBotError):
+    def __init__(self):
         super().__init__(
-            "No Discord token was entered! Enter your discord token into the .env file at root or pass it in when initializing Goldy class with the Token class. See '' for more info."
+            "No MongoDB database token was entered! Create and enter a MongoDB database token into the .env file at root or pass it in when initializing Goldy class with the Token class. See '' for more info."
         )
 
 @dataclass
@@ -46,7 +36,32 @@ class Token:
         self.database_token = (lambda entered_token: mongodb_token if entered_token is None else entered_token)(self.database_token)
 
         if self.discord_token is None:
+            self.create_token_env_file()
             raise NoDiscordToken()
+
+        if self.database_token is None:
+            self.create_token_env_file()
+            raise NoDatabaseToken()
+
+    def create_token_env_file(self) -> bool:
+        if not ".env" in os.listdir("."):
+            self.logger.debug("Creating .env file in root dir...")
+
+            # Open template env file.
+            template_env_file = open(Paths.TOKEN_ENV, mode="r")
+            template_env_file.seek(0)
+
+            # Create .env at root.
+            env_file = open(".env", mode="w")
+
+            # Copy template to it.
+            env_file.write(template_env_file.read())
+
+            self.logger.info(Colours.GREEN.apply_to_string("Created .env file in root dir!"))
+            return True
+
+        self.logger.debug("A .env file already exists in root.")
+        return False
 
 
     def get_token_from_env(self) -> Tuple[str|None, str|None]:
