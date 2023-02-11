@@ -3,6 +3,7 @@ from __future__ import annotations
 from ... import LoggerAdapter
 
 from typing import List
+from devgoldyutils import Colours
 
 class GoldyDB():
     """A class representing a singular goldy bot database in mongoDB."""
@@ -10,7 +11,7 @@ class GoldyDB():
         self.client = core_database.client
         self.database = self.client[code_name]
         
-        self.logger = LoggerAdapter(core_database.logger, code_name)
+        self.logger = LoggerAdapter(core_database.logger, Colours.PINK_GREY.apply_to_string(code_name))
 
     async def insert(self, collection:str, data) -> bool:
         """Inserts the data provided into a collection in this database."""
