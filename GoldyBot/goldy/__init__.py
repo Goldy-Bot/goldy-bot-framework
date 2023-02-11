@@ -14,6 +14,7 @@ from devgoldyutils import Colours
 
 from .. import LoggerAdapter, goldy_bot_logger
 from ..errors import GoldyBotError
+from ..info import VERSION, COPYRIGHT
 
 from .token import Token
 
@@ -31,6 +32,11 @@ class Goldy():
         self.token = None
         self.logger = LoggerAdapter(goldy_bot_logger, Colours.ORANGE.apply_to_string("Goldy"))
         self.async_loop = asyncio.get_event_loop()
+
+        # Boot title and copyright stuff.
+        print(
+            f" {Colours.YELLOW.apply_to_string('Goldy')} {Colours.ORANGE.apply_to_string('Bot')} ({Colours.BLUE.apply_to_string(VERSION)}) - {Colours.CLAY.apply_to_string(COPYRIGHT)}\n"
+        )
 
         # Initializing stuff
         # -------------------
@@ -62,6 +68,7 @@ class Goldy():
 
         # Adding shortcuts to sub classes to core class.
         # --------------------------------
+        self.database = Database(self)
         self.presence = Presence(self)
 
     def start(self):
@@ -106,8 +113,14 @@ class Goldy():
         self.logger.warn(Colours.YELLOW.apply_to_string("Goldy Bot is shutting down..."))
         self.logger.info(Colours.BLUE.apply_to_string(f"Reason: {reason}"))
         
+        self.logger.debug("Closing nextcore http client...")
         self.async_loop.run_until_complete(self.http_client.close())
+
+        self.logger.debug("Closing nextcore shard manager...")
         self.async_loop.run_until_complete(self.shard_manager.close())
+
+        self.logger.debug("Closing AsyncIOMotorClient...")
+        self.database.client.close()
 
         self.async_loop.stop()
 
@@ -116,6 +129,7 @@ class Goldy():
 
 # Root imports.
 # -------------
+from .database import Database
 from .presence import Presence, Status
 
 
