@@ -129,7 +129,7 @@ class Goldy():
 
 # Root imports.
 # -------------
-from .database import Database, DatabaseEnums
+from .database import Database
 from .presence import Presence, Status
 
 

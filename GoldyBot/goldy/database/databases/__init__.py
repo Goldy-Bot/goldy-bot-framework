@@ -41,7 +41,7 @@ class GoldyDB():
                 document_list.append(document)
 
             return document_list
-        except KeyError as e:
+        except KeyError:
             self.logger.debug(f"Could not find the collection '{collection}'!")
             return None
 
@@ -55,7 +55,7 @@ class GoldyDB():
                 document_list.append(document)
 
             return document_list
-        except KeyError as e:
+        except KeyError:
             self.logger.debug(f"Could not find the collection '{collection}'!")
             return None
 
