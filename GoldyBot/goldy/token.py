@@ -82,7 +82,7 @@ class Token:
         # ------------------
         self.logger.debug("Grabbing discord token...")
         discord_token = config(
-            "TOKEN", 
+            "DISCORD_TOKEN", 
             default=None
         )
 

@@ -1,111 +1,93 @@
 from __future__ import annotations
 import asyncio
-from typing import Any, Dict, List
+from typing import List
+
+from enum import Enum
+
 import pymongo
+from pymongo.errors import ServerSelectionTimeoutError
+from devgoldyutils import Colours
 import motor.motor_asyncio
 from .. import Goldy, LoggerAdapter, goldy_bot_logger, GoldyBotError
 
-MODULE_NAME = "DATABASE"
+from .databases import GoldyDB
+
+class DatabaseEnums(Enum):
+    """Enum class that holds the code names for all goldy bot pymongo databases."""
+    GOLDY_MAIN = "goldy_main"
+    GOLDY_MEMBER_DATA = "goldy_member_data"
+
+    def __init__(self, database_name:str):
+        self.database_name = database_name
 
 class Database():
-    """Goldy Bot's class to interface with a Mongo Database."""
+    """Goldy Bot's class to interface with a Mongo Database asynchronously."""
     def __init__(self, goldy:Goldy):
         self.goldy = goldy
         self.database_token_url = self.goldy.token.database_token
         self.async_loop = asyncio.get_event_loop()
         self.logger = LoggerAdapter(goldy_bot_logger, prefix="Database")
 
-        # Initializing MongoDB database
+        # Initializing MongoDB database.
         try:
             self.client:pymongo.MongoClient = motor.motor_asyncio.AsyncIOMotorClient(self.database_token_url, serverSelectionTimeoutMS=2000)
             self.async_loop.run_until_complete(self.client.server_info())
-            self.database = self.client[
-                #TODO: Get database name and dump it here.
-            ]
-
-        except Exception:
+            self.logger.info("AsyncIOMotorClient " + Colours.GREEN.apply_to_string("Connected!"))
+        except ServerSelectionTimeoutError as e:
             raise GoldyBotError(
-                "Couldn't connect to Database! Check the database URL you entered."
+                f"Couldn't connect to Database! Check if the database URL you entered is correct. Error received from motor >>> {e}"
             )
 
-    async def insert(self, collection:str, data) -> bool:
-        """Tells database to insert the data provided into a collection."""
-        await self.database[collection].insert_one(data)
-        self.logger.debug(f"Inserted '{data}' into '{collection}.'")
-        return True
+        except Exception as e:
+            raise GoldyBotError(
+                f"Couldn't connect to Database! Error received from motor >>> {e}"
+            )
 
-    async def edit(self, collection:str, query, data:dict) -> bool:
-        """Tells database to find and edit a document with the data provided in a collection."""
-        await self.database[collection].update_one(query, {"$set": data})
-        self.logger.debug(f"Edited '{query}' into '{data}.'")
-        return True
+    async def setup(self):
+        """Creates all of goldy bot's databases and their structure in mongoDB if they don't already exist."""
+        ...
 
-    async def remove(self, collection:str, data) -> bool:
-        """Tells database to find and delete a copy of this data from the collection."""
-        await self.database[collection].delete_one(data)
-        self.logger.debug(f"Deleted '{data}' from '{collection}.'")
-        return True
+    async def insert(self, database:DatabaseEnums|str, collection:str, data) -> bool:
+        """Inserts the data provided into a collection in this database."""
+        return await self.get_goldy_database(database).insert(collection, data)
 
-    async def find(self, collection:str, query, key:str, max_to_find=50) -> List[dict]:
-        """Searches for documents with the query."""
-        try:
-            document_list = []
-            cursor = self.database[collection].find(query).sort(key)
+    async def edit(self, database:DatabaseEnums|str, collection:str, query, data:dict) -> bool:
+        """Finds and edits a document in this database and collection with the data provided."""
+        return await self.get_goldy_database(database).edit(collection, query, data)
 
-            for document in await cursor.to_list(max_to_find):
-                document_list.append(document)
+    async def remove(self, database:DatabaseEnums|str, collection:str, data) -> bool:
+        """Finds and deletes a copy of this data from a collection in this database."""
+        return await self.get_goldy_database(database).remove(collection, data)
 
-            return document_list
-        except KeyError as e:
-            self.logger.debug(f"Could not find the collection '{collection}'!")
-            return None
+    async def find(self, database:DatabaseEnums|str, collection:str, query, key:str, max_to_find=50) -> List[dict]:
+        """Searches for and returns documents with that query in a collection in this database."""
+        return await self.get_goldy_database(database).find(collection, query, key, max_to_find)
 
-    async def find_all(self, collection:str, max_to_find=100) -> List[dict] | None:
-        """Finds and returns all documents in a collection. This took me a day to make! 😞"""
-        try:
-            document_list = []
-            cursor = self.database[collection].find().sort('_id')
+    async def find_all(self, database:DatabaseEnums|str, collection:str, max_to_find=100) -> List[dict] | None:
+        """Finds and returns all documents in a collection from this database. This took me a day to make! 😞"""
+        return await self.get_goldy_database(database).find_all(collection, max_to_find)
 
-            for document in await cursor.to_list(max_to_find):
-                document_list.append(document)
+    async def find_one(self, database:DatabaseEnums|str, collection:str, query:dict) -> (dict | None):
+        """Searches for and returns specific data from a collection in this database."""
+        return await self.get_goldy_database(database).find_one(collection, query)
 
-            return document_list
-        except KeyError as e:
-            self.logger.debug(f"Could not find the collection '{collection}'!")
-            return None
+    async def create_collection(self, database:DatabaseEnums|str, collection_name:str, data) -> bool:
+        return await self.get_goldy_database(database).create_collection(collection_name, data)
 
-    async def get_collection(self, collection):
+    async def get_collection(self, database:DatabaseEnums|str, collection:str):
         """Returns cursor of the following collection."""
-        return self.database[collection]
+        return await self.get_goldy_database(database).get_collection(collection)
 
-    async def list_collection_names(self) -> List[str]:
-        """Returns list of all collection names."""
-        return await self.database.list_collection_names()
+    async def delete_collection(self, database:DatabaseEnums|str, collection_name:str) -> bool:
+        return await self.get_goldy_database(database).delete_collection(collection_name)
 
-    async def find_one(self, collection:str, query:dict) -> (dict | None):
-        """Tells database to search for and return specific data from a collection."""
-        data = await self.database[collection].find_one(query)
+    async def list_collection_names(self, database:DatabaseEnums|str) -> List[str]:
+        """Returns list of all collection name in this database."""
+        return await self.get_goldy_database(database).list_collection_names()
 
-        if not data == None:
-            self.logger.debug(f"Found '{query}' in '{collection}.'")
-            return data
-        else:
-            self.logger.debug(f"'{query}' was not found in '{collection}.'")
-            return None
-        
-    async def create_collection(self, collection_name:str, data):
-        await self.database[collection_name].insert_one(data)
-        self.logger.debug(f"Database collection '{collection_name}' created.")
-
-    async def delete_collection(self, collection_name:str):
-        await self.database[collection_name].drop()
-        self.logger.debug(f"Database collection '{collection_name}' dropped.")
-
-    def new_instance(self, database_name:str):
-        """Starts a new database instance the efficient way. 👍"""
-        class NewDatabase(Database):
-            def __init__(self, database_self:Database):
-                self.database = database_self.client[database_name]
-
-        return NewDatabase(self)
-
+    
+    def get_goldy_database(self, database_name:DatabaseEnums|str) -> GoldyDB:
+        if isinstance(database_name, DatabaseEnums):
+            return GoldyDB(self, database_name.value)
+        else: # I hope this doesn't bother future me. 😉
+            return GoldyDB(self, DatabaseEnums(database_name).value)
