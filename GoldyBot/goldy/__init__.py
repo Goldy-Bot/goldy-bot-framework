@@ -140,4 +140,6 @@ def get_goldy_instance() -> Goldy | None:
     return cache["goldy_core_instance"]
 
 get_core = get_goldy_instance
+"""Returns instance of goldy core class."""
 get_goldy = get_goldy_instance
+"""Returns instance of goldy core class."""
