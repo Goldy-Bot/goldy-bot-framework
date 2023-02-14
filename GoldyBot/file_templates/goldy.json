@@ -1,0 +1,13 @@
+{
+    "goldy" : {
+        "extensions": {
+            "ignored_extensions" : [],
+
+            "folder_location" : "./extensions"
+        },
+
+        "allowed_guilds" : {
+            "{guild_id_here}" : "uwu_hangout_guild"
+        }
+    }
+}
