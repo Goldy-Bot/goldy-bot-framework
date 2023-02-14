@@ -9,7 +9,7 @@ from nextcore.http import BotAuthentication, UnauthorizedError
 from nextcore.gateway import ShardManager
 
 from typing import cast, Dict, Any
-from discord_typings import UpdatePresenceData
+from discord_typings import UpdatePresenceData, PartialActivityData
 from devgoldyutils import Colours
 
 from .. import LoggerAdapter, goldy_bot_logger
@@ -35,7 +35,7 @@ class Goldy():
 
         # Boot title and copyright stuff.
         print(
-            f" {Colours.YELLOW.apply_to_string('Goldy')} {Colours.ORANGE.apply_to_string('Bot')} ({Colours.BLUE.apply_to_string(VERSION)}) - {Colours.CLAY.apply_to_string(COPYRIGHT)}\n"
+            f" {Colours.YELLOW.apply_to_string('Goldy')} {Colours.ORANGE.apply_to_string('Bot')} ({Colours.BLUE.apply_to_string(VERSION)}) - {Colours.PINK_GREY.apply_to_string(COPYRIGHT)}\n"
         )
 
         # Initializing stuff
@@ -56,10 +56,10 @@ class Goldy():
             http_client = self.http_client,
 
             presence = UpdatePresenceData(
-                activities=[],
-                since=None,
-                status=Status.ONLINE.value,
-                afk=False
+                activities = [PartialActivityData(name=f"Goldy Bot (v{VERSION})", type=ActivityTypes.PLAYING_GAME.value)],
+                since = None,
+                status = Status.ONLINE.value,
+                afk = False
             )
         )
 
@@ -110,6 +110,8 @@ class Goldy():
 
     def stop(self, reason:str = "Unknown Reason"):
         """Shuts down goldy bot right away and safely incase anything sussy wussy is going on. 😳"""
+        self.async_loop.run_until_complete(self.presence.change(Status.INVISIBLE)) # Set bot to invisible before shutting off.
+
         self.logger.warn(Colours.YELLOW.apply_to_string("Goldy Bot is shutting down..."))
         self.logger.info(Colours.BLUE.apply_to_string(f"Reason: {reason}"))
         
@@ -130,7 +132,7 @@ class Goldy():
 # Root imports.
 # -------------
 from .database import Database
-from .presence import Presence, Status
+from .presence import Presence, Status, ActivityTypes
 
 
 # Get goldy instance method.
