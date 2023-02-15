@@ -69,7 +69,11 @@ class Goldy():
         # Adding shortcuts to sub classes to core class.
         # --------------------------------
         self.database = Database(self)
+        """Goldy Bot's class to interface with a Mongo Database asynchronously."""
         self.presence = Presence(self)
+        """Class that allows you to control the status, game activity and more of Goldy Bot"""
+        self.config = GoldyConfig()
+        """Class that allows you to retrieve configuration data from the ``goldy.json`` config file."""
 
     def start(self):
         """🧡🌆 Awakens Goldy Bot from her hibernation. 😴 Shortcut to ``asyncio.run(goldy.__start_async())`` and also handles various exceptions carefully."""
@@ -133,6 +137,7 @@ class Goldy():
 # -------------
 from .database import Database
 from .presence import Presence, Status, ActivityTypes
+from .goldy_config import GoldyConfig
 
 
 # Get goldy instance method.
