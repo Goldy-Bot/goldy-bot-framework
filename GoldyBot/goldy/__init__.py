@@ -76,7 +76,7 @@ class Goldy():
         """
         Class that allows you to retrieve configuration data from the ``goldy.json`` config file. 
         
-        All properties raise KeyError when not found in the config.
+        All properties return None when not found in the config.
         """
 
     def start(self):
