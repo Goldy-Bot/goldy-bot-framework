@@ -21,6 +21,6 @@
   
   <br>
 
-  **© Copyright (C) 2023 Goldy (Under the [GPL-3.0 License](LICENSE.md))**
+  **© Copyright (C) 2023 Goldy (Under the [GPL-3.0 License](LICENSE))**
 
 </div>
