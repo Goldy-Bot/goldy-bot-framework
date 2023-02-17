@@ -19,3 +19,22 @@ class Config():
         self.logger.debug("Phrasing json in config to dict...")
         self.json_data:dict = json.loads(self.file.read())
         self.logger.debug(Colours.GREEN.apply_to_string("Done!"))
+
+    def get(self, *keys, json_data=None):
+        """
+        A small method used to grab data from the json dictionary with an advantage of handling KeyError respectfully. 
+        Use this method please instead of just directly accessing the dict via self.
+        """
+        if json_data is None:
+            json_data = self.json_data
+
+        data = json_data
+
+        try:
+            for key in keys:
+                data = data[key]
+            
+            return data
+        except KeyError as e:
+            self.logger.warn(f"Could not find key {e} in config so I'm returning None... Keys: {keys}")
+            return None

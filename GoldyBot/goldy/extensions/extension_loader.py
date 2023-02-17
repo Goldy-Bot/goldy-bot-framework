@@ -14,6 +14,7 @@ class ExtensionLoader():
 
     def find_all_paths(self) -> List[str]:
         """Searches for all extensions, internal and external then returns their paths."""
+
         ...
 
     @overload

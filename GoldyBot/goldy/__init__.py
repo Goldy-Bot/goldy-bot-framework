@@ -73,7 +73,11 @@ class Goldy():
         self.presence = Presence(self)
         """Class that allows you to control the status, game activity and more of Goldy Bot"""
         self.config = GoldyConfig()
-        """Class that allows you to retrieve configuration data from the ``goldy.json`` config file."""
+        """
+        Class that allows you to retrieve configuration data from the ``goldy.json`` config file. 
+        
+        All properties raise KeyError when not found in the config.
+        """
 
     def start(self):
         """🧡🌆 Awakens Goldy Bot from her hibernation. 😴 Shortcut to ``asyncio.run(goldy.__start_async())`` and also handles various exceptions carefully."""
