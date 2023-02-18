@@ -78,6 +78,7 @@ class Goldy():
         
         All properties return None when not found in the config.
         """
+        self.extension_loader = ExtensionLoader(self)
 
     def start(self):
         """🧡🌆 Awakens Goldy Bot from her hibernation. 😴 Shortcut to ``asyncio.run(goldy.__start_async())`` and also handles various exceptions carefully."""
@@ -109,12 +110,16 @@ class Goldy():
             event_name="READY"
         )
 
-        # TODO: Run Goldy Bot setup method here.
+        await self.setup()
 
-        # Raise a error and exit whenever a critical error occurs
+        # Raise a error and exit whenever a critical error occurs.
         error = await self.shard_manager.dispatcher.wait_for(lambda: True, "critical")
 
         raise cast(Exception, error)
+
+    async def setup(self):
+        """Method ran to set up goldy bot."""
+        ...
 
     def stop(self, reason:str = "Unknown Reason"):
         """Shuts down goldy bot right away and safely incase anything sussy wussy is going on. 😳"""
@@ -137,13 +142,6 @@ class Goldy():
         return None
 
 
-# Root imports.
-# -------------
-from .database import Database
-from .presence import Presence, Status, ActivityTypes
-from .goldy_config import GoldyConfig
-
-
 # Get goldy instance method.
 # ---------------------------
 def get_goldy_instance() -> Goldy | None:
@@ -154,3 +152,11 @@ get_core = get_goldy_instance
 """Returns instance of goldy core class."""
 get_goldy = get_goldy_instance
 """Returns instance of goldy core class."""
+
+
+# Root imports.
+# -------------
+from .database import Database
+from .presence import Presence, Status, ActivityTypes
+from .goldy_config import GoldyConfig
+from .extensions.extension_loader import ExtensionLoader

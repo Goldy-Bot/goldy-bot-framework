@@ -14,3 +14,7 @@ class Paths:
     GOLDY_JSON = FILE_TEMPLATES + "/goldy.json"
 
     RUN_SCRIPT = FILE_TEMPLATES + "/run.py"
+
+    # Internal Extensions
+    # ---------------------
+    INTERNAL_EXTENSIONS = str(GOLDY_BOT_ROOT) + "/internal_extensions"
