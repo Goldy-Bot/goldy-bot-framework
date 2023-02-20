@@ -3,6 +3,7 @@
         "extensions": {
             "ignored_extensions" : [],
 
+            "raise_on_load_error" : true,
             "folder_location" : "./extensions"
         },
 

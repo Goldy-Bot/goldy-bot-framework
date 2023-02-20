@@ -1,7 +1,7 @@
 from typing import List
 
 from ..config import Config
-from ..paths import Paths
+from ..errors import GoldyBotError
 
 class GoldyConfig(Config):
     """
@@ -10,7 +10,12 @@ class GoldyConfig(Config):
     All properties return None when not found in the config.
     """
     def __init__(self):
-        super().__init__(Paths.GOLDY_JSON)
+        try:
+            super().__init__("./goldy.json")
+        except FileNotFoundError as e:
+            raise GoldyBotError(
+                f"Goldy config not found in root! Please create an environment with the command 'goldybot setup' in terminal. \nERROR -> {e}"
+            )
 
     @property
     def ignored_extensions(self) -> List[str]:
@@ -21,5 +26,10 @@ class GoldyConfig(Config):
     def extension_folder_location(self) -> str:
         """Returns location set for the extension folder in ``goldy.json``."""
         return self.get("goldy", "extensions", "folder_location")
+
+    @property
+    def raise_on_extension_loader_error(self) -> bool:
+        """Returns whether the extension loader should raise on load errors stopping the entire framework or not."""
+        return self.get("goldy", "extensions", "raise_on_load_error", default_value=True)
 
     #TODO: Add more properties.

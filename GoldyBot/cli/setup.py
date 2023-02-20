@@ -24,19 +24,28 @@ def normal():
     # TODO: Place code that generates environment here.
 
     file_templates = FileTemplates([
-        Paths.GOLDY_JSON,
-        Paths.RUN_SCRIPT,
-        Paths.TOKEN_ENV
+        Paths.GOLDY_JSON_TEMPLATE,
+        Paths.RUN_SCRIPT_TEMPLATE,
+        Paths.TOKEN_ENV_TEMPLATE
     ])
 
     file_templates.copy_to(".")
 
+    # Rename token.env file to .env
+    # ------------------------------
     try:
         os.rename("token.env", ".env")
     except FileExistsError:
         goldy_bot_logger.debug("'.env' already exists so I'm going to delete the one I was about to copy into root.")
         os.remove("token.env")
     
+    # Extensions folder.
+    # -------------------
+    try:
+        os.mkdir("./extensions")
+        goldy_bot_logger.debug("Created 'extensions' folder in root!")
+    except FileExistsError:
+        goldy_bot_logger.debug("The 'extensions' folder already exists so I'm not creating it.")
 
 @setup.command()
 def demo():

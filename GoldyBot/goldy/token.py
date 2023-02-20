@@ -48,7 +48,7 @@ class Token:
             self.logger.debug("Creating .env file in root dir...")
 
             # Open template env file.
-            template_env_file = open(Paths.TOKEN_ENV, mode="r")
+            template_env_file = open(Paths.TOKEN_ENV_TEMPLATE, mode="r")
             template_env_file.seek(0)
 
             # Create .env at root.

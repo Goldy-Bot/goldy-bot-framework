@@ -28,8 +28,8 @@ cache:Dict[str, Any] = {
 
 class Goldy():
     """The main Goldy Bot class that controls the whole framework and let's you start an instance of Goldy Bot. Also known as the core."""
-    def __init__(self, token:Token = None):
-        self.token = None
+    def __init__(self, token:Token = None, raise_on_extension_loader_error = None):
+        self.token = token
         self.logger = LoggerAdapter(goldy_bot_logger, Colours.ORANGE.apply_to_string("Goldy"))
         self.async_loop = asyncio.get_event_loop()
 
@@ -40,10 +40,8 @@ class Goldy():
 
         # Initializing stuff
         # -------------------
-        if token is None:
+        if self.token is None:
             self.token = Token()
-        else:
-            self.token = token
         
         self.nc_authentication = BotAuthentication(self.token.discord_token)
         self.intents = 1 << 9 | 1 << 15
@@ -78,7 +76,8 @@ class Goldy():
         
         All properties return None when not found in the config.
         """
-        self.extension_loader = ExtensionLoader(self)
+        self.extension_loader = ExtensionLoader(self, raise_on_extension_loader_error)
+        """Class that handles extension loading."""
 
     def start(self):
         """🧡🌆 Awakens Goldy Bot from her hibernation. 😴 Shortcut to ``asyncio.run(goldy.__start_async())`` and also handles various exceptions carefully."""
@@ -119,7 +118,9 @@ class Goldy():
 
     async def setup(self):
         """Method ran to set up goldy bot."""
-        ...
+        self.extension_loader.load()
+
+        #raise GoldyBotError("STOP")
 
     def stop(self, reason:str = "Unknown Reason"):
         """Shuts down goldy bot right away and safely incase anything sussy wussy is going on. 😳"""

@@ -15,4 +15,6 @@ goldy_bot_logger = add_custom_handler(log.getLogger(LOGGER_NAME)); goldy_bot_log
 from .info import VERSION, DISPLAY_NAME
 from .paths import Paths
 
-from .goldy import Goldy, Token, get_goldy_instance
+from .goldy import Goldy, get_goldy_instance
+from .goldy.token import Token
+from .goldy.extensions import Extension

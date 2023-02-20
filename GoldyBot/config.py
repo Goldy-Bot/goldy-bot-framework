@@ -10,6 +10,7 @@ class Config():
         self.logger = LoggerAdapter(goldy_bot_logger, prefix="Config")
 
         self.logger.debug(f"Opening config file at '{self.json_path}'...")
+
         self.file = open(
             self.json_path, 
             "r+", 
@@ -20,7 +21,7 @@ class Config():
         self.json_data:dict = json.loads(self.file.read())
         self.logger.debug(Colours.GREEN.apply_to_string("Done!"))
 
-    def get(self, *keys, json_data=None):
+    def get(self, *keys, json_data = None, default_value = None):
         """
         A small method used to grab data from the json dictionary with an advantage of handling KeyError respectfully. 
         Use this method please instead of just directly accessing the dict via self.
@@ -36,5 +37,5 @@ class Config():
             
             return data
         except KeyError as e:
-            self.logger.warn(f"Could not find key {e} in config so I'm returning None... Keys: {keys}")
-            return None
+            self.logger.warn(f"Could not find key {e} in config so I'm returning default value... Keys: {keys}")
+            return default_value

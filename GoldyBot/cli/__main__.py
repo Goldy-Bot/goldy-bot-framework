@@ -34,7 +34,7 @@ def goldy_bot(ctx:click.Context):
 
         goldy_bot_logger.info(
             Colours.ORANGE.apply_to_string(
-                f"Running command {ctx.invoked_subcommand}..."
+                f"Running the command --> [{ctx.invoked_subcommand}]..."
             )
         )
         print("")

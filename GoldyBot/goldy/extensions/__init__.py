@@ -3,7 +3,8 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import Tuple, List
 
-from ... import get_goldy_instance, goldy_bot_logger, LoggerAdapter
+from ...goldy import get_goldy_instance
+from ... import goldy_bot_logger, LoggerAdapter
 
 extensions_cache:List[Tuple[str, object]] = [
 
@@ -24,13 +25,13 @@ class Extension(ABC):
     ```python
     class YourExtension(GoldyBot.Extension):
         def __init__(self):
-            super().__init__(self, package_module_name=package_module)
+            super().__init__()
 
         def loader(self):
 
             @GoldyBot.command()
             async def uwu(self:YourExtension, ctx):
-                await ctx.send(f'Hi, {ctx.author.mention}! OwO!')
+                await send(ctx, f'Hi, {ctx.author.mention}! OwO!')
 
     def load():
         YourExtension()
