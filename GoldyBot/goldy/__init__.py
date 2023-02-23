@@ -160,4 +160,6 @@ get_goldy = get_goldy_instance
 from .database import Database
 from .presence import Presence, Status, ActivityTypes
 from .goldy_config import GoldyConfig
+from .extensions import extensions_cache
 from .extensions.extension_loader import ExtensionLoader
+from . import utils

@@ -51,7 +51,7 @@ class Extension(ABC):
         # Adding to cache and loading commands.
         # ---------------------------------------
         if not self.code_name in self.ignored_extensions_list:
-            self.logger.debug("Adding to cache...")
+            self.logger.debug("Adding myself to cache...")
             extensions_cache.append(
                 (self.code_name, self)
             )
@@ -76,11 +76,13 @@ class Extension(ABC):
         return self.__class__.__name__
 
     def add_command(self, command) -> None:
+        """Add this command to this extension."""
         self.__commands.append(command)
-        self.logger.debug(f"Added command {command}")
+        self.logger.debug(f"Added the command '{command.name}' to {self.code_name}")
         return None
     
     def get_commands(self) -> List: # TODO: Also add the command class type here too.
+        """Returns all the commands loaded with this extension."""
         return self.__commands
 
     @abstractmethod
