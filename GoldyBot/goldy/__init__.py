@@ -170,4 +170,3 @@ from .presence import Presence, Status, ActivityTypes
 from .goldy_config import GoldyConfig
 from .extensions.extension_loader import ExtensionLoader
 from .guilds import Guilds
-from . import utils
