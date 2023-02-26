@@ -1,11 +1,11 @@
 from __future__ import annotations
-import asyncio
+from ... import get_goldy_instance
 from typing import Dict, List
 
 from . import Command
 
 def command(
-    cmd_name:str = None, 
+    name:str = None, 
     description:str = None, 
     required_roles:List[str]=None, 
     slash_cmd_only=False, 
@@ -26,12 +26,33 @@ def command(
     ```
     """
     def decorate(func):
-        def inner() -> Command:
-            func:function = func
+        def inner(func) -> Command:
+            goldy = get_goldy_instance()
+            command = Command(goldy, func, name, description, required_roles)
+            extension = command.extension
+
+            create_slash = True; create_normal = True
+
+            if slash_cmd_only: create_normal = False
+            if normal_cmd_only: create_slash = False
+
+            if create_slash:
+                goldy.async_loop.create_task(
+                    command.create_slash()
+                )
+
+            if create_normal:
+                goldy.async_loop.create_task(
+                    command.create_normal()
+                )
+
+            extension.add_command(command)
+
+            return command
             
             # TODO: Use code from goldy bot v4.
             
 
-        return inner()
+        return inner(func)
 
     return decorate

@@ -9,7 +9,7 @@ from nextcore.http import BotAuthentication, UnauthorizedError
 from nextcore.gateway import ShardManager
 
 from typing import cast, Dict, Any
-from discord_typings import UpdatePresenceData, PartialActivityData
+from discord_typings import UpdatePresenceData, PartialActivityData, ApplicationData
 from devgoldyutils import Colours
 
 from .. import LoggerAdapter, goldy_bot_logger
@@ -61,6 +61,8 @@ class Goldy():
             )
         )
 
+        self.application_data:ApplicationData = None
+
         # Add to cache.
         cache["goldy_core_instance"] = self
 
@@ -78,6 +80,7 @@ class Goldy():
         """
         self.extension_loader = ExtensionLoader(self, raise_on_extension_loader_error)
         """Class that handles extension loading."""
+        self.guilds = Guilds(self)
 
     def start(self):
         """🧡🌆 Awakens Goldy Bot from her hibernation. 😴 Shortcut to ``asyncio.run(goldy.__start_async())`` and also handles various exceptions carefully."""
@@ -109,12 +112,17 @@ class Goldy():
             event_name="READY"
         )
 
+        await self.pre_setup()
         await self.setup()
 
         # Raise a error and exit whenever a critical error occurs.
         error = await self.shard_manager.dispatcher.wait_for(lambda: True, "critical")
 
         raise cast(Exception, error)
+
+    async def pre_setup(self):
+        """Method ran before actual setup. This is used to fetch some data from discord needed by goldy when running the actual setup."""
+        self.application_data = await self.http_client.get_current_bot_application_information(self.nc_authentication)
 
     async def setup(self):
         """Method ran to set up goldy bot."""
@@ -160,6 +168,6 @@ get_goldy = get_goldy_instance
 from .database import Database
 from .presence import Presence, Status, ActivityTypes
 from .goldy_config import GoldyConfig
-from .extensions import extensions_cache
 from .extensions.extension_loader import ExtensionLoader
+from .guilds import Guilds
 from . import utils

@@ -1,24 +1,27 @@
 from __future__ import annotations
 
 from typing import List
+from discord_typings import ApplicationCommandData
 
 from .. import utils
-from ... import LoggerAdapter, goldy_bot_logger
+from ... import LoggerAdapter, goldy_bot_logger, Goldy
 from ..extensions import Extension, extensions_cache
+
 
 class Command():
     def __init__(
         self, 
+        goldy:Goldy, 
         func, 
-        cmd_name:str = None,
-        description:str = None,
-        required_roles:List[str] = None,
+        name:str = None, 
+        description:str = None, 
+        required_roles:List[str] = None, 
         parent_cmd:Command = None
     ):
         """A class representing a GoldyBot command."""
         self.func:function = func
         """The command's callback function."""
-        self.cmd_name = cmd_name
+        self.name = name
         """The command's code name."""
         self.description = description
         """The command's set description. None if there is no description set."""
@@ -27,20 +30,32 @@ class Command():
         self.parent_cmd = parent_cmd
         """Command object of the parent command if this command is a subcommand."""
 
-        self.logger = LoggerAdapter(goldy_bot_logger, prefix="Command")
+        self.goldy = goldy
+        self.logger = LoggerAdapter(
+            LoggerAdapter(goldy_bot_logger, prefix="Command"), 
+            prefix=(lambda x: self.func.__name__ if x is None else x)(self.name)
+        )
 
-        if self.cmd_name is None:
-            self.cmd_name = self.func.__name__
+        # If cmd_name is null, set it to function name.
+        if self.name is None:
+            self.name = self.func.__name__
         
+        if self.description is None:
+            self.description = "This command has no description. Sorry about that."
+        
+        # Get list of function params.
         self.params = list(self.func.__code__.co_varnames)
         self.__params_amount = self.func.__code__.co_argcount
         
+        # Check if command is inside extension by checking if self is first parameter.
         self.__in_extension = False
 
         if self.params[0] == "self":
             self.__in_extension = True
             self.__params_amount -= 1
             self.params.pop(0)
+
+        self.list_of_application_command_data:List[ApplicationCommandData] = None
 
     @property
     def in_extension(self) -> bool:
@@ -61,7 +76,7 @@ class Command():
     def extension(self) -> Extension | None:
         """Finds and returns the object of the command's extension. Returns None if command is not in any extension."""
         if self.in_extension:
-            return utils.cache_lookup(self.extension_name, extensions_cache)
+            return utils.cache_lookup(self.extension_name, extensions_cache)[1]
         
         return None
 
@@ -73,9 +88,34 @@ class Command():
         else:
             return True
 
-    def create_slash(self) -> nextcord.BaseApplicationCommand:
-        """Creates slash command."""
-        self.logger.info(f"Creating slash command for '{self.cmd_name}'...")
+    async def create_slash(self) -> List[ApplicationCommandData]:
+        """Creates and registers a slash command in goldy bot. E.g.``/goldy``"""
+        self.logger.info(f"Creating slash command for '{self.name}'...")
+
+        list_of_application_command_data = []
+
+        # Add slash command for each allowed guild.
+        # -------------------------------------------
+        for guild in self.goldy.guilds.allowed_guilds:
+
+            list_of_application_command_data.append(
+                await self.goldy.http_client.create_guild_application_command(
+                    authentication = self.goldy.nc_authentication,
+                    application_id = self.goldy.application_data["id"],
+                    guild_id = guild[0],
+
+                    name = self.name,
+                    description = self.description,
+                )
+            )
+
+            self.logger.debug(f"Created slash for guild '{guild[1]}'.")
+
+        self.list_of_application_command_data = list_of_application_command_data
+        return list_of_application_command_data
+    
+    async def create_normal(self) -> None:
+        """Creates and registers a normal on-msg command in goldy bot. Also know as a prefix command. E.g.``!goldy``"""
         ...
     
     # Where I left off.

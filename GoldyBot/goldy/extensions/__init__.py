@@ -1,10 +1,13 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import Tuple, List
+from typing import Tuple, List, TYPE_CHECKING
 
 from ...goldy import get_goldy_instance
 from ... import goldy_bot_logger, LoggerAdapter
+
+if TYPE_CHECKING:
+    from ..commands import Command
 
 extensions_cache:List[Tuple[str, object]] = [
 
@@ -48,6 +51,13 @@ class Extension(ABC):
             prefix=self.code_name
         )
 
+        # Cached commands list.
+        self.__commands:List[Command] = [
+
+        ]
+
+        # TODO: Added command class to List type after command class is done.
+
         # Adding to cache and loading commands.
         # ---------------------------------------
         if not self.code_name in self.ignored_extensions_list:
@@ -64,24 +74,17 @@ class Extension(ABC):
                 "Not loading commands from this extension as it's ignored!"
             )
 
-        # Cached commands list.
-        self.__commands:List = [
-
-        ]
-
-        # TODO: Added command class to List type after command class is done.
-
     @property
     def code_name(self) -> str:
         return self.__class__.__name__
 
-    def add_command(self, command) -> None:
+    def add_command(self, command:Command) -> None:
         """Add this command to this extension."""
         self.__commands.append(command)
-        self.logger.debug(f"Added the command '{command.name}' to {self.code_name}")
+        self.logger.debug(f"Added the command '{command.name}' to {self.code_name}.")
         return None
     
-    def get_commands(self) -> List: # TODO: Also add the command class type here too.
+    def get_commands(self) -> List[Command]: # TODO: Also add the command class type here too.
         """Returns all the commands loaded with this extension."""
         return self.__commands
 

@@ -5,8 +5,6 @@ import pathlib
 from typing import List, overload
 import importlib.util
 
-from . import Extension
-
 from .. import Goldy, GoldyBotError
 from ... import goldy_bot_logger, LoggerAdapter
 from ...paths import Paths

@@ -37,5 +37,5 @@ class Config():
             
             return data
         except KeyError as e:
-            self.logger.warn(f"Could not find key {e} in config so I'm returning default value... Keys: {keys}")
+            self.logger.warn(f"Could not find key {e} in config so I'm returning default value '{default_value}'... Keys: {keys}")
             return default_value
