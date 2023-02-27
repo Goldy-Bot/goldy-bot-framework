@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import List
+from typing import List, Callable
 from discord_typings import ApplicationCommandData
 
 from .. import utils
@@ -19,7 +19,7 @@ class Command():
         parent_cmd:Command = None
     ):
         """A class representing a GoldyBot command."""
-        self.func:function = func
+        self.func:Callable = func
         """The command's callback function."""
         self.name = name
         """The command's code name."""

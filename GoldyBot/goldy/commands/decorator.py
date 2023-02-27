@@ -1,6 +1,6 @@
 from __future__ import annotations
 from ... import get_goldy_instance
-from typing import Dict, List
+from typing import List
 
 from . import Command
 

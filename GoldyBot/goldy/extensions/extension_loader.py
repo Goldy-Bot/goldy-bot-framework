@@ -104,7 +104,7 @@ class ExtensionLoader():
                 load_function = getattr(module_py, "load")
                 load_function()
 
-                self.logger.debug(f"Successfully ran the load function!")
+                self.logger.debug("Successfully ran the load function!")
             except AttributeError as e:
                 error_str = f"We encountered an error while trying to load extension at '{path}'! You most likely forgot the 'load()' function. \nERROR --> {e}"
 

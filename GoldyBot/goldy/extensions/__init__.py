@@ -9,9 +9,7 @@ from ... import goldy_bot_logger, LoggerAdapter
 if TYPE_CHECKING:
     from ..commands import Command
 
-extensions_cache:List[Tuple[str, object]] = [
-
-]
+extensions_cache:List[Tuple[str, object]] = []
 """
 This cache contains all the extensions that have been loaded and it's memory location to the class.
 """
