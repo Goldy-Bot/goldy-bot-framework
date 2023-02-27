@@ -1,12 +1,10 @@
 import os
 import click
 from click import Context
-from devgoldyutils import Colours
 
 from . import goldy_bot, goldy_bot_logger
 from ..paths import Paths
 from ..file_templates import FileTemplates
-from ..goldy.token import Token
 
 @goldy_bot.group(invoke_without_command=True)
 @click.pass_context
