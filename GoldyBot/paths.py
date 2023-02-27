@@ -9,8 +9,12 @@ class Paths:
     # -----------------
     FILE_TEMPLATES = str(GOLDY_BOT_ROOT) + "/file_templates"
 
-    TOKEN_ENV = FILE_TEMPLATES + "/token.env"
+    TOKEN_ENV_TEMPLATE = FILE_TEMPLATES + "/token.env"
 
-    GOLDY_JSON = FILE_TEMPLATES + "/goldy.json"
+    GOLDY_JSON_TEMPLATE = FILE_TEMPLATES + "/goldy.json"
 
-    RUN_SCRIPT = FILE_TEMPLATES + "/run.py"
+    RUN_SCRIPT_TEMPLATE = FILE_TEMPLATES + "/run.py"
+
+    # Internal Extensions
+    # ---------------------
+    INTERNAL_EXTENSIONS = str(GOLDY_BOT_ROOT) + "/internal_extensions"

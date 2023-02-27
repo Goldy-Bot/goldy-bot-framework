@@ -9,7 +9,7 @@ from nextcore.http import BotAuthentication, UnauthorizedError
 from nextcore.gateway import ShardManager
 
 from typing import cast, Dict, Any
-from discord_typings import UpdatePresenceData, PartialActivityData
+from discord_typings import UpdatePresenceData, PartialActivityData, ApplicationData
 from devgoldyutils import Colours
 
 from .. import LoggerAdapter, goldy_bot_logger
@@ -28,8 +28,8 @@ cache:Dict[str, Any] = {
 
 class Goldy():
     """The main Goldy Bot class that controls the whole framework and let's you start an instance of Goldy Bot. Also known as the core."""
-    def __init__(self, token:Token = None):
-        self.token = None
+    def __init__(self, token:Token = None, raise_on_extension_loader_error = None):
+        self.token = token
         self.logger = LoggerAdapter(goldy_bot_logger, Colours.ORANGE.apply_to_string("Goldy"))
         self.async_loop = asyncio.get_event_loop()
 
@@ -40,10 +40,8 @@ class Goldy():
 
         # Initializing stuff
         # -------------------
-        if token is None:
+        if self.token is None:
             self.token = Token()
-        else:
-            self.token = token
         
         self.nc_authentication = BotAuthentication(self.token.discord_token)
         self.intents = 1 << 9 | 1 << 15
@@ -63,13 +61,26 @@ class Goldy():
             )
         )
 
+        self.application_data:ApplicationData = None
+
         # Add to cache.
         cache["goldy_core_instance"] = self
 
         # Adding shortcuts to sub classes to core class.
         # --------------------------------
         self.database = Database(self)
+        """Goldy Bot's class to interface with a Mongo Database asynchronously."""
         self.presence = Presence(self)
+        """Class that allows you to control the status, game activity and more of Goldy Bot"""
+        self.config = GoldyConfig()
+        """
+        Class that allows you to retrieve configuration data from the ``goldy.json`` config file. 
+        
+        All properties return None when not found in the config.
+        """
+        self.extension_loader = ExtensionLoader(self, raise_on_extension_loader_error)
+        """Class that handles extension loading."""
+        self.guilds = Guilds(self)
 
     def start(self):
         """🧡🌆 Awakens Goldy Bot from her hibernation. 😴 Shortcut to ``asyncio.run(goldy.__start_async())`` and also handles various exceptions carefully."""
@@ -101,12 +112,23 @@ class Goldy():
             event_name="READY"
         )
 
-        # TODO: Run Goldy Bot setup method here.
+        await self.pre_setup()
+        await self.setup()
 
-        # Raise a error and exit whenever a critical error occurs
+        # Raise a error and exit whenever a critical error occurs.
         error = await self.shard_manager.dispatcher.wait_for(lambda: True, "critical")
 
         raise cast(Exception, error)
+
+    async def pre_setup(self):
+        """Method ran before actual setup. This is used to fetch some data from discord needed by goldy when running the actual setup."""
+        self.application_data = await self.http_client.get_current_bot_application_information(self.nc_authentication)
+
+    async def setup(self):
+        """Method ran to set up goldy bot."""
+        self.extension_loader.load()
+
+        #raise GoldyBotError("STOP")
 
     def stop(self, reason:str = "Unknown Reason"):
         """Shuts down goldy bot right away and safely incase anything sussy wussy is going on. 😳"""
@@ -129,12 +151,6 @@ class Goldy():
         return None
 
 
-# Root imports.
-# -------------
-from .database import Database
-from .presence import Presence, Status, ActivityTypes
-
-
 # Get goldy instance method.
 # ---------------------------
 def get_goldy_instance() -> Goldy | None:
@@ -145,3 +161,12 @@ get_core = get_goldy_instance
 """Returns instance of goldy core class."""
 get_goldy = get_goldy_instance
 """Returns instance of goldy core class."""
+
+
+# Root imports.
+# -------------
+from .database import Database
+from .presence import Presence, Status, ActivityTypes
+from .goldy_config import GoldyConfig
+from .extensions.extension_loader import ExtensionLoader
+from .guilds import Guilds

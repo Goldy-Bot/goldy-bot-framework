@@ -37,3 +37,8 @@ def add_custom_handler(logger:log.Logger) -> log.Logger:
     logger.addHandler(stream_handler)
 
     return logger
+
+LOGGER_NAME = f"{Colours.YELLOW.value}Goldy {Colours.ORANGE.value}Bot{Colours.RESET_COLOUR.value}"
+
+goldy_bot_logger = add_custom_handler(log.getLogger(LOGGER_NAME)); goldy_bot_logger.setLevel(log.DEBUG)
+"""The logger object for Goldy Bot."""
