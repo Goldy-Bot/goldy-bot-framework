@@ -4,3 +4,5 @@ dist
 env
 __pycache__
 demo
+.pytest_cache
+.coverage

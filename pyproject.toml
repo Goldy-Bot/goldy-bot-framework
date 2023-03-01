@@ -28,7 +28,9 @@ dependencies = [
     "nextcore@git+https://github.com/nextsnake/nextcore",
     "click>=8.1.3",
     "python-decouple>=3.7",
-    "motor"
+    "motor",
+    "pytest",
+    "pytest-cov"
 ]
 
 dynamic = ["version"]
