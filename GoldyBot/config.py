@@ -19,6 +19,7 @@ class Config():
 
         self.logger.debug("Phrasing json in config to dict...")
         self.json_data:dict = json.loads(self.file.read())
+        self.file.close()
         self.logger.debug(Colours.GREEN.apply_to_string("Done!"))
 
     def get(self, *keys, json_data = None, default_value = None):
@@ -36,6 +37,6 @@ class Config():
                 data = data[key]
             
             return data
-        except KeyError as e:
-            self.logger.warn(f"Could not find key {e} in config so I'm returning default value '{default_value}'... Keys: {keys}")
+        except (KeyError, TypeError) as e:
+            self.logger.warning(f"Could not find key {e} in config so I'm returning default value '{default_value}'... Keys: {keys}")
             return default_value
