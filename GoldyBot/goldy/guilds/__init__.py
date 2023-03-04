@@ -22,7 +22,7 @@ class Guilds():
 
     async def setup(self):
         """Adds guilds specified in goldy.json to the database if not already added."""
-        # TODO: Create collection for each guild if it doesn't already exist.
+        # TODO: Find better way to organize this code, it's too long and complex for my liking.
 
         database = self.goldy.database.get_goldy_database(DatabaseEnums.GOLDY_MAIN)
 
@@ -67,6 +67,7 @@ class Guilds():
             self.guilds.append(
                 (guild[0], Guild(id=guild[0], code_name=guild[1], config_dict=guild_config))
             )
+
 
     def get_guild(self, guild_id:str|int) -> Guild | None:
         """Finds and returns goldy bot guild by id."""

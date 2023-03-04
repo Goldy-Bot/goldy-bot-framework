@@ -106,7 +106,7 @@ class Command():
             data:MessageData = data
             prefix = self.goldy.guilds.get_guild(data["guild_id"]).prefix
 
-            if data["content"] == f"{prefix}{self.name}": # TODO: Instead of hard coding the prefix, grab the prefix of the guild from the guild class.
+            if data["content"] == f"{prefix}{self.name}":
                 self.logger.info(f"Command invoked by '{data['author']['username']}#{data['author']['discriminator']}'.")
                 await self.func(gold_plater)
 
