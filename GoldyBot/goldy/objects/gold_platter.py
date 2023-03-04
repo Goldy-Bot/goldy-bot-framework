@@ -3,7 +3,7 @@ from enum import Enum
 
 from discord_typings import MessageData, InteractionData
 
-class PlatterType:
+class PlatterType(Enum):
     PREFIX_CMD = 0
     SLASH_CMD = 1
 

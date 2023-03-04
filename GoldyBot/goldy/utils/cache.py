@@ -1,6 +1,14 @@
 from __future__ import annotations
 
-from typing import Any, Tuple
+from typing import Any, Tuple, overload
+
+@overload
+def cache_lookup(key:str|int, cache:dict) -> Any | None:
+    ...
+
+@overload
+def cache_lookup(key:str|int, cache:list) -> Tuple[str, ...] | None:
+    ...
 
 def cache_lookup(key:str|int, cache:dict|list) -> Tuple[str, ...] | Any | None:
     """Finds and returns object using key from any goldy bot cache object."""

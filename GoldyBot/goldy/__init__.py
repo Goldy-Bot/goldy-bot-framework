@@ -126,9 +126,9 @@ class Goldy():
 
     async def setup(self):
         """Method ran to set up goldy bot."""
+        await self.guilds.setup()
+        
         self.extension_loader.load()
-
-        #raise GoldyBotError("STOP")
 
     def stop(self, reason:str = "Unknown Reason"):
         """Shuts down goldy bot right away and safely incase anything sussy wussy is going on. 😳"""

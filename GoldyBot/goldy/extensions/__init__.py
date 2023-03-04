@@ -54,8 +54,6 @@ class Extension(ABC):
 
         ]
 
-        # TODO: Added command class to List type after command class is done.
-
         # Adding to cache and loading commands.
         # ---------------------------------------
         if not self.code_name in self.ignored_extensions_list:
@@ -82,7 +80,7 @@ class Extension(ABC):
         self.logger.debug(f"Added the command '{command.name}' to {self.code_name}.")
         return None
     
-    def get_commands(self) -> List[Command]: # TODO: Also add the command class type here too.
+    def get_commands(self) -> List[Command]:
         """Returns all the commands loaded with this extension."""
         return self.__commands
 

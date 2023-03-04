@@ -1,1 +1,1 @@
-from .gold_platter import GoldPlatter
+from .gold_platter import GoldPlatter, PlatterType

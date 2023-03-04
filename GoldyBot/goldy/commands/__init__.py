@@ -1,9 +1,10 @@
 from __future__ import annotations
 
 from typing import List, Callable
-from discord_typings import ApplicationCommandData
+from discord_typings import ApplicationCommandData, MessageData, InteractionData
 
 from .. import utils
+from ..objects import GoldPlatter, PlatterType
 from ... import LoggerAdapter, goldy_bot_logger, Goldy
 from ..extensions import Extension, extensions_cache
 
@@ -87,6 +88,28 @@ class Command():
             return False
         else:
             return True
+        
+    
+    async def __invoke(self, data:MessageData|InteractionData, type:PlatterType|int) -> bool:
+        """Runs/triggers this command. This method is mostly supposed to be used internally."""
+        gold_plater = GoldPlatter(data, type)
+
+        # If not from guild in allowed guilds don't invoke.
+        if not data["guild_id"] in [x[0] for x in self.goldy.config.allowed_guilds]:
+            return False
+
+        # TODO: Add all permission and guild management stuff here...
+
+        # Of course it won't be just like this when it's complete, currently a work in progress.
+
+        if gold_plater.type.value == PlatterType.PREFIX_CMD.value:
+            data:MessageData = data
+            prefix = self.goldy.guilds.get_guild(data["guild_id"]).prefix
+
+            if data["content"] == f"{prefix}{self.name}": # TODO: Instead of hard coding the prefix, grab the prefix of the guild from the guild class.
+                self.logger.info(f"Command invoked by '{data['author']['username']}#{data['author']['discriminator']}'.")
+                await self.func(gold_plater)
+
 
     async def create_slash(self) -> List[ApplicationCommandData]:
         """Creates and registers a slash command in goldy bot. E.g.``/goldy``"""
@@ -114,9 +137,17 @@ class Command():
         self.list_of_application_command_data = list_of_application_command_data
         return list_of_application_command_data
     
+
     async def create_normal(self) -> None:
-        """Creates and registers a normal on-msg command in goldy bot. Also know as a prefix command. E.g.``!goldy``"""
-        ...
+        """Creates and registers a normal on-msg/prefix command in goldy bot. Also know as a prefix command. E.g.``!goldy``"""
+        self.logger.info(f"Creating normal/prefix command for '{self.name}'...")
+
+        self.goldy.shard_manager.event_dispatcher.add_listener(
+            lambda x: self.goldy.async_loop.create_task(self.__invoke(x, type=PlatterType.PREFIX_CMD)),
+            event_name="MESSAGE_CREATE"
+        )
+
+    
     
     # Where I left off.
     # TODO: Use code from goldy bot v4 to fill the rest.
