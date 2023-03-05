@@ -78,6 +78,8 @@ class Goldy():
         
         All properties return None when not found in the config.
         """
+        self.command_loader = CommandLoader(self)
+        """Class that handles command loading."""
         self.extension_loader = ExtensionLoader(self, raise_on_extension_loader_error)
         """Class that handles extension loading."""
         self.guilds = Guilds(self)
@@ -126,9 +128,10 @@ class Goldy():
 
     async def setup(self):
         """Method ran to set up goldy bot."""
+        await self.guilds.setup()
+        
         self.extension_loader.load()
-
-        #raise GoldyBotError("STOP")
+        self.command_loader.load()
 
     def stop(self, reason:str = "Unknown Reason"):
         """Shuts down goldy bot right away and safely incase anything sussy wussy is going on. 😳"""
@@ -169,4 +172,5 @@ from .database import Database
 from .presence import Presence, Status, ActivityTypes
 from .goldy_config import GoldyConfig
 from .extensions.extension_loader import ExtensionLoader
+from .commands.command_loader import CommandLoader
 from .guilds import Guilds

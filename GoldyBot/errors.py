@@ -1,12 +1,15 @@
 from devgoldyutils import Colours
-from . import goldy_bot_logger
+from . import goldy_bot_logger, log
 
 class GoldyBotError(Exception):
     """Raises whenever there's a known error in goldy bot."""
-    def __init__(self, message:str):
+    def __init__(self, message:str, logger:log.Logger=None):
         message = Colours.RED.apply_to_string(message)
+
+        if logger is None:
+            logger = goldy_bot_logger
         
-        goldy_bot_logger.error(message)
+        logger.error(message)
         super().__init__(message)
 
 class InvalidTypeInMethod(GoldyBotError):
