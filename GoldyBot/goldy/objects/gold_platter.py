@@ -1,7 +1,14 @@
 from __future__ import annotations
 from enum import Enum
 
+from typing import TYPE_CHECKING
 from discord_typings import MessageData, InteractionData
+
+if TYPE_CHECKING:
+    from ...goldy import Goldy
+    from .message import Message
+    from ..commands import Command
+
 
 class PlatterType(Enum):
     PREFIX_CMD = 0
@@ -16,9 +23,19 @@ class GoldPlatter():
 
     ✨ Behold the gold platter. ✨😁
     """
-    def __init__(self, data:MessageData|InteractionData, type:PlatterType|int) -> None:
+    def __init__(self, data:MessageData|InteractionData, type:PlatterType|int, goldy:Goldy, command:Command) -> None:
         self.data = data
+        """The raw data received right from discord that triggered this prefix or slash command."""
+        self.goldy = goldy
+        """An instance of the goldy class."""
+        self.command = command
+        """The object for this command. 😱"""
 
         self.type:PlatterType = (lambda x: PlatterType(x) if isinstance(x, int) else x)(type)
-    
-    # TODO: Add send/reply method for both interaction and message command.
+        """The type of command this is."""
+
+    async def send_message(self, text:str, reply:bool=False) -> Message:
+        return await nextcore_utils.send_msg(self, text, reply)
+
+
+from .. import nextcore_utils

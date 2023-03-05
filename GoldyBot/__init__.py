@@ -10,6 +10,7 @@ from .logging import LoggerAdapter, log, goldy_bot_logger, LOGGER_NAME
 from .info import VERSION, DISPLAY_NAME
 from .paths import Paths
 
+from .goldy.utils import *
 from .goldy import Goldy, get_goldy_instance
 from .goldy.token import Token
 from .goldy.extensions import Extension

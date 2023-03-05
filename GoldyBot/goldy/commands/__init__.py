@@ -17,6 +17,7 @@ This cache contains all the commands that have been registered and it's memory l
 """
 
 class Command():
+    """Class that represents all commands in goldy bot."""
     def __init__(
         self, 
         goldy:Goldy, 
@@ -69,7 +70,7 @@ class Command():
             self.__params_amount -= 1
             self.params.pop(0)
 
-        self.list_of_application_command_data:List[ApplicationCommandData] = None
+        self.list_of_application_command_data:List[Tuple[str, ApplicationCommandData]] | None = None
 
         commands_cache.append(
             (self.name, self)
@@ -114,10 +115,11 @@ class Command():
         # If not from guild in allowed guilds don't invoke.
         if data["guild_id"] in [x[0] for x in self.goldy.config.allowed_guilds]:
         
-            gold_plater = GoldPlatter(data, type)
+            gold_plater = GoldPlatter(data, type, goldy=self.goldy, command=self)
             guild = self.goldy.guilds.get_guild(data["guild_id"])
 
             # TODO: Add all permission and argument management stuff here...
+
 
             # Prefix/normal command.
             # ------------------------
@@ -126,12 +128,26 @@ class Command():
                 prefix = guild.prefix
 
                 if data["content"] == f"{prefix}{self.name}":
-                    self.logger.info(f"Command invoked by '{data['author']['username']}#{data['author']['discriminator']}'.")
+                    self.logger.info(f"Prefix command invoked by '{data['author']['username']}#{data['author']['discriminator']}'.")
 
                     if self.in_extension:
                         await self.func(self.extension, gold_plater)
                     else:
                         await self.func(gold_plater)
+
+
+            # Slash command.
+            # ----------------
+            if gold_plater.type.value == PlatterType.SLASH_CMD.value:
+                data:InteractionData = data
+                prefix = guild.prefix
+
+                self.logger.info(f"Slash command invoked by '{data['member']['user']['username']}#{data['member']['user']['discriminator']}'.")
+
+                if self.in_extension:
+                    await self.func(self.extension, gold_plater)
+                else:
+                    await self.func(gold_plater)
 
 
     async def create_slash(self) -> List[ApplicationCommandData]:
@@ -145,17 +161,27 @@ class Command():
         for guild in self.goldy.guilds.allowed_guilds:
 
             list_of_application_command_data.append(
-                await self.goldy.http_client.create_guild_application_command(
-                    authentication = self.goldy.nc_authentication,
-                    application_id = self.goldy.application_data["id"],
-                    guild_id = guild[0],
+                (
+                    guild[0], 
+                    await self.goldy.http_client.create_guild_application_command(
+                        authentication = self.goldy.nc_authentication,
+                        application_id = self.goldy.application_data["id"],
+                        guild_id = guild[0],
 
-                    name = self.name,
-                    description = self.description,
+                        name = self.name,
+                        description = self.description,
+                    )
                 )
             )
 
             self.logger.debug(f"Created slash for guild '{guild[1]}'.")
+
+        # Set event listener for slash command.
+        # --------------------------------------
+        self.goldy.shard_manager.event_dispatcher.add_listener(
+            lambda x: self.goldy.async_loop.create_task(self.__invoke(x, type=PlatterType.SLASH_CMD)),
+            event_name="INTERACTION_CREATE"
+        )
 
         self.list_of_application_command_data = list_of_application_command_data
         return list_of_application_command_data
@@ -169,6 +195,8 @@ class Command():
             lambda x: self.goldy.async_loop.create_task(self.__invoke(x, type=PlatterType.PREFIX_CMD)),
             event_name="MESSAGE_CREATE"
         )
+
+        return None
 
 
     def load(self) -> None:
