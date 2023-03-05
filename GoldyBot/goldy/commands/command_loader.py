@@ -1,9 +1,8 @@
 from __future__ import annotations
 
 from typing import List, overload, TYPE_CHECKING
-import importlib.util
 
-from .. import Goldy, GoldyBotError
+from .. import Goldy
 from ... import goldy_bot_logger, LoggerAdapter
 from . import commands_cache
 
