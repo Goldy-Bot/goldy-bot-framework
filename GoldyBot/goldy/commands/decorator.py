@@ -3,6 +3,9 @@ from ... import get_goldy_instance
 from typing import List
 
 from . import Command
+from ...errors import GoldyBotError
+
+
 
 def command(
     name:str = None, 
@@ -28,27 +31,24 @@ def command(
     def decorate(func):
         def inner(func) -> Command:
             goldy = get_goldy_instance()
-            command = Command(goldy, func, name, description, required_roles)
-            extension = command.extension
+
+            if goldy is None:
+                raise GoldyBotError("Please initialize goldy class before registering commands.")
 
             create_slash = True; create_normal = True
 
             if slash_cmd_only: create_normal = False
             if normal_cmd_only: create_slash = False
 
-            if create_slash:
-                goldy.async_loop.create_task(
-                    command.create_slash()
-                )
-
-            if create_normal:
-                goldy.async_loop.create_task(
-                    command.create_normal()
-                )
-
-            extension.add_command(command)
-
-            return command
+            return Command(
+                goldy, 
+                func, 
+                name, 
+                description, 
+                required_roles, 
+                allow_prefix_cmd=create_normal, 
+                allow_slash_cmd=create_slash
+            )
             
             # TODO: Use code from goldy bot v4.
             

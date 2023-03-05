@@ -1,6 +1,6 @@
 import sys; sys.path.insert(0, '..')
-from GoldyBot import Goldy
+import GoldyBot
 
-goldy = Goldy() # Initialize goldy.
+goldy = GoldyBot.Goldy() # Initialize goldy.
 
 goldy.start() # Launch goldy bot.

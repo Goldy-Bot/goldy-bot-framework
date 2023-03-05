@@ -1,13 +1,20 @@
 from __future__ import annotations
 
-from typing import List, Callable
+from typing import List, Callable, Tuple, TYPE_CHECKING
 from discord_typings import ApplicationCommandData, MessageData, InteractionData
 
 from .. import utils
 from ..objects import GoldPlatter, PlatterType
-from ... import LoggerAdapter, goldy_bot_logger, Goldy
+from ... import LoggerAdapter, goldy_bot_logger
 from ..extensions import Extension, extensions_cache
 
+if TYPE_CHECKING:
+    from ... import Goldy
+
+commands_cache:List[Tuple[str, object]] = []
+"""
+This cache contains all the commands that have been registered and it's memory location to the class.
+"""
 
 class Command():
     def __init__(
@@ -17,6 +24,8 @@ class Command():
         name:str = None, 
         description:str = None, 
         required_roles:List[str] = None, 
+        allow_prefix_cmd:bool = True, 
+        allow_slash_cmd:bool = True, 
         parent_cmd:Command = None
     ):
         """A class representing a GoldyBot command."""
@@ -28,6 +37,10 @@ class Command():
         """The command's set description. None if there is no description set."""
         self.required_roles = required_roles
         """The code names for the roles needed to access this command."""
+        self.allow_prefix_cmd = allow_prefix_cmd
+        """If the creation of a prefix command is allowed."""
+        self.allow_slash_cmd = allow_slash_cmd
+        """If the creation of a slash command is allowed."""
         self.parent_cmd = parent_cmd
         """Command object of the parent command if this command is a subcommand."""
 
@@ -57,6 +70,12 @@ class Command():
             self.params.pop(0)
 
         self.list_of_application_command_data:List[ApplicationCommandData] = None
+
+        commands_cache.append(
+            (self.name, self)
+        )
+
+        self.logger.debug("Command initialized!")
 
     @property
     def in_extension(self) -> bool:
@@ -92,23 +111,27 @@ class Command():
     
     async def __invoke(self, data:MessageData|InteractionData, type:PlatterType|int) -> bool:
         """Runs/triggers this command. This method is mostly supposed to be used internally."""
-        gold_plater = GoldPlatter(data, type)
-
         # If not from guild in allowed guilds don't invoke.
-        if not data["guild_id"] in [x[0] for x in self.goldy.config.allowed_guilds]:
-            return False
+        if data["guild_id"] in [x[0] for x in self.goldy.config.allowed_guilds]:
+        
+            gold_plater = GoldPlatter(data, type)
+            guild = self.goldy.guilds.get_guild(data["guild_id"])
 
-        # TODO: Add all permission and guild management stuff here...
+            # TODO: Add all permission and argument management stuff here...
 
-        # Of course it won't be just like this when it's complete, currently a work in progress.
+            # Prefix/normal command.
+            # ------------------------
+            if gold_plater.type.value == PlatterType.PREFIX_CMD.value:
+                data:MessageData = data
+                prefix = guild.prefix
 
-        if gold_plater.type.value == PlatterType.PREFIX_CMD.value:
-            data:MessageData = data
-            prefix = self.goldy.guilds.get_guild(data["guild_id"]).prefix
+                if data["content"] == f"{prefix}{self.name}":
+                    self.logger.info(f"Command invoked by '{data['author']['username']}#{data['author']['discriminator']}'.")
 
-            if data["content"] == f"{prefix}{self.name}":
-                self.logger.info(f"Command invoked by '{data['author']['username']}#{data['author']['discriminator']}'.")
-                await self.func(gold_plater)
+                    if self.in_extension:
+                        await self.func(self.extension, gold_plater)
+                    else:
+                        await self.func(gold_plater)
 
 
     async def create_slash(self) -> List[ApplicationCommandData]:
@@ -147,6 +170,24 @@ class Command():
             event_name="MESSAGE_CREATE"
         )
 
+
+    def load(self) -> None:
+        """Loads and creates the command."""
+
+        if self.allow_slash_cmd:
+            self.goldy.async_loop.create_task(
+                self.create_slash()
+            )
+
+        if self.allow_prefix_cmd:
+            self.goldy.async_loop.create_task(
+                self.create_normal()
+            )
+
+        if self.extension is not None:
+            self.extension.add_command(self)
+
+        return None
     
     
     # Where I left off.

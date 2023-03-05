@@ -14,3 +14,5 @@ from .goldy import Goldy, get_goldy_instance
 from .goldy.token import Token
 from .goldy.extensions import Extension
 from .goldy.commands.decorator import command
+
+from .goldy.objects.gold_platter import GoldPlatter, PlatterType
