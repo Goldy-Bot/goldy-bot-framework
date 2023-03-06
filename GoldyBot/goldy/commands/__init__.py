@@ -187,11 +187,48 @@ class Command():
         return list_of_application_command_data
     
 
+    async def remove_slash(self) -> None:
+        """Un-registers the slash command."""
+        self.logger.debug(f"Removing slash command for '{self.name}'...")
+
+        for slash_command in self.list_of_application_command_data:
+            
+            await self.goldy.http_client.delete_guild_application_command(
+                authentication = self.goldy.nc_authentication,
+                application_id = self.goldy.application_data["id"],
+                guild_id = slash_command[0],
+                command_id = slash_command[1]["id"],
+            )
+
+            self.logger.debug(f"Deleted slash for guild with id '{slash_command[0]}'.")
+
+        # Set event listener for slash command.
+        # --------------------------------------
+        self.goldy.shard_manager.event_dispatcher.remove_listener(
+            lambda x: self.goldy.async_loop.create_task(self.__invoke(x, type=PlatterType.SLASH_CMD)),
+            event_name="INTERACTION_CREATE"
+        )
+
+        return None
+    
+
     async def create_normal(self) -> None:
         """Creates and registers a normal on-msg/prefix command in goldy bot. Also know as a prefix command. E.g.``!goldy``"""
         self.logger.info(f"Creating normal/prefix command for '{self.name}'...")
 
         self.goldy.shard_manager.event_dispatcher.add_listener(
+            lambda x: self.goldy.async_loop.create_task(self.__invoke(x, type=PlatterType.PREFIX_CMD)),
+            event_name="MESSAGE_CREATE"
+        )
+
+        return None
+    
+
+    async def remove_normal(self) -> None:
+        """Un-registers the prefix command."""
+        self.logger.debug(f"Removing normal/prefix command for '{self.name}'...")
+
+        self.goldy.shard_manager.event_dispatcher.remove_listener(
             lambda x: self.goldy.async_loop.create_task(self.__invoke(x, type=PlatterType.PREFIX_CMD)),
             event_name="MESSAGE_CREATE"
         )
@@ -217,6 +254,29 @@ class Command():
 
         return None
     
+
+    def unload(self) -> None:
+        """Unloads and removes the command."""
+
+        if self.allow_slash_cmd:
+            self.goldy.async_loop.create_task(
+                self.remove_slash()
+            )
+
+        if self.allow_prefix_cmd:
+            self.goldy.async_loop.create_task(
+                self.remove_normal()
+            )
+
+        return None
+    
+    def delete(self) -> None:
+        """Completely deletes this command. Unloads it and removes it from cache."""
+        self.unload()
+
+        commands_cache.remove((self.name, self))
+
+        self.logger.info(f"Command '{self.name}' deleted!")
     
     # Where I left off.
     # TODO: Use code from goldy bot v4 to fill the rest.

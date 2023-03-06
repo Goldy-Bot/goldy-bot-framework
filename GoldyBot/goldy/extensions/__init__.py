@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 from abc import ABC, abstractmethod
 from typing import Tuple, List, TYPE_CHECKING
 
@@ -54,6 +55,8 @@ class Extension(ABC):
 
         ]
 
+        self.__loaded_path = os.path.realpath(__file__)
+
         # Adding to cache and loading commands.
         # ---------------------------------------
         if not self.code_name in self.ignored_extensions_list:
@@ -73,6 +76,11 @@ class Extension(ABC):
     @property
     def code_name(self) -> str:
         return self.__class__.__name__
+    
+    @property
+    def loaded_path(self) -> str:
+        "The path where this extension was loaded."
+        return self.__loaded_path
 
     def add_command(self, command:Command) -> None:
         """Add this command to this extension."""
@@ -83,6 +91,17 @@ class Extension(ABC):
     def get_commands(self) -> List[Command]:
         """Returns all the commands loaded with this extension."""
         return self.__commands
+    
+    def delete(self) -> None:
+        """Unloads and deletes itself from cache and all the commands with it."""
+        for command in self.get_commands():
+            command.delete()
+
+        extensions_cache.remove((self.code_name, self))
+
+        self.logger.debug(f"Extension '{self.code_name}' removed!")
+
+        return None
 
     @abstractmethod
     def loader(self):

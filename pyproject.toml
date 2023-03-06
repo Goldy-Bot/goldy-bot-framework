@@ -30,7 +30,8 @@ dependencies = [
     "python-decouple>=3.7",
     "motor",
     "pytest",
-    "pytest-cov"
+    "pytest-cov",
+    "cmd2"
 ]
 
 dynamic = ["version"]

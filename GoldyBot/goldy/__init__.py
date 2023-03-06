@@ -82,6 +82,10 @@ class Goldy():
         """Class that handles command loading."""
         self.extension_loader = ExtensionLoader(self, raise_on_extension_loader_error)
         """Class that handles extension loading."""
+        self.extension_reloader = ExtensionReloader(self)
+        """Class that handles extension reloading."""
+        self.live_console = LiveConsole(self)
+        """The goldy bot live console."""
         self.guilds = Guilds(self)
 
     def start(self):
@@ -116,6 +120,7 @@ class Goldy():
 
         await self.pre_setup()
         await self.setup()
+        self.live_console.start()
 
         # Raise a error and exit whenever a critical error occurs.
         error = await self.shard_manager.dispatcher.wait_for(lambda: True, "critical")
@@ -172,5 +177,7 @@ from .database import Database
 from .presence import Presence, Status, ActivityTypes
 from .goldy_config import GoldyConfig
 from .extensions.extension_loader import ExtensionLoader
+from .extensions.extension_reloader import ExtensionReloader
 from .commands.command_loader import CommandLoader
+from .live_console import LiveConsole
 from .guilds import Guilds
