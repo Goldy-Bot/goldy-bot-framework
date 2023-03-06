@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 from discord_typings import MessageReferenceData
 
 from ...objects import Message
-from ....errors import GoldyBotError
+from ....errors import NotSupportedYetForSlash
 
 if TYPE_CHECKING:
     from ...objects import GoldPlatter
@@ -28,13 +28,13 @@ async def send_msg(platter:GoldPlatter, text:str, reply=False) -> Message:
     ``GoldyBot.goldy.objects.message.Message``
         The message that was sent.
     """
-    data = None
+    message_data = None
     message_reference_data = None
     goldy = platter.goldy
 
     if platter.type.value == 1:
         # TODO: Add support for slash once application command responding is functioning in nextcore.
-        raise GoldyBotError("send_msg not supported yet for slash commands! Will be supported soon...", platter.command.logger)
+        raise NotSupportedYetForSlash("send_msg", platter.command.logger)
     
     else:
         if reply:
@@ -44,7 +44,7 @@ async def send_msg(platter:GoldPlatter, text:str, reply=False) -> Message:
                 guild_id = platter.data["guild_id"]
             )
 
-        data = await goldy.http_client.create_message(
+        message_data = await goldy.http_client.create_message(
             authentication = goldy.nc_authentication,
             channel_id = platter.data['channel_id'],
             content = text,
@@ -53,4 +53,4 @@ async def send_msg(platter:GoldPlatter, text:str, reply=False) -> Message:
 
         platter.command.logger.debug(f"The message '{text[:50]}...' was sent.")
 
-    return Message(data)
+    return Message(message_data)

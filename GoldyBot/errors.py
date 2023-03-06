@@ -12,9 +12,19 @@ class GoldyBotError(Exception):
         logger.error(message)
         super().__init__(message)
 
+
 class InvalidTypeInMethod(GoldyBotError):
     """Raises whenever there is an invalid typing being inputted. Is normally is found in GoldyBot methods that default to None in it's arguments."""
     def __init__(self, message):
         super().__init__(
             f"You entered an invalid type in a method >> {message}"
+        )
+
+
+class NotSupportedYetForSlash(GoldyBotError):
+    """Raises whenever there is an operation that isn't supported just yet for slash commands."""
+    def __init__(self, operation, logger:log.Logger=None):
+        super().__init__(
+            f"'{operation}' is not supported yet for slash commands! Will be supported soon...",
+            logger = logger
         )

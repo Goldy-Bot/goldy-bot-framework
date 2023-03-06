@@ -1,7 +1,5 @@
 run:
-	cd env/Scripts
-	activate
-	cd ../../
+	cd env/Scripts && activate && cd ../../
 	cd demo && python run.py
 
 create-env:
