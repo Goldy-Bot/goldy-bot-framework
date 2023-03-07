@@ -1,16 +1,14 @@
 from __future__ import annotations
 
 import sys
-import time
 import asyncio
-from asyncio import Task
 
 from nextcore.http.client import HTTPClient
 
 from nextcore.http import BotAuthentication, UnauthorizedError
 from nextcore.gateway import ShardManager
 
-from typing import cast, Dict, Any
+from typing import Dict, Any
 from discord_typings import UpdatePresenceData, PartialActivityData, ApplicationData
 from devgoldyutils import Colours
 
