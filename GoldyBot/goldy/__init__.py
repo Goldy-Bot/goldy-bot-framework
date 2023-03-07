@@ -123,6 +123,7 @@ class Goldy():
 
         await self.pre_setup()
         await self.setup()
+
         self.live_console.start()
 
         # Raise a error and exit whenever a critical error occurs.
