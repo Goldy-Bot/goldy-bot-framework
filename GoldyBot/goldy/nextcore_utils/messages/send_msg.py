@@ -1,14 +1,10 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING
 from discord_typings import MessageReferenceData
 
-from ...objects import Message
-from ....errors import NotSupportedYetForSlash
+from ... import objects
+from .... import errors
 
-if TYPE_CHECKING:
-    from ...objects import GoldPlatter
-
-async def send_msg(platter:GoldPlatter, text:str, reply=False) -> Message:
+async def send_msg(platter:objects.GoldPlatter, text:str, reply=False) -> objects.Message:
     """
     Allows you to create and send a message to the channel the command was invoked as a form of reply.
     
@@ -34,7 +30,7 @@ async def send_msg(platter:GoldPlatter, text:str, reply=False) -> Message:
 
     if platter.type.value == 1:
         # TODO: Add support for slash once application command responding is functioning in nextcore.
-        raise NotSupportedYetForSlash("send_msg", platter.command.logger)
+        raise errors.NotSupportedYetForSlash("send_msg", platter.command.logger)
     
     else:
         if reply:
@@ -53,4 +49,4 @@ async def send_msg(platter:GoldPlatter, text:str, reply=False) -> Message:
 
         platter.command.logger.debug(f"The message '{text[:50]}...' was sent.")
 
-    return Message(message_data)
+    return objects.Message(message_data, goldy)

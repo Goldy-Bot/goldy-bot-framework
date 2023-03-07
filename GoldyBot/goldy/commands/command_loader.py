@@ -17,21 +17,22 @@ class CommandLoader():
         self.logger = LoggerAdapter(goldy_bot_logger, prefix="CommandLoader")
 
     @overload
-    def load(self) -> None:
+    async def load(self) -> None:
         """Loads all commands that have been initialized in goldy bot."""
         ...
 
     @overload
-    def load(self, commands:List[str]) -> None:
+    async def load(self, commands:List[Command]) -> None:
         """Loads each command in this list."""
         ...
 
-    def load(self, commands:List[Command] = None) -> None:
+    async def load(self, commands:List[Command] = None) -> None:
         """Loads all commands that have been initialized in goldy bot."""
         if commands is None:
             commands = [x[1] for x in commands_cache]
 
         for command in commands:
-            command.load()
+            if command.loaded is False:
+                await command.load()
         
         return None
