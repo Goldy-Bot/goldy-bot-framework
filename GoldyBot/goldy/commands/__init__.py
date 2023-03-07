@@ -72,6 +72,13 @@ class Command():
 
         self.list_of_application_command_data:List[Tuple[str, ApplicationCommandData]] | None = None
 
+        self.__loaded = False
+
+        # Callbacks
+        # ----------
+        self.__slash_callback = lambda x: self.goldy.async_loop.create_task(self.__invoke(x, type=PlatterType.SLASH_CMD))
+        self.__normal_callback = lambda x: self.goldy.async_loop.create_task(self.__invoke(x, type=PlatterType.PREFIX_CMD))
+
         commands_cache.append(
             (self.name, self)
         )
@@ -108,8 +115,13 @@ class Command():
             return False
         else:
             return True
-        
     
+    @property
+    def loaded(self) -> bool:
+        """Returns whether this command has been loaded."""
+        return self.__loaded
+
+
     async def __invoke(self, data:MessageData|InteractionData, type:PlatterType|int) -> bool:
         """Runs/triggers this command. This method is mostly supposed to be used internally."""
         # If not from guild in allowed guilds don't invoke.
@@ -179,7 +191,7 @@ class Command():
         # Set event listener for slash command.
         # --------------------------------------
         self.goldy.shard_manager.event_dispatcher.add_listener(
-            lambda x: self.goldy.async_loop.create_task(self.__invoke(x, type=PlatterType.SLASH_CMD)),
+            self.__slash_callback,
             event_name="INTERACTION_CREATE"
         )
 
@@ -202,77 +214,73 @@ class Command():
 
             self.logger.debug(f"Deleted slash for guild with id '{slash_command[0]}'.")
 
-        # Set event listener for slash command.
+        # Remove event listener for slash command.
         # --------------------------------------
         self.goldy.shard_manager.event_dispatcher.remove_listener(
-            lambda x: self.goldy.async_loop.create_task(self.__invoke(x, type=PlatterType.SLASH_CMD)),
+            self.__slash_callback,
             event_name="INTERACTION_CREATE"
         )
 
         return None
     
 
-    async def create_normal(self) -> None:
+    def create_normal(self) -> None:
         """Creates and registers a normal on-msg/prefix command in goldy bot. Also know as a prefix command. E.g.``!goldy``"""
         self.logger.info(f"Creating normal/prefix command for '{self.name}'...")
 
         self.goldy.shard_manager.event_dispatcher.add_listener(
-            lambda x: self.goldy.async_loop.create_task(self.__invoke(x, type=PlatterType.PREFIX_CMD)),
+            self.__normal_callback,
             event_name="MESSAGE_CREATE"
         )
 
         return None
     
 
-    async def remove_normal(self) -> None:
+    def remove_normal(self) -> None:
         """Un-registers the prefix command."""
         self.logger.debug(f"Removing normal/prefix command for '{self.name}'...")
 
         self.goldy.shard_manager.event_dispatcher.remove_listener(
-            lambda x: self.goldy.async_loop.create_task(self.__invoke(x, type=PlatterType.PREFIX_CMD)),
+            self.__normal_callback,
             event_name="MESSAGE_CREATE"
         )
 
         return None
 
 
-    def load(self) -> None:
+    async def load(self) -> None:
         """Loads and creates the command."""
 
         if self.allow_slash_cmd:
-            self.goldy.async_loop.create_task(
-                self.create_slash()
-            )
+            await self.create_slash()
 
         if self.allow_prefix_cmd:
-            self.goldy.async_loop.create_task(
-                self.create_normal()
-            )
+            self.create_normal()
 
         if self.extension is not None:
             self.extension.add_command(self)
 
+        self.__loaded = True
+
         return None
     
 
-    def unload(self) -> None:
+    async def unload(self) -> None:
         """Unloads and removes the command."""
 
         if self.allow_slash_cmd:
-            self.goldy.async_loop.create_task(
-                self.remove_slash()
-            )
+            await self.remove_slash()
 
         if self.allow_prefix_cmd:
-            self.goldy.async_loop.create_task(
-                self.remove_normal()
-            )
+            self.remove_normal()
+
+        self.__loaded = False
 
         return None
     
-    def delete(self) -> None:
+    async def delete(self) -> None:
         """Completely deletes this command. Unloads it and removes it from cache."""
-        self.unload()
+        await self.unload()
 
         commands_cache.remove((self.name, self))
 

@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import sys
+import time
 import asyncio
+from asyncio import Task
 
 from nextcore.http.client import HTTPClient
 
@@ -96,6 +98,10 @@ class Goldy():
             )
         except KeyboardInterrupt:
             self.stop("Keyboard interrupt detected!")
+        except RuntimeError as e:
+            # I really do hope this doesn't torture me in the future. 💀
+            print(e)
+            pass
 
         return None
 
@@ -123,9 +129,12 @@ class Goldy():
         self.live_console.start()
 
         # Raise a error and exit whenever a critical error occurs.
-        error = await self.shard_manager.dispatcher.wait_for(lambda: True, "critical")
+        error = await self.shard_manager.dispatcher.wait_for(lambda reason: True, "critical")
 
-        raise cast(Exception, error)
+        self.logger.warn(Colours.YELLOW.apply_to_string("Goldy Bot is shutting down..."))
+        self.logger.info(Colours.BLUE.apply_to_string(f"Reason: {error[0]}"))
+
+        await self.__stop_async()
 
     async def pre_setup(self):
         """Method ran before actual setup. This is used to fetch some data from discord needed by goldy when running the actual setup."""
@@ -136,27 +145,29 @@ class Goldy():
         await self.guilds.setup()
         
         self.extension_loader.load()
-        self.command_loader.load()
+        await self.command_loader.load()
 
     def stop(self, reason:str = "Unknown Reason"):
         """Shuts down goldy bot right away and safely incase anything sussy wussy is going on. 😳"""
-        self.async_loop.run_until_complete(self.presence.change(Status.INVISIBLE)) # Set bot to invisible before shutting off.
+        self.live_console.stop()
 
-        self.logger.warn(Colours.YELLOW.apply_to_string("Goldy Bot is shutting down..."))
-        self.logger.info(Colours.BLUE.apply_to_string(f"Reason: {reason}"))
+        self.async_loop.create_task(self.shard_manager.dispatcher.dispatch("critical", reason)) # Raises critical error within nextcore and stops it.
+
+    async def __stop_async(self):
+        """This is an internal method and NOT to be used by you. Use the ``Goldy().stop()`` instead. This method is ran when nextcore raises a critical error."""
+        await self.presence.change(Status.INVISIBLE) # Set bot to invisible before shutting off.
         
         self.logger.debug("Closing nextcore http client...")
-        self.async_loop.run_until_complete(self.http_client.close())
+        await self.http_client.close()
 
         self.logger.debug("Closing nextcore shard manager...")
-        self.async_loop.run_until_complete(self.shard_manager.close())
+        await self.shard_manager.close()
 
         self.logger.debug("Closing AsyncIOMotorClient...")
         self.database.client.close()
-
+    
+        self.logger.debug("Closing async_loop...")
         self.async_loop.stop()
-
-        return None
 
 
 # Get goldy instance method.

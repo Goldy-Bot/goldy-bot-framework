@@ -55,7 +55,7 @@ class Extension(ABC):
 
         ]
 
-        self.__loaded_path = os.path.realpath(__file__)
+        self.__loaded_path = os.path.realpath(self.__class__.__module__) + ".py"
 
         # Adding to cache and loading commands.
         # ---------------------------------------
@@ -92,10 +92,10 @@ class Extension(ABC):
         """Returns all the commands loaded with this extension."""
         return self.__commands
     
-    def delete(self) -> None:
+    async def delete(self) -> None:
         """Unloads and deletes itself from cache and all the commands with it."""
         for command in self.get_commands():
-            command.delete()
+            await command.delete()
 
         extensions_cache.remove((self.code_name, self))
 

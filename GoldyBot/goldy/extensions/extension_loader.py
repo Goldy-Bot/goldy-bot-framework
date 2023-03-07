@@ -110,7 +110,6 @@ class ExtensionLoader():
 
                 if self.raise_on_load_error:
                     raise GoldyBotError(error_str)
-
                 else:
                     self.logger.error(error_str)
         

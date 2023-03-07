@@ -20,16 +20,16 @@ class ExtensionReloader():
         self.logger = LoggerAdapter(goldy_bot_logger, prefix="ExtensionReloader")
 
     @overload
-    def reload(self) -> None:
+    async def reload(self) -> None:
         """Reloads all extensions loaded in goldy bot."""
         ...
     
     @overload
-    def reload(self, extensions:List[Extension]) -> None:
+    async def reload(self, extensions:List[Extension]) -> None:
         """Reloads each extension in the list."""
         ...
 
-    def reload(self, extensions:List[Extension] = None) -> None:
+    async def reload(self, extensions:List[Extension] = None) -> None:
         """Reloads each extension in this list. If extensions is kept none, goldy bot will reload all the extensions loaded itself."""
         if extensions is None:
             extensions = [x[1] for x in extensions_cache]
@@ -40,14 +40,14 @@ class ExtensionReloader():
 
         for extension in extensions:
             # Delete all commands in extension.
-            extension.delete()
+            await extension.delete()
 
             if not extension.loaded_path in loaded_paths:
                 loaded_paths.append(extension.loaded_path)
 
-        # TODO: Remove this print statement.
-        print(">>", loaded_paths)
-
         self.goldy.extension_loader.load(loaded_paths)
+
+        # Load commands again.
+        await self.goldy.command_loader.load()
 
         return None

@@ -17,6 +17,8 @@ class LiveConsole(threading.Thread):
         """The goldy bot live console."""
         self.goldy = goldy
         self.logger = LoggerAdapter(goldy_bot_logger, prefix=Colours.PURPLE.apply_to_string("Live_Console"))
+
+        self.__stop = False
         super().__init__(daemon=True)
 
     def run(self) -> None:
@@ -26,7 +28,11 @@ class LiveConsole(threading.Thread):
 
         app.preloop()
 
-        while True:
-            app.onecmd(input(""))
+        while self.__stop is False:
+            print("")
+            app.onecmd(input("> "))
+
+    def stop(self):
+        self.__stop = True
 
 from .app import LiveConsoleApp
