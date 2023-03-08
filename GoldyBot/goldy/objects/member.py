@@ -2,15 +2,20 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 
 from typing import TYPE_CHECKING
-from discord_typings import GuildMemberData
+from discord_typings import UserData
+from devgoldyutils import DictDataclass
+
+from ... import goldy_bot_logger, LoggerAdapter
 from ...urls import USER_AVATAR
 
 if TYPE_CHECKING:
     from .. import Goldy
 
+logger = LoggerAdapter(goldy_bot_logger, prefix="Member")
+
 @dataclass
-class Member:
-    data:GuildMemberData
+class Member(DictDataclass):
+    data:UserData
     goldy:Goldy = field(repr=False)
 
     id:str = field(init=False)
@@ -23,12 +28,15 @@ class Member:
     """The url to the member's profile picture."""
 
     def __post_init__(self):
-        self.id = self.data["user"]["id"]
-        self.username = self.data["user"]["username"]
-        self.discriminator = self.data["user"]["discriminator"]
-        self.avatar_url = USER_AVATAR.format(self.id, self.data["user"]["avatar"])
+        self.logger = logger
 
-        # TODO: Add the rest. Where I left off, 07.03.2023
+        self.id = self.get("id")
+        self.username = self.get("username")
+        self.discriminator = self.get("discriminator")
+        self.avatar_url = USER_AVATAR.format(
+            user_id = self.id, 
+            user_avatar_hash = self.get("avatar")
+        )
     
 
 from .. import nextcore_utils

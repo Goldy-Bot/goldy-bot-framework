@@ -34,8 +34,12 @@ class GoldPlatter():
         self.type:PlatterType = (lambda x: PlatterType(x) if isinstance(x, int) else x)(type)
         """The type of command this is."""
 
+
+        self.author = Member(data["author"], goldy)
+
     async def send_message(self, text:str, reply:bool=False) -> Message:
         return await nextcore_utils.send_msg(self, text, reply)
 
 
+from .member import Member
 from .. import nextcore_utils
