@@ -74,11 +74,6 @@ class Command():
 
         self.__loaded = False
 
-        # Callbacks
-        # ----------
-        self.__slash_callback = lambda x: self.goldy.async_loop.create_task(self.__invoke(x, type=PlatterType.SLASH_CMD))
-        self.__normal_callback = lambda x: self.goldy.async_loop.create_task(self.__invoke(x, type=PlatterType.PREFIX_CMD))
-
         commands_cache.append(
             (self.name, self)
         )
@@ -122,44 +117,58 @@ class Command():
         return self.__loaded
 
 
-    async def __invoke(self, data:MessageData|InteractionData, type:PlatterType|int) -> bool:
+    async def __invoke_prefix(self, data:MessageData):
+        guild = self.goldy.guilds.get_guild(data["guild_id"])
+
+        if guild is not None:
+
+            if data["content"] == f"{guild.prefix}{self.name}":
+                self.goldy.async_loop.create_task(self.__invoke(data, type=PlatterType.PREFIX_CMD))
+
+    async def __invoke_slash(self, data:InteractionData):
+        guild = self.goldy.guilds.get_guild(data["guild_id"])
+
+        if guild is not None:
+
+            if self.name == data["data"]["name"]:
+                self.goldy.async_loop.create_task(self.__invoke(data, type=PlatterType.SLASH_CMD))
+
+
+    async def __invoke(self, data:MessageData|InteractionData, type:PlatterType|int) -> None:
         """Runs/triggers this command. This method is mostly supposed to be used internally."""
-        # If not from guild in allowed guilds don't invoke.
-        if data["guild_id"] in [x[0] for x in self.goldy.config.allowed_guilds]:
+        self.logger.debug(f"Attempting to invoke '{type.name}'...")
         
-            gold_plater = GoldPlatter(data, type, goldy=self.goldy, command=self)
-            guild = self.goldy.guilds.get_guild(data["guild_id"])
+        gold_plater = GoldPlatter(data, type, goldy=self.goldy, command=self)
 
-            # TODO: Add all permission and argument management stuff here...
-
-
-            # Prefix/normal command.
-            # ------------------------
-            if gold_plater.type.value == PlatterType.PREFIX_CMD.value:
-                data:MessageData = data
-                prefix = guild.prefix
-
-                if data["content"] == f"{prefix}{self.name}":
-                    self.logger.info(f"Prefix command invoked by '{data['author']['username']}#{data['author']['discriminator']}'.")
-
-                    if self.in_extension:
-                        await self.func(self.extension, gold_plater)
-                    else:
-                        await self.func(gold_plater)
+        # TODO: Add all permission and argument management stuff here...
 
 
-            # Slash command.
-            # ----------------
-            if gold_plater.type.value == PlatterType.SLASH_CMD.value:
-                data:InteractionData = data
-                prefix = guild.prefix
+        # Prefix/normal command.
+        # ------------------------
+        if gold_plater.type.value == PlatterType.PREFIX_CMD.value:
+            data:MessageData = data
 
-                self.logger.info(f"Slash command invoked by '{data['member']['user']['username']}#{data['member']['user']['discriminator']}'.")
+            self.logger.info(f"Prefix command invoked by '{data['author']['username']}#{data['author']['discriminator']}'.")
 
-                if self.in_extension:
-                    await self.func(self.extension, gold_plater)
-                else:
-                    await self.func(gold_plater)
+            if self.in_extension:
+                await self.func(self.extension, gold_plater)
+            else:
+                await self.func(gold_plater)
+
+
+        # Slash command.
+        # ----------------
+        if gold_plater.type.value == PlatterType.SLASH_CMD.value:
+            data:InteractionData = data
+
+            self.logger.info(f"Slash command invoked by '{data['member']['user']['username']}#{data['member']['user']['discriminator']}'.")
+
+            if self.in_extension:
+                await self.func(self.extension, gold_plater)
+            else:
+                await self.func(gold_plater)
+
+        return None
 
 
     async def create_slash(self) -> List[ApplicationCommandData]:
@@ -191,7 +200,7 @@ class Command():
         # Set event listener for slash command.
         # --------------------------------------
         self.goldy.shard_manager.event_dispatcher.add_listener(
-            self.__slash_callback,
+            self.__invoke_slash,
             event_name="INTERACTION_CREATE"
         )
 
@@ -217,7 +226,7 @@ class Command():
         # Remove event listener for slash command.
         # --------------------------------------
         self.goldy.shard_manager.event_dispatcher.remove_listener(
-            self.__slash_callback,
+            self.__invoke_slash,
             event_name="INTERACTION_CREATE"
         )
 
@@ -229,7 +238,7 @@ class Command():
         self.logger.info(f"Creating normal/prefix command for '{self.name}'...")
 
         self.goldy.shard_manager.event_dispatcher.add_listener(
-            self.__normal_callback,
+            self.__invoke_prefix,
             event_name="MESSAGE_CREATE"
         )
 
@@ -241,7 +250,7 @@ class Command():
         self.logger.debug(f"Removing normal/prefix command for '{self.name}'...")
 
         self.goldy.shard_manager.event_dispatcher.remove_listener(
-            self.__normal_callback,
+            self.__invoke_prefix,
             event_name="MESSAGE_CREATE"
         )
 

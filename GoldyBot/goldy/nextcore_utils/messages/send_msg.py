@@ -1,6 +1,8 @@
 from __future__ import annotations
 from typing import overload
-from discord_typings import MessageReferenceData
+from discord_typings import MessageReferenceData, InteractionMessageCallbackData
+
+from nextcore.http import Route, errors as nc_errors
 
 from ... import objects
 from .... import errors
@@ -80,10 +82,79 @@ async def send_msg(platter:objects.GoldPlatter, text:str, reply=False) -> object
     # TODO: Add support for member and channel objects.
 
     if platter.type.value == 1:
-        # TODO: Add support for slash once application command responding is functioning in nextcore.
-        raise errors.NotSupportedYetForSlash("send_msg", platter.command.logger)
-    
+        # Perform interaction response.
+        # ------------------------------
+
+        # Callback message.
+        if platter.interaction_responded == False:
+
+            route = Route(
+                "POST", 
+                "/interactions/{interaction_id}/{interaction_token}/callback", 
+                interaction_id = platter.data["id"], 
+                interaction_token = platter.data["token"]
+            )
+
+            await goldy.http_client._request(
+                route,
+                rate_limit_key = goldy.nc_authentication.rate_limit_key,
+                json = {
+                    "type": 4, 
+                    "data": InteractionMessageCallbackData(
+                        content = text
+                    )
+                }
+            )
+
+            platter.interaction_responded = True
+
+            platter.command.logger.debug(f"Interaction callback message '{text[:50]}...' sent.")
+
+        # Follow up message.
+        else:
+
+            route = Route(
+                "POST", 
+                "/webhooks/{application_id}/{interaction_token}", 
+                application_id = goldy.application_data["id"], 
+                interaction_token = platter.data["token"]
+            )
+
+            test = await goldy.http_client._request(
+                route,
+                rate_limit_key = goldy.nc_authentication.rate_limit_key,
+                json = {
+                    "type": 4, 
+                    "data": InteractionMessageCallbackData(
+                        content = text
+                    )
+                }
+            )
+
+            # TODO: Where I left off last night.
+
+            print(await test.json())
+
+            platter.command.logger.debug(f"Interaction follow up message '{text[:50]}...' sent.")
+
+        # Get message data of interaction response.
+        # -------------------------------------------
+        route = Route(
+            "GET", 
+            "/webhooks/{application_id}/{interaction_token}/messages/@original", 
+            application_id = goldy.application_data["id"], 
+            interaction_token = platter.data["token"]
+        )
+
+        r = await goldy.http_client._request(
+            route,
+            rate_limit_key = goldy.nc_authentication.rate_limit_key
+        )
+
+        message_data = await r.json()
+
     else:
+
         if reply:
             message_reference_data = MessageReferenceData(
                 message_id = platter.data["id"],
