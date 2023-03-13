@@ -74,101 +74,102 @@ async def send_msg(member:objects.Member, text:str):
     """
     ...
 
-async def send_msg(platter:objects.GoldPlatter, text:str, reply=False) -> objects.Message:
+async def send_msg(object:objects.GoldPlatter|objects.Member, text:str, reply=False) -> objects.Message:
     message_data = None
     message_reference_data = None
-    goldy = platter.goldy
+    goldy = object.goldy
 
     # TODO: Add support for member and channel objects.
 
-    if platter.type.value == 1:
-        # Perform interaction response.
-        # ------------------------------
+    if isinstance(object, objects.GoldPlatter):
 
-        # Callback message.
-        if platter.interaction_responded == False:
+        if object.type.value == 1:
+            # Perform interaction response.
+            # ------------------------------
 
-            route = Route(
-                "POST", 
-                "/interactions/{interaction_id}/{interaction_token}/callback", 
-                interaction_id = platter.data["id"], 
-                interaction_token = platter.data["token"]
-            )
+            # Callback message.
+            # ------------------
+            if object.interaction_responded == False:
 
-            await goldy.http_client._request(
-                route,
-                rate_limit_key = goldy.nc_authentication.rate_limit_key,
-                json = {
-                    "type": 4, 
-                    "data": InteractionMessageCallbackData(
+                await goldy.http_client._request(
+                    Route(
+                        "POST", 
+                        "/interactions/{interaction_id}/{interaction_token}/callback", 
+                        interaction_id = object.data["id"], 
+                        interaction_token = object.data["token"]
+                    ),
+                    rate_limit_key = goldy.nc_authentication.rate_limit_key,
+                    json = {
+                        "type": 4, 
+                        "data": InteractionMessageCallbackData(
+                            content = text
+                        )
+                    }
+                )
+
+                object.interaction_responded = True
+
+                # Get and return message data of original interaction response. 
+                r = await goldy.http_client._request(
+                    Route(
+                        "GET", 
+                        "/webhooks/{application_id}/{interaction_token}/messages/@original", 
+                        application_id = goldy.application_data["id"], 
+                        interaction_token = object.data["token"]
+                    ),
+                    rate_limit_key = goldy.nc_authentication.rate_limit_key
+                )
+
+                message_data = await r.json()
+
+                object.command.logger.debug(f"Interaction callback message '{text[:50]}...' sent.")
+
+
+            # Follow up message.
+            # -------------------
+            else:
+
+                r = await goldy.http_client._request(
+                    Route(
+                        "POST", 
+                        "/webhooks/{application_id}/{interaction_token}", 
+                        application_id = goldy.application_data["id"], 
+                        interaction_token = object.data["token"]
+                    ),
+                    rate_limit_key = goldy.nc_authentication.rate_limit_key,
+                    json = InteractionMessageCallbackData(
                         content = text
                     )
-                }
-            )
+                )
 
-            platter.interaction_responded = True
+                message_data = await r.json()
 
-            platter.command.logger.debug(f"Interaction callback message '{text[:50]}...' sent.")
+                object.command.logger.debug(f"Interaction follow up message '{text[:50]}...' sent.")
 
-        # Follow up message.
         else:
+            # Perform normal message response.
+            # ----------------------------------
 
-            route = Route(
-                "POST", 
-                "/webhooks/{application_id}/{interaction_token}", 
-                application_id = goldy.application_data["id"], 
-                interaction_token = platter.data["token"]
+            if reply:
+                message_reference_data = MessageReferenceData(
+                    message_id = object.data["id"],
+                    channel_id = object.data["channel_id"],
+                    guild_id = object.data["guild_id"]
+                )
+
+            message_data = await goldy.http_client.create_message(
+                authentication = goldy.nc_authentication,
+                channel_id = object.data['channel_id'],
+                content = text,
+                message_reference = (lambda x: x if not None else None)(message_reference_data)
             )
 
-            test = await goldy.http_client._request(
-                route,
-                rate_limit_key = goldy.nc_authentication.rate_limit_key,
-                json = {
-                    "type": 4, 
-                    "data": InteractionMessageCallbackData(
-                        content = text
-                    )
-                }
-            )
+            object.command.logger.debug(f"The message '{text[:50]}...' was sent.")
 
-            # TODO: Where I left off last night.
 
-            print(await test.json())
+        return objects.Message(message_data, goldy)
+    
+    if isinstance(object, objects.Member):
+        # TODO: Idk how the fuck to do this.
 
-            platter.command.logger.debug(f"Interaction follow up message '{text[:50]}...' sent.")
-
-        # Get message data of interaction response.
-        # -------------------------------------------
-        route = Route(
-            "GET", 
-            "/webhooks/{application_id}/{interaction_token}/messages/@original", 
-            application_id = goldy.application_data["id"], 
-            interaction_token = platter.data["token"]
-        )
-
-        r = await goldy.http_client._request(
-            route,
-            rate_limit_key = goldy.nc_authentication.rate_limit_key
-        )
-
-        message_data = await r.json()
-
-    else:
-
-        if reply:
-            message_reference_data = MessageReferenceData(
-                message_id = platter.data["id"],
-                channel_id = platter.data["channel_id"],
-                guild_id = platter.data["guild_id"]
-            )
-
-        message_data = await goldy.http_client.create_message(
-            authentication = goldy.nc_authentication,
-            channel_id = platter.data['channel_id'],
-            content = text,
-            message_reference = (lambda x: x if not None else None)(message_reference_data)
-        )
-
-        platter.command.logger.debug(f"The message '{text[:50]}...' was sent.")
-
-    return objects.Message(message_data, goldy)
+        ...
