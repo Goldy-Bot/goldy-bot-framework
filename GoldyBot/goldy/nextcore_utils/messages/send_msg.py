@@ -1,8 +1,11 @@
 from __future__ import annotations
 from typing import overload
-from discord_typings import MessageReferenceData, InteractionMessageCallbackData
+from discord_typings import MessageReferenceData, InteractionMessageCallbackData, MessageData
+from discord_typings.resources.channel import MessageBase
 
+from aiohttp import FormData
 from nextcore.http import Route, errors as nc_errors
+from nextcore.common import json_dumps
 
 from ... import objects
 from .... import errors
@@ -75,7 +78,7 @@ async def send_msg(member:objects.Member, text:str):
     ...
 
 async def send_msg(object:objects.GoldPlatter|objects.Member, text:str, reply=False) -> objects.Message:
-    message_data = None
+    message_data:MessageData = None
     message_reference_data = None
     goldy = object.goldy
 
@@ -122,11 +125,12 @@ async def send_msg(object:objects.GoldPlatter|objects.Member, text:str, reply=Fa
 
                 message_data = await r.json()
 
-                object.command.logger.debug(f"Interaction callback message '{text[:50]}...' sent.")
+                object.command.logger.debug(f"Interaction callback message '{text[:50]}...' was sent.")
 
 
             # Follow up message.
             # -------------------
+            # Is sent when you want to respond again after sending the original response.
             else:
 
                 r = await goldy.http_client._request(
@@ -144,25 +148,38 @@ async def send_msg(object:objects.GoldPlatter|objects.Member, text:str, reply=Fa
 
                 message_data = await r.json()
 
-                object.command.logger.debug(f"Interaction follow up message '{text[:50]}...' sent.")
+                object.command.logger.debug(f"Interaction follow up message '{text[:50]}...' was sent.")
 
         else:
             # Perform normal message response.
             # ----------------------------------
+            payload = MessageBase()
 
             if reply:
-                message_reference_data = MessageReferenceData(
+                payload["message_reference"] = MessageReferenceData(
                     message_id = object.data["id"],
                     channel_id = object.data["channel_id"],
                     guild_id = object.data["guild_id"]
                 )
 
-            message_data = await goldy.http_client.create_message(
-                authentication = goldy.nc_authentication,
-                channel_id = object.data['channel_id'],
-                content = text,
-                message_reference = (lambda x: x if not None else None)(message_reference_data)
+            if text is not None:
+                payload["content"] = text
+
+            form_data = FormData()
+            form_data.add_field("payload_json", json_dumps(payload))
+
+            r = await goldy.http_client._request(
+                Route(
+                    "POST", 
+                    "/channels/{channel_id}/messages", 
+                    channel_id = object.data['channel_id']
+                ),
+                data = form_data,
+                rate_limit_key = goldy.nc_authentication.rate_limit_key,
+                headers = {"Authorization": str(goldy.nc_authentication)},
             )
+
+            message_data = await r.json()
 
             object.command.logger.debug(f"The message '{text[:50]}...' was sent.")
 
