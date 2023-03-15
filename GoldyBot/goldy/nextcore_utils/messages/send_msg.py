@@ -4,11 +4,10 @@ from discord_typings import MessageReferenceData, InteractionMessageCallbackData
 from discord_typings.resources.channel import MessageBase
 
 from aiohttp import FormData
-from nextcore.http import Route, errors as nc_errors
+from nextcore.http import Route
 from nextcore.common import json_dumps
 
 from ... import objects
-from .... import errors
 
 # TODO: Add more options to allow using channel instead of platter.
 
@@ -79,7 +78,6 @@ async def send_msg(member:objects.Member, text:str):
 
 async def send_msg(object:objects.GoldPlatter|objects.Member, text:str, reply=False) -> objects.Message:
     message_data:MessageData = None
-    message_reference_data = None
     goldy = object.goldy
 
     # TODO: Add support for member and channel objects.
@@ -130,7 +128,7 @@ async def send_msg(object:objects.GoldPlatter|objects.Member, text:str, reply=Fa
 
             # Follow up message.
             # -------------------
-            # Is sent when you want to respond again after sending the original response.
+            # Is sent when you want to respond again after sending the original response to an interaction command.
             else:
 
                 r = await goldy.http_client._request(

@@ -46,8 +46,7 @@ class GoldyConfig(Config):
             )
 
         # Removes template from dict if it exists.
-        if "{guild_id_here}" in data:
-            del data["{guild_id_here}"]
+        if "{guild_id_here}" in data: del data["{guild_id_here}"]
         
         # Append each allowed guild as tuple.
         for key in data:

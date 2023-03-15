@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 from typing import List, Callable, Tuple, TYPE_CHECKING
-from discord_typings import ApplicationCommandData, MessageData, InteractionData
+from discord_typings import ApplicationCommandData, MessageData, InteractionData, ApplicationCommandPayload
+
+from nextcore.http import Route
 
 from .. import utils
 from ..objects import GoldPlatter, PlatterType
@@ -181,17 +183,28 @@ class Command():
         # -------------------------------------------
         for guild in self.goldy.guilds.allowed_guilds:
 
+            payload = ApplicationCommandPayload(
+                name = self.name,
+                description = self.description,
+                type = 1
+            )
+
+            r = await self.goldy.http_client._request(
+                Route(
+                    "POST",
+                    "/applications/{application_id}/guilds/{guild_id}/commands",
+                    application_id = self.goldy.application_data["id"],
+                    guild_id = guild[0],
+                ),
+                rate_limit_key = self.goldy.nc_authentication.rate_limit_key,
+                headers = {"Authorization": str(self.goldy.nc_authentication)},
+                json = payload
+            )
+
             list_of_application_command_data.append(
                 (
-                    guild[0], 
-                    await self.goldy.http_client.create_guild_application_command(
-                        authentication = self.goldy.nc_authentication,
-                        application_id = self.goldy.application_data["id"],
-                        guild_id = guild[0],
-
-                        name = self.name,
-                        description = self.description,
-                    )
+                    guild[0],
+                    await r.json()
                 )
             )
 
@@ -213,12 +226,17 @@ class Command():
         self.logger.debug(f"Removing slash command for '{self.name}'...")
 
         for slash_command in self.list_of_application_command_data:
-            
-            await self.goldy.http_client.delete_guild_application_command(
-                authentication = self.goldy.nc_authentication,
-                application_id = self.goldy.application_data["id"],
-                guild_id = slash_command[0],
-                command_id = slash_command[1]["id"],
+
+            await self.goldy.http_client._request(
+                Route(
+                    "GET",
+                    "/applications/{application_id}/guilds/{guild_id}/commands/{command_id}",
+                    application_id = self.goldy.application_data["id"],
+                    guild_id = slash_command[0],
+                    command_id = slash_command[1]["id"],
+                ),
+                rate_limit_key = self.goldy.nc_authentication.rate_limit_key,
+                headers = {"Authorization": str(self.goldy.nc_authentication)}
             )
 
             self.logger.debug(f"Deleted slash for guild with id '{slash_command[0]}'.")

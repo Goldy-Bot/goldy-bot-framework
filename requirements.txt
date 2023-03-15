@@ -1,4 +1,4 @@
-devgoldyutils>=2.1.1
+devgoldyutils>=2.3
 nextcore@git+https://github.com/nextsnake/nextcore
 click>=8.1.3
 python-decouple>=3.7

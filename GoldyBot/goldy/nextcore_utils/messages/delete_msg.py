@@ -1,6 +1,8 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 
+from nextcore.http import Route
+
 from ... import LoggerAdapter, goldy_bot_logger
 
 if TYPE_CHECKING:
@@ -8,7 +10,7 @@ if TYPE_CHECKING:
 
 logger = LoggerAdapter(goldy_bot_logger, prefix="delete_msg")
 
-async def delete_msg(message:Message, reason:str=None) -> Message:
+async def delete_msg(message:Message, reason:str = None) -> Message:
     """
     Allows you to delete a message that has been sent.
     
@@ -24,17 +26,26 @@ async def delete_msg(message:Message, reason:str=None) -> Message:
     Returns
     -------
     ``GoldyBot.goldy.objects.message.Message``
-        The message that was sent.
+        The message that we deleted.
     """
     goldy = message.goldy
 
-    await goldy.http_client.delete_message(
-        authentication = goldy.nc_authentication,
-        channel_id = message.data["channel_id"],
-        message_id = message.data["id"],
-        reason = reason
+    headers = {"Authorization": str(goldy.nc_authentication)}
+
+    if reason is not None:
+        headers["X-Audit-Log-Reason"] = reason
+
+    await goldy.http_client._request(
+        Route(
+            "DELETE", 
+            "/channels/{channel_id}/messages/{message_id}", 
+            channel_id = message.data["channel_id"], 
+            message_id = message.data["id"]
+        ),
+        rate_limit_key = goldy.nc_authentication.rate_limit_key,
+        headers = headers
     )
 
-    logger.debug(f"The message '{message.data['content'][:50]}...' at '{message.data['channel_id']}' was deleted.")
+    logger.debug(f"The message '{message.data['content'][:50]}...' in the channel '{message.data['channel_id']}' was deleted.")
 
     return message
