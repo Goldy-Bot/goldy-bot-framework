@@ -49,10 +49,7 @@ def command(
                 allow_prefix_cmd=create_normal, 
                 allow_slash_cmd=create_slash
             )
-            
-            # TODO: Use code from goldy bot v4.
-            
-
+        
         return inner(func)
 
     return decorate

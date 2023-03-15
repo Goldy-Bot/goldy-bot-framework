@@ -24,6 +24,8 @@ class GoldPlatter():
     ✨ Behold the gold platter. ✨😁
     """
     def __init__(self, data:MessageData|InteractionData, type:PlatterType|int, goldy:Goldy, command:Command) -> None:
+        # TODO: We got to somehow test this stuff with pytest because this being error prone is sort of a catastrophe.
+
         self.data = data
         """The raw data received right from discord that triggered this prefix or slash command."""
         self.goldy = goldy
@@ -34,8 +36,17 @@ class GoldPlatter():
         self.type:PlatterType = (lambda x: PlatterType(x) if isinstance(x, int) else x)(type)
         """The type of command this is."""
 
+        if self.type.value == PlatterType.SLASH_CMD.value:
+            self.author = Member(data["member"]["user"], goldy)
+        else:
+            self.author = Member(data["author"], goldy)
+
+        self.interaction_responded = False
+        """An internal property that is set by the ``nextcore_utils.send_msg()`` method when a slash command is responded to."""
+
     async def send_message(self, text:str, reply:bool=False) -> Message:
         return await nextcore_utils.send_msg(self, text, reply)
 
 
+from .member import Member
 from .. import nextcore_utils

@@ -5,7 +5,7 @@ import asyncio
 
 from nextcore.http.client import HTTPClient
 
-from nextcore.http import BotAuthentication, UnauthorizedError
+from nextcore.http import BotAuthentication, UnauthorizedError, Route
 from nextcore.gateway import ShardManager
 
 from typing import Dict, Any
@@ -136,7 +136,16 @@ class Goldy():
 
     async def pre_setup(self):
         """Method ran before actual setup. This is used to fetch some data from discord needed by goldy when running the actual setup."""
-        self.application_data = await self.http_client.get_current_bot_application_information(self.nc_authentication)
+        r = await self.http_client._request(
+            Route(
+                "GET", 
+                "/oauth2/applications/@me"
+            ),
+            rate_limit_key = self.nc_authentication.rate_limit_key,
+            headers = {"Authorization": str(self.nc_authentication)}
+        )
+
+        self.application_data = await r.json()
 
     async def setup(self):
         """Method ran to set up goldy bot."""
@@ -149,7 +158,7 @@ class Goldy():
         """Shuts down goldy bot right away and safely incase anything sussy wussy is going on. 😳"""
         self.live_console.stop()
 
-        self.async_loop.create_task(self.shard_manager.dispatcher.dispatch("critical", reason)) # Raises critical error within nextcore and stops it.
+        self.async_loop.create_task(self.shard_manager.dispatcher.dispatch("critical", "Goldy Exiting: " + reason)) # Raises critical error within nextcore and stops it.
 
     async def __stop_async(self):
         """This is an internal method and NOT to be used by you. Use the ``Goldy().stop()`` instead. This method is ran when nextcore raises a critical error."""
