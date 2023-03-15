@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import cmd2
-import asyncio
 from typing import TYPE_CHECKING, Tuple
 
 from .. import utils

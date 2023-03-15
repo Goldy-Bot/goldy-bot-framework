@@ -37,6 +37,3 @@ class Member(DictDataclass):
             user_id = self.id, 
             user_avatar_hash = self.get("avatar")
         )
-    
-
-from .. import nextcore_utils
