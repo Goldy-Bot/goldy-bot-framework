@@ -7,6 +7,18 @@ authors = [
 readme = {file = "README.md", content-type = "text/markdown"}
 requires-python = ">=3.8"
 license = { file = "LICENSE" }
+dependencies = [
+    "requests",
+    "importlib-metadata; python_version<'3.8'",
+    "devgoldyutils>=2.3",
+    "nextcore@git+https://github.com/nextsnake/nextcore",
+    "click>=8.1.3",
+    "python-decouple>=3.7",
+    "motor",
+    "pytest",
+    "pytest-cov",
+    "cmd2"
+]
 keywords = [
     "goldybot", "goldy bot", "Goldy Bot", "Goldy Bot V4", "Goldy Bot V3", "goldy", "Goldy Bot V5"
 ]
@@ -20,25 +32,16 @@ classifiers = [
     'Programming Language :: Python :: 3.10',
 	'Programming Language :: Python :: 3.11'
 ]
-dependencies = [
-    "requests",
-    "importlib-metadata; python_version<'3.8'",
-    "devgoldyutils>=2.3",
-    "nextcore@git+https://github.com/nextsnake/nextcore",
-    "click>=8.1.3",
-    "python-decouple>=3.7",
-    "motor",
-    "pytest",
-    "pytest-cov",
-    "cmd2"
-]
 
-version = "1"
+dynamic = ["version"]
 
 [project.urls]
 GitHub = "https://github.com/Goldy-Bot/Goldy-Bot-V5"
 BugTracker = "https://github.com/Goldy-Bot/Goldy-Bot-V5/issues"
 ChangeLog = "https://github.com/Goldy-Bot/Goldy-Bot-V5/master/CHANGELOG.md"
+
+[tool.setuptools.dynamic]
+version = { attr = "GoldyBot.info.VERSION" }
 
 [build-system]
 requires = ["setuptools", "setuptools-scm"]
