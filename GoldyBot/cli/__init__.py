@@ -1,3 +1,3 @@
 from .__main__ import *
 
-from .setup import setup
+from ._setup import setup
