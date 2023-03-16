@@ -2,7 +2,7 @@ from devgoldyutils.file_configs import JSONConfig
 
 from . import goldy_bot_logger
 
-# TODO: I moved this to my utils library: 
+# I moved this to my utils library: 
 # https://github.com/THEGOLDENPRO/devgoldyutils/blob/master/devgoldyutils/file_configs.py#L6
 
 class Config(JSONConfig):

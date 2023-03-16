@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import os
-from abc import ABC, abstractmethod
 from typing import Tuple, List, TYPE_CHECKING
 
 from ...goldy import get_goldy_instance
@@ -15,9 +14,9 @@ extensions_cache:List[Tuple[str, object]] = []
 This cache contains all the extensions that have been loaded and it's memory location to the class.
 """
 
-class Extension(ABC):
+class Extension():
     """
-    The base class for a Goldy Bot extension.
+    The base class for a Goldy Bot extension. 
 
     ---------------
     ### ***``Example:``***
@@ -29,11 +28,9 @@ class Extension(ABC):
         def __init__(self):
             super().__init__()
 
-        def loader(self):
-
-            @GoldyBot.command()
-            async def uwu(self:YourExtension, ctx):
-                await send(ctx, f'Hi, {ctx.author.mention}! OwO!')
+        @GoldyBot.command()
+        async def uwu(self:YourExtension, ctx):
+            await send(ctx, f'Hi, {ctx.author.mention}! OwO!')
 
     def load():
         YourExtension()
@@ -57,21 +54,16 @@ class Extension(ABC):
 
         self.__loaded_path = os.path.realpath(self.__class__.__module__) + ".py"
 
-        # Adding to cache and loading commands.
-        # ---------------------------------------
-        if not self.code_name in self.ignored_extensions_list:
-            self.logger.debug("Adding myself to cache...")
-            extensions_cache.append(
-                (self.code_name, self)
-            )
-        
-            self.logger.debug("Loading commands...")
-            self.loader() # Load commands.
+        self.__ignored = False
+        if self.code_name in self.ignored_extensions_list:
+            self.__ignored = True
 
-        else:
-            self.logger.warn(
-                "Not loading commands from this extension as it's ignored!"
-            )
+        # Adding to cache and loading commands.
+        # ---------------------------------------        
+        self.logger.debug("Adding myself to cache...")
+        extensions_cache.append(
+            (self.code_name, self)
+        )
 
     @property
     def code_name(self) -> str:
@@ -81,6 +73,11 @@ class Extension(ABC):
     def loaded_path(self) -> str:
         "The path where this extension was loaded."
         return self.__loaded_path
+    
+    @property
+    def is_ignored(self):
+        """Returns if the extension is being ignored."""
+        return self.__ignored
 
     def add_command(self, command:Command) -> None:
         """Add this command to this extension."""
@@ -91,7 +88,7 @@ class Extension(ABC):
     def get_commands(self) -> List[Command]:
         """Returns all the commands loaded with this extension."""
         return self.__commands
-    
+
     async def delete(self) -> None:
         """Unloads and deletes itself from cache and all the commands with it."""
         for command in self.get_commands():
@@ -102,8 +99,3 @@ class Extension(ABC):
         self.logger.debug(f"Extension '{self.code_name}' removed!")
 
         return None
-
-    @abstractmethod
-    def loader(self):
-        """The extension's command loader. This is what Goldy Bot uses to load your commands in an extension."""
-        ...

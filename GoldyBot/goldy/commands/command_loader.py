@@ -32,7 +32,18 @@ class CommandLoader():
             commands = [x[1] for x in commands_cache]
 
         for command in commands:
-            if command.loaded is False:
-                await command.load()
+
+            if command.loaded == False:
+
+                if command.extension.is_ignored == False:
+                    await command.load()
+                else:
+                    self.logger.debug(
+                        f"Not loading command '{command.name}' because the extension '{command.extension_name}' is being ignored!"
+                    )
+            else:
+                self.logger.debug(
+                    f"Not loading command '{command.name}' as it's already loaded."
+                )
         
         return None

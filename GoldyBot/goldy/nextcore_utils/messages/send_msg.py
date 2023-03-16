@@ -79,6 +79,8 @@ async def send_msg(member:objects.Member, text:str):
 async def send_msg(object:objects.GoldPlatter|objects.Member, text:str, reply=False) -> objects.Message:
     message_data:MessageData = None
     goldy = object.goldy
+    
+    text = str(text)
 
     # TODO: Add support for member and channel objects.
 

@@ -175,7 +175,7 @@ class Command():
 
     async def create_slash(self) -> List[ApplicationCommandData]:
         """Creates and registers a slash command in goldy bot. E.g.``/goldy``"""
-        self.logger.info(f"Creating slash command for '{self.name}'...")
+        self.logger.debug(f"Creating slash command for '{self.name}'...")
 
         list_of_application_command_data = []
 
@@ -253,7 +253,7 @@ class Command():
 
     def create_normal(self) -> None:
         """Creates and registers a normal on-msg/prefix command in goldy bot. Also know as a prefix command. E.g.``!goldy``"""
-        self.logger.info(f"Creating normal/prefix command for '{self.name}'...")
+        self.logger.debug(f"Creating normal/prefix command for '{self.name}'...")
 
         self.goldy.shard_manager.event_dispatcher.add_listener(
             self.__invoke_prefix,
@@ -277,7 +277,6 @@ class Command():
 
     async def load(self) -> None:
         """Loads and creates the command."""
-
         if self.allow_slash_cmd:
             await self.create_slash()
 
@@ -288,6 +287,10 @@ class Command():
             self.extension.add_command(self)
 
         self.__loaded = True
+
+        self.logger.info(
+            f"Command '{self.name}' has been loaded!"
+        )
 
         return None
     
@@ -303,6 +306,10 @@ class Command():
 
         self.__loaded = False
 
+        self.logger.debug(
+            f"Command '{self.name}' has been unloaded!"
+        )
+
         return None
     
     async def delete(self) -> None:
@@ -311,10 +318,13 @@ class Command():
 
         commands_cache.remove((self.name, self))
 
-        self.logger.info(f"Command '{self.name}' deleted!")
+        self.logger.info(
+            f"Command '{self.name}' has been deleted!"
+        )
     
     # Where I left off.
     # TODO: Use code from goldy bot v4 to fill the rest.
+    # Like argument missing detection for prefix commands.
 
     def any_args_missing(self, command_executers_args:tuple) -> bool:
         """Checks if the args given by the command executer matches what parameters the command needs."""

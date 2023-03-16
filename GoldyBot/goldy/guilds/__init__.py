@@ -8,8 +8,6 @@ from ...errors import GoldyBotError
 
 from .guild import Guild
 
-# TODO: Finish this and import it in goldy/__init__.py.
-
 class Guilds():
     def __init__(self, goldy:Goldy) -> None:
         self.goldy = goldy
