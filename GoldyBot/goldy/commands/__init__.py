@@ -122,7 +122,7 @@ class Command():
     async def __invoke_prefix(self, data:MessageData):
         guild = self.goldy.guilds.get_guild(data["guild_id"])
 
-        if guild is not None:
+        if guild is not None: # Ignore invoke if guild is None as None could mean the guild is not in the allowed guilds list.
 
             if data["content"] == f"{guild.prefix}{self.name}":
                 self.goldy.async_loop.create_task(self.__invoke(data, type=PlatterType.PREFIX_CMD))
@@ -130,47 +130,76 @@ class Command():
     async def __invoke_slash(self, data:InteractionData):
         guild = self.goldy.guilds.get_guild(data["guild_id"])
 
-        if guild is not None:
+        if guild is not None: # Ignore invoke if guild is None as None could mean the guild is not in the allowed guilds list.
 
             if self.name == data["data"]["name"]:
                 self.goldy.async_loop.create_task(self.__invoke(data, type=PlatterType.SLASH_CMD))
 
 
-    async def __invoke(self, data:MessageData|InteractionData, type:PlatterType|int) -> None:
+    async def __invoke(self, data:MessageData|InteractionData, type:PlatterType|int) -> bool:
         """Runs/triggers this command. This method is mostly supposed to be used internally."""
         self.logger.debug(f"Attempting to invoke '{type.name}'...")
         
         gold_plater = GoldPlatter(data, type, goldy=self.goldy, command=self)
 
-        # TODO: Add all permission and argument management stuff here...
+        if self.__got_perms(gold_plater):
+
+            # Prefix/normal command.
+            # ------------------------
+            if gold_plater.type.value == PlatterType.PREFIX_CMD.value:
+                data:MessageData = data
+
+                self.logger.info(f"Prefix command invoked by '{data['author']['username']}#{data['author']['discriminator']}'.")
+
+                if self.in_extension:
+                    await self.func(self.extension, gold_plater)
+                else:
+                    await self.func(gold_plater)
 
 
-        # Prefix/normal command.
-        # ------------------------
-        if gold_plater.type.value == PlatterType.PREFIX_CMD.value:
-            data:MessageData = data
+            # Slash command.
+            # ----------------
+            if gold_plater.type.value == PlatterType.SLASH_CMD.value:
+                data:InteractionData = data
 
-            self.logger.info(f"Prefix command invoked by '{data['author']['username']}#{data['author']['discriminator']}'.")
+                self.logger.info(f"Slash command invoked by '{data['member']['user']['username']}#{data['member']['user']['discriminator']}'.")
 
-            if self.in_extension:
-                await self.func(self.extension, gold_plater)
-            else:
-                await self.func(gold_plater)
+                if self.in_extension:
+                    await self.func(self.extension, gold_plater)
+                else:
+                    await self.func(gold_plater)
 
+            return True
+    
+        # Member has no perms.
+        # TODO: Add no perms discord message.
 
-        # Slash command.
-        # ----------------
-        if gold_plater.type.value == PlatterType.SLASH_CMD.value:
-            data:InteractionData = data
+        return False
+    
+    def __got_perms(self, gold_plater:GoldPlatter) -> bool:
+        """Internal method that checks if the command author has the perms to run this command."""
 
-            self.logger.info(f"Slash command invoked by '{data['member']['user']['username']}#{data['member']['user']['discriminator']}'.")
+        if not self.required_roles == []:
 
-            if self.in_extension:
-                await self.func(self.extension, gold_plater)
-            else:
-                await self.func(gold_plater)
+            # If the required roles contain 'bot_dev' and the bot dev is running the command allow the command to execute.
+            # --------------------------------------------------------------------------------------------------------------
+            if "bot_dev" in self.required_roles:
+                if gold_plater.author.id == self.goldy.config.bot_dev:
+                    return True
 
-        return None
+            # Check if member has any of the required roles.
+            #----------------------------------------------------
+            for role_code_name in self.required_roles:
+
+                if not role_code_name in ["bot_dev", "bot_admin"]:
+                    
+                    # TODO: Check if member has this role.
+                    # Might have to create a role object and add a .has_role() method to Member object.
+                    ...
+
+            return False
+        
+        return True
 
 
     async def create_slash(self) -> List[ApplicationCommandData]:

@@ -53,3 +53,8 @@ class GoldyConfig(Config):
             tuple_list.append((key, data[key]))
 
         return tuple_list
+    
+    @property
+    def bot_dev(self) -> str:
+        """The discord id of the bot developer. If none this will default to me (https://github.com/THEGOLDENPRO)."""
+        return self.get("goldy", "bot_admin", default_value="332592361307897856")
