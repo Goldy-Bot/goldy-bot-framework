@@ -6,7 +6,7 @@ from discord_typings import UserData
 from devgoldyutils import DictDataclass
 
 from ... import goldy_bot_logger, LoggerAdapter
-from ...urls import USER_AVATAR
+from ..nextcore_utils.urls import USER_AVATAR
 
 if TYPE_CHECKING:
     from .. import Goldy

@@ -59,6 +59,9 @@ class Command():
         
         if self.description is None:
             self.description = "This command has no description. Sorry about that."
+
+        if self.required_roles is None:
+            self.required_roles = []
         
         # Get list of function params.
         self.params = list(self.func.__code__.co_varnames)
