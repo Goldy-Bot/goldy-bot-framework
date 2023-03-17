@@ -28,6 +28,8 @@ class Member(DictDataclass):
     """The url to the member's profile picture."""
 
     def __post_init__(self):
+        super().__post_init__()
+
         self.logger = logger
 
         self.id = self.get("id")
