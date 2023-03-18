@@ -94,7 +94,7 @@ async def send_msg(object:objects.GoldPlatter|objects.Member, text:str, reply=Fa
             # ------------------
             if object.interaction_responded == False:
 
-                await goldy.http_client._request(
+                await goldy.http_client.request(
                     Route(
                         "POST", 
                         "/interactions/{interaction_id}/{interaction_token}/callback", 
@@ -113,7 +113,7 @@ async def send_msg(object:objects.GoldPlatter|objects.Member, text:str, reply=Fa
                 object.interaction_responded = True
 
                 # Get and return message data of original interaction response. 
-                r = await goldy.http_client._request(
+                r = await goldy.http_client.request(
                     Route(
                         "GET", 
                         "/webhooks/{application_id}/{interaction_token}/messages/@original", 
@@ -133,7 +133,7 @@ async def send_msg(object:objects.GoldPlatter|objects.Member, text:str, reply=Fa
             # Is sent when you want to respond again after sending the original response to an interaction command.
             else:
 
-                r = await goldy.http_client._request(
+                r = await goldy.http_client.request(
                     Route(
                         "POST", 
                         "/webhooks/{application_id}/{interaction_token}", 
@@ -168,7 +168,7 @@ async def send_msg(object:objects.GoldPlatter|objects.Member, text:str, reply=Fa
             form_data = FormData()
             form_data.add_field("payload_json", json_dumps(payload))
 
-            r = await goldy.http_client._request(
+            r = await goldy.http_client.request(
                 Route(
                     "POST", 
                     "/channels/{channel_id}/messages", 
@@ -176,7 +176,7 @@ async def send_msg(object:objects.GoldPlatter|objects.Member, text:str, reply=Fa
                 ),
                 data = form_data,
                 rate_limit_key = goldy.nc_authentication.rate_limit_key,
-                headers = {"Authorization": str(goldy.nc_authentication)},
+                headers = goldy.nc_authentication.headers,
             )
 
             message_data = await r.json()
