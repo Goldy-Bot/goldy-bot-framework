@@ -19,8 +19,6 @@ def setup(ctx:Context):
 
 @setup.command()
 def normal():
-    # TODO: Place code that generates environment here.
-
     file_templates = FileTemplates([
         Paths.GOLDY_JSON_TEMPLATE,
         Paths.RUN_SCRIPT_TEMPLATE,
