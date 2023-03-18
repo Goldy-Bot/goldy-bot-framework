@@ -221,7 +221,7 @@ class Command():
                 type = 1
             )
 
-            r = await self.goldy.http_client._request(
+            r = await self.goldy.http_client.request(
                 Route(
                     "POST",
                     "/applications/{application_id}/guilds/{guild_id}/commands",
@@ -229,7 +229,7 @@ class Command():
                     guild_id = guild[0],
                 ),
                 rate_limit_key = self.goldy.nc_authentication.rate_limit_key,
-                headers = {"Authorization": str(self.goldy.nc_authentication)},
+                headers = self.goldy.nc_authentication.headers,
                 json = payload
             )
 
@@ -259,7 +259,7 @@ class Command():
 
         for slash_command in self.list_of_application_command_data:
 
-            await self.goldy.http_client._request(
+            await self.goldy.http_client.request(
                 Route(
                     "GET",
                     "/applications/{application_id}/guilds/{guild_id}/commands/{command_id}",
@@ -268,7 +268,7 @@ class Command():
                     command_id = slash_command[1]["id"],
                 ),
                 rate_limit_key = self.goldy.nc_authentication.rate_limit_key,
-                headers = {"Authorization": str(self.goldy.nc_authentication)}
+                headers = self.goldy.nc_authentication.headers
             )
 
             self.logger.debug(f"Deleted slash for guild with id '{slash_command[0]}'.")

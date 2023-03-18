@@ -30,12 +30,12 @@ async def delete_msg(message:Message, reason:str = None) -> Message:
     """
     goldy = message.goldy
 
-    headers = {"Authorization": str(goldy.nc_authentication)}
+    headers = goldy.nc_authentication.headers
 
     if reason is not None:
         headers["X-Audit-Log-Reason"] = reason
 
-    await goldy.http_client._request(
+    await goldy.http_client.request(
         Route(
             "DELETE", 
             "/channels/{channel_id}/messages/{message_id}", 

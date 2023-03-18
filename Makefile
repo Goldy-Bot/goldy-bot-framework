@@ -2,13 +2,12 @@ run:
 	cd env/Scripts && activate && cd ../../
 	cd demo && python run.py
 
-create-env:
-	python -m venv env
-	cd env/Scripts
-	activate
-	cd ../../
-	pip install .
-
 test:
 	cd tests
 	pytest
+
+docker-build:
+	docker build -t devgoldy/goldybot .
+
+docker-compose:
+	docker compose --env-file ./demo/.env up
