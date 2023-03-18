@@ -22,6 +22,7 @@ class FileTemplates():
             template_file.seek(0)
             file = open(dest_path + "/" + file_name, mode="w")
             file.write(template_file.read())
+            file.close()
 
             goldy_bot_logger.debug(f"Created '{file_name}' file at '{dest_path}'!")
         

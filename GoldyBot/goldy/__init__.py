@@ -136,16 +136,17 @@ class Goldy():
 
     async def pre_setup(self):
         """Method ran before actual setup. This is used to fetch some data from discord needed by goldy when running the actual setup."""
-        r = await self.http_client._request(
+        r = await self.http_client.request(
             Route(
                 "GET", 
                 "/oauth2/applications/@me"
             ),
             rate_limit_key = self.nc_authentication.rate_limit_key,
-            headers = {"Authorization": str(self.nc_authentication)}
+            headers = self.nc_authentication.headers
         )
 
         self.application_data = await r.json()
+        self.logger.debug("Application data requested!")
 
     async def setup(self):
         """Method ran to set up goldy bot."""
