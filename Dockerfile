@@ -4,9 +4,7 @@ WORKDIR /app
 
 COPY GoldyBot ./GoldyBot
 COPY pyproject.toml .
-COPY docker_stuff/run.sh .
-COPY docker_stuff/cli.py .
-COPY docker_stuff/run.py .
+COPY docker_stuff .
 
 RUN pip install .
 
