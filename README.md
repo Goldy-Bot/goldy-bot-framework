@@ -28,6 +28,11 @@
 <br>
 
 ## *Install/Set Up* - ``Normal``
+
+These instructions assume you have a [MongoDB database](https://www.mongodb.com/), [Git](https://git-scm.com/) and [Python](https://www.python.org/) installed.
+
+> ℹ GoldyBot will connect to your mongoDB database and create stuff.
+
 1. ~~**Install package from pypi.**~~ *not on there yet... here's a git install*
 ```sh
 # Windows/Linux
@@ -43,7 +48,7 @@ Create a directory of your choice anywhere, then open a terminal in that directo
 goldybot setup normal
 ```
 
-3. **Run goldy!**
+3. **Run goldy!** ⚡
 
 Make sure to enter your Discord BOT token and mongoDB database token in the ``.env`` file generated in your folder.
 ```env
@@ -51,7 +56,28 @@ DISCORD_TOKEN="DISCORD BOT TOKEN HERE"
 MONGODB_TOKEN="MONGO DATABASE TOKEN HERE"
 ```
 
-Now you may run GoldyBot! 🌠✨
+Also make sure to add your discord guild to ``allowed_guilds`` in ``goldy.json``.
+
+You may change ``"uwu_hangout_guild"`` to anything you like but just remember this will be the code_name of the guild within goldy bot and you'll use this code_name to reference it.
+
+```json
+{
+    "goldy" : {
+        "extensions": {
+            "ignored_extensions" : [],
+
+            "raise_on_load_error" : true,
+            "folder_location" : "./extensions"
+        },
+
+        "allowed_guilds" : {
+            "{guild_id_here}" : "uwu_hangout_guild"
+        }
+    }
+}
+```
+
+**Now you may run GoldyBot! 🌠✨**
 ```sh
 python run.py
 ```
