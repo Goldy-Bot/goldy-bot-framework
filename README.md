@@ -32,7 +32,7 @@
 ```sh
 # Windows/Linux
 
-pip install goldybot@git+https://github.com/Goldy-Bot/Goldy-Bot-V5
+pip install GoldyBot@git+https://github.com/Goldy-Bot/Goldy-Bot-V5
 ```
 
 <br>
