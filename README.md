@@ -25,8 +25,6 @@
 
 </p>
 
-<br>
-
 ## *Install/Set Up*
 1. ~~**Install package from pypi.**~~ *not on there yet...*
 ```sh
