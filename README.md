@@ -27,13 +27,36 @@
 
 <br>
 
-## *Install/Set Up*
-1. ~~**Install package from pypi.**~~ *not on there yet...*
+## *Install/Set Up* - ``Normal``
+1. ~~**Install package from pypi.**~~ *not on there yet... here's a git install*
 ```sh
 # Windows/Linux
 
 pip install GoldyBot@git+https://github.com/Goldy-Bot/Goldy-Bot-V5
 ```
+
+2. **Generate a quick template.**
+Create a directory of your choice anywhere, then open a terminal in that directory and type the following below.
+```sh
+# Windows/Linux
+
+goldybot setup normal
+```
+
+3. **Run goldy!**
+
+Make sure to enter your Discord BOT token and mongoDB database token in the ``.env`` file generated in your folder.
+```env
+DISCORD_TOKEN="DISCORD BOT TOKEN HERE"
+MONGODB_TOKEN="MONGO DATABASE TOKEN HERE"
+```
+
+Now you may run GoldyBot! 🌠✨
+```sh
+python run.py
+```
+
+
 
 <br>
 
