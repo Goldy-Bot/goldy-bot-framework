@@ -25,12 +25,14 @@
 
 </p>
 
+<br>
+
 ## *Install/Set Up*
 1. ~~**Install package from pypi.**~~ *not on there yet...*
 ```sh
-#Windows/Linux
+# Windows/Linux
 
-pip install GoldyBot
+pip install goldybot@git+https://github.com/Goldy-Bot/Goldy-Bot-V5
 ```
 
 <br>
