@@ -13,13 +13,13 @@
 
 #### ⚠ *Warning: ``GoldyBot`` is in very deep development right now so some utils and code will be incomplete.*
 
-<br>
-
 <p align="right">
 
-  <img align="left" src="./assets/goldy_art/1.png" width="200"/>
- 
-  <h2>Why Goldy Bot V5?</h2>
+
+  <h2>Why Version 5?</h2>
+
+  
+  <img align="left" src="./assets/goldy_art/1.png" width="180"/>
 
   > I'm developing a new Discord bot framework to replace my [previous one](https://github.com/Goldy-Bot/Goldy-Bot-V4), which I found limiting and frustrating. The new framework will be more efficient and user-friendly and will utilize what I believe to be a better API wrapper than discord.py, which prompted the rewrite. Originally, I planned to update [V4](https://github.com/Goldy-Bot/Goldy-Bot-V4) for backwards compatibility, but it would be too difficult, and my extensions would need to be rewritten anyways. Therefore, I'm excited to announce the upcoming release of Goldy Bot Framework V5, which will be a brand-new framework starting fresh. 🍋
 
