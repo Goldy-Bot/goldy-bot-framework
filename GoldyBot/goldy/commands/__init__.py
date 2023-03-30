@@ -212,6 +212,7 @@ class Command():
 
         # Set event listener for slash command.
         # --------------------------------------
+        # TODO: This may change. I haven't done much testing with this but it may be better to just add one global listener for all commands instead of having one for each command.
         self.goldy.shard_manager.event_dispatcher.add_listener(
             self.__invoke_slash,
             event_name="INTERACTION_CREATE"
