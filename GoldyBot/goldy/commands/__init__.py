@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from devgoldyutils import Colours
 from typing import List, Callable, Tuple, TYPE_CHECKING
 from discord_typings import ApplicationCommandData, MessageData, InteractionData, ApplicationCommandPayload
 
@@ -150,7 +151,11 @@ class Command():
         if gold_plater.type.value == PlatterType.PREFIX_CMD.value:
             data:MessageData = data
 
-            self.logger.info(f"Prefix command invoked by '{data['author']['username']}#{data['author']['discriminator']}'.")
+            self.logger.info(
+                Colours.BLUE.apply(
+                    f"Prefix command invoked by '{data['author']['username']}#{data['author']['discriminator']}'."
+                )
+            )
 
             if self.in_extension:
                 await self.func(self.extension, gold_plater)
@@ -163,7 +168,11 @@ class Command():
         if gold_plater.type.value == PlatterType.SLASH_CMD.value:
             data:InteractionData = data
 
-            self.logger.info(f"Slash command invoked by '{data['member']['user']['username']}#{data['member']['user']['discriminator']}'.")
+            self.logger.info(
+                Colours.CLAY.apply(
+                    f"Slash command invoked by '{data['member']['user']['username']}#{data['member']['user']['discriminator']}'."
+                )
+            )
 
             if self.in_extension:
                 await self.func(self.extension, gold_plater)
