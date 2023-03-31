@@ -80,6 +80,8 @@ class Goldy():
         """
         self.command_loader = CommandLoader(self)
         """Class that handles command loading."""
+        self.command_listener = CommandListener(self)
+        """Class that handles the invoking of commands."""
         self.extension_loader = ExtensionLoader(self, raise_on_extension_loader_error)
         """Class that handles extension loading."""
         self.extension_reloader = ExtensionReloader(self)
@@ -154,6 +156,7 @@ class Goldy():
         
         self.extension_loader.load()
         await self.command_loader.load()
+        await self.command_listener.start_listening()
 
     def stop(self, reason:str = "Unknown Reason"):
         """Shuts down goldy bot right away and safely incase anything sussy wussy is going on. 😳"""
@@ -197,6 +200,7 @@ from .presence import Presence, Status, ActivityTypes
 from .goldy_config import GoldyConfig
 from .extensions.extension_loader import ExtensionLoader
 from .extensions.extension_reloader import ExtensionReloader
-from .commands.command_loader import CommandLoader
+from .commands.loader import CommandLoader
+from .commands.listener import CommandListener
 from .live_console import LiveConsole
 from .guilds import Guilds

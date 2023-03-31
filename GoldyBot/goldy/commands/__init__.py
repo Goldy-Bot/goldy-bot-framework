@@ -23,14 +23,14 @@ class Command():
     """Class that represents all commands in goldy bot."""
     def __init__(
         self, 
-        goldy:Goldy, 
+        goldy: Goldy, 
         func, 
-        name:str = None, 
-        description:str = None, 
-        required_roles:List[str] = None, 
-        allow_prefix_cmd:bool = True, 
-        allow_slash_cmd:bool = True, 
-        parent_cmd:Command = None
+        name: str = None, 
+        description: str = None, 
+        required_roles: List[str] = None, 
+        allow_prefix_cmd: bool = True, 
+        allow_slash_cmd: bool = True, 
+        parent_cmd: Command = None
     ):
         """A class representing a GoldyBot command."""
         self.func:Callable = func
@@ -51,7 +51,7 @@ class Command():
         self.goldy = goldy
         self.logger = LoggerAdapter(
             LoggerAdapter(goldy_bot_logger, prefix="Command"), 
-            prefix=(lambda x: self.func.__name__ if x is None else x)(self.name)
+            prefix = Colours.GREY.apply((lambda x: self.func.__name__ if x is None else x)(self.name))
         )
 
         # If cmd_name is null, set it to function name.
@@ -120,24 +120,7 @@ class Command():
         return self.__loaded
 
 
-    async def __invoke_prefix(self, data:MessageData):
-        guild = self.goldy.guilds.get_guild(data["guild_id"])
-
-        if guild is not None:
-
-            if data["content"] == f"{guild.prefix}{self.name}":
-                self.goldy.async_loop.create_task(self.__invoke(data, type=PlatterType.PREFIX_CMD))
-
-    async def __invoke_slash(self, data:InteractionData):
-        guild = self.goldy.guilds.get_guild(data["guild_id"])
-
-        if guild is not None:
-
-            if self.name == data["data"]["name"]:
-                self.goldy.async_loop.create_task(self.__invoke(data, type=PlatterType.SLASH_CMD))
-
-
-    async def __invoke(self, data:MessageData|InteractionData, type:PlatterType|int) -> None:
+    async def invoke(self, data:MessageData|InteractionData, type:PlatterType|int) -> None:
         """Runs/triggers this command. This method is mostly supposed to be used internally."""
         self.logger.debug(f"Attempting to invoke '{type.name}'...")
         
@@ -219,18 +202,9 @@ class Command():
 
             self.logger.debug(f"Created slash for guild '{guild[1]}'.")
 
-        # Set event listener for slash command.
-        # --------------------------------------
-        # TODO: This may change. I haven't done much testing with this but it may be better to just add one global listener for all commands instead of having one for each command.
-        self.goldy.shard_manager.event_dispatcher.add_listener(
-            self.__invoke_slash,
-            event_name="INTERACTION_CREATE"
-        )
-
         self.list_of_application_command_data = list_of_application_command_data
         return list_of_application_command_data
     
-
     async def remove_slash(self) -> None:
         """Un-registers the slash command."""
         self.logger.debug(f"Removing slash command for '{self.name}'...")
@@ -251,37 +225,6 @@ class Command():
 
             self.logger.debug(f"Deleted slash for guild with id '{slash_command[0]}'.")
 
-        # Remove event listener for slash command.
-        # --------------------------------------
-        self.goldy.shard_manager.event_dispatcher.remove_listener(
-            self.__invoke_slash,
-            event_name="INTERACTION_CREATE"
-        )
-
-        return None
-    
-
-    def create_normal(self) -> None:
-        """Creates and registers a normal on-msg/prefix command in goldy bot. Also know as a prefix command. E.g.``!goldy``"""
-        self.logger.debug(f"Creating normal/prefix command for '{self.name}'...")
-
-        self.goldy.shard_manager.event_dispatcher.add_listener(
-            self.__invoke_prefix,
-            event_name="MESSAGE_CREATE"
-        )
-
-        return None
-    
-
-    def remove_normal(self) -> None:
-        """Un-registers the prefix command."""
-        self.logger.debug(f"Removing normal/prefix command for '{self.name}'...")
-
-        self.goldy.shard_manager.event_dispatcher.remove_listener(
-            self.__invoke_prefix,
-            event_name="MESSAGE_CREATE"
-        )
-
         return None
 
 
@@ -289,9 +232,6 @@ class Command():
         """Loads and creates the command."""
         if self.allow_slash_cmd:
             await self.create_slash()
-
-        if self.allow_prefix_cmd:
-            self.create_normal()
 
         if self.extension is not None:
             self.extension.add_command(self)
@@ -310,9 +250,6 @@ class Command():
 
         if self.allow_slash_cmd:
             await self.remove_slash()
-
-        if self.allow_prefix_cmd:
-            self.remove_normal()
 
         self.__loaded = False
 

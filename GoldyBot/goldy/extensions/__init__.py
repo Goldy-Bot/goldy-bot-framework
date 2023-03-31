@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+from devgoldyutils import Colours
 from typing import Tuple, List, TYPE_CHECKING
 
 from ...goldy import get_goldy_instance
@@ -43,8 +44,8 @@ class Extension():
         self.ignored_extensions_list = self.goldy.config.ignored_extensions
 
         self.logger = LoggerAdapter(
-            LoggerAdapter(goldy_bot_logger, prefix="Extensions"), 
-            prefix=self.code_name
+            LoggerAdapter(goldy_bot_logger, prefix = "Extensions"), 
+            prefix = Colours.GREY.apply(self.code_name)
         )
 
         # Cached commands list.
