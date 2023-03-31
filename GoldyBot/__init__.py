@@ -16,7 +16,7 @@ from .goldy.extensions import Extension
 from .goldy.commands.decorator import command
 from .goldy.utils import *
 
-from .goldy.nextcore_utils import ( send_msg, delete_msg )
+from .goldy.nextcore_utils import ( Embed, send_msg, delete_msg )
 
 from .goldy.objects.gold_platter import GoldPlatter, PlatterType
 from .goldy.objects.message import Message

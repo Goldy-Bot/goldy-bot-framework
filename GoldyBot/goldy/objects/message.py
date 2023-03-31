@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 
 logger = LoggerAdapter(goldy_bot_logger, prefix="Message")
 
-@dataclass()
+@dataclass
 class Message(DictDataclass):
     data:MessageData = field(repr=False)
     goldy:Goldy = field(repr=False)

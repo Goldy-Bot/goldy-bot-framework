@@ -1,8 +1,8 @@
 from __future__ import annotations
 from enum import Enum
 
-from typing import TYPE_CHECKING
-from discord_typings import MessageData, InteractionData
+from typing import TYPE_CHECKING, List
+from discord_typings import MessageData, InteractionData, EmbedData
 
 if TYPE_CHECKING:
     from ...goldy import Goldy
@@ -44,8 +44,30 @@ class GoldPlatter():
         self.interaction_responded = False
         """An internal property that is set by the ``nextcore_utils.send_msg()`` method when a slash command is responded to."""
 
-    async def send_message(self, text:str, reply:bool=False) -> Message:
-        return await nextcore_utils.send_msg(self, text, reply)
+    async def send_message(self, text:str=None, embeds:List[EmbedData]=None, reply:bool=False, **extra) -> Message:
+        """
+        Allows you to create and send a message to the channel the command was invoked from as a form of reply.
+        
+        ------------------
+
+        Parameters
+        ----------
+        ``text``
+            The content of the message.
+        ``embeds``
+            Embeds to include in the message.
+        ``reply``
+            Whether goldy bot should liberally reply to the message the command was invoked.
+        ``**extra``
+            Allows you to pass the extra parameters that are missing.
+
+        Returns
+        -------
+        ``GoldyBot.goldy.objects.message.Message``
+            The message that was sent.
+        
+        """
+        return await nextcore_utils.send_msg(self, text, embeds, reply, **extra)
 
 
 from .member import Member
