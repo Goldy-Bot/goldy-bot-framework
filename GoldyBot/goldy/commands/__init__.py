@@ -1,12 +1,14 @@
 from __future__ import annotations
 
 from devgoldyutils import Colours
-from typing import List, Callable, Tuple, TYPE_CHECKING
-from discord_typings import ApplicationCommandData, MessageData, InteractionData, ApplicationCommandPayload
+from typing import List, Callable, Tuple, TYPE_CHECKING, Dict
+from discord_typings import ApplicationCommandData, MessageData, InteractionData, ApplicationCommandPayload, ApplicationCommandOptionData, ApplicationCommandOptionInteractionData
+from discord_typings.interactions.commands import ChoicesStringOptionData
 
 from nextcore.http import Route
 
-from .. import utils
+from .. import utils, nextcore_utils
+from ... import errors
 from ..objects import GoldPlatter, PlatterType
 from ... import LoggerAdapter, goldy_bot_logger
 from ..extensions import Extension, extensions_cache
@@ -28,6 +30,7 @@ class Command():
         name: str = None, 
         description: str = None, 
         required_roles: List[str] = None, 
+        slash_options: Dict[str, ApplicationCommandOptionData] = None,
         allow_prefix_cmd: bool = True, 
         allow_slash_cmd: bool = True, 
         parent_cmd: Command = None
@@ -41,6 +44,8 @@ class Command():
         """The command's set description. None if there is no description set."""
         self.required_roles = required_roles
         """The code names for the roles needed to access this command."""
+        self.slash_options = slash_options
+        """Allows you to customize slash command arguments and make them beautiful 🥰."""
         self.allow_prefix_cmd = allow_prefix_cmd
         """If the creation of a prefix command is allowed."""
         self.allow_slash_cmd = allow_slash_cmd
@@ -60,18 +65,24 @@ class Command():
         
         if self.description is None:
             self.description = "This command has no description. Sorry about that."
+
+        if self.required_roles is None:
+            self.required_roles = []
+
+        if self.slash_options is None:
+            self.slash_options = {}
         
         # Get list of function params.
         self.params = list(self.func.__code__.co_varnames)
-        self.__params_amount = self.func.__code__.co_argcount
         
         # Check if command is inside extension by checking if self is first parameter.
         self.__in_extension = False
 
         if self.params[0] == "self":
             self.__in_extension = True
-            self.__params_amount -= 1
             self.params.pop(0)
+
+        self.params.pop(0) # Remove 'platter' argument.
 
         self.list_of_application_command_data:List[Tuple[str, ApplicationCommandData]] | None = None
 
@@ -120,7 +131,7 @@ class Command():
         return self.__loaded
 
 
-    async def invoke(self, data:MessageData|InteractionData, type:PlatterType|int) -> None:
+    async def invoke(self, data: MessageData|InteractionData, type: PlatterType) -> None:
         """Runs/triggers this command. This method is mostly supposed to be used internally."""
         self.logger.debug(f"Attempting to invoke '{type.name}'...")
         
@@ -140,10 +151,14 @@ class Command():
                 )
             )
 
+            params = nextcore_utils.invoke_data_to_params(data, type)
+
+            # Run callback.
+            # --------------
             if self.in_extension:
-                await self.func(self.extension, gold_plater)
+                await self.func(self.extension, gold_plater, *params)
             else:
-                await self.func(gold_plater)
+                await self.func(gold_plater, *params)
 
 
         # Slash command.
@@ -156,11 +171,15 @@ class Command():
                     f"Slash command invoked by '{data['member']['user']['username']}#{data['member']['user']['discriminator']}'."
                 )
             )
+            
+            params = nextcore_utils.invoke_data_to_params(data, type)
 
+            # Run callback.
+            # --------------
             if self.in_extension:
-                await self.func(self.extension, gold_plater)
+                await self.func(self.extension, gold_plater, **params)
             else:
-                await self.func(gold_plater)
+                await self.func(gold_plater, **params)
 
         return None
 
@@ -171,15 +190,18 @@ class Command():
 
         list_of_application_command_data = []
 
+        # Creating payload.
+        # ------------------
+        payload = ApplicationCommandPayload(
+            name = self.name,
+            description = self.description,
+            options = nextcore_utils.params_to_options(self),
+            type = 1
+        )
+
         # Add slash command for each allowed guild.
         # -------------------------------------------
         for guild in self.goldy.guilds.allowed_guilds:
-
-            payload = ApplicationCommandPayload(
-                name = self.name,
-                description = self.description,
-                type = 1
-            )
 
             r = await self.goldy.http_client.request(
                 Route(
