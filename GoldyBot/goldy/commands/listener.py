@@ -85,7 +85,6 @@ class CommandListener():
             if command is not None:
 
                 if command[1].allow_prefix_cmd:
-                    # TODO: Add error handling for the TypeErrors that can occur here due to missing parameters.
                     gold_platter = GoldPlatter(
                         data = message, 
                         type = objects.PlatterType.PREFIX_CMD, 
