@@ -1,10 +1,17 @@
-from typing import Tuple
+from __future__ import annotations
+
+from typing import Tuple, TYPE_CHECKING
 from devgoldyutils import Colours
 from discord_typings import InteractionCreateData, MessageData
 
 from . import commands_cache, Command
-from .. import utils, objects, Goldy
+from .. import utils, objects
 from ... import LoggerAdapter, goldy_bot_logger
+from ..objects.gold_platter import GoldPlatter
+from ..nextcore_utils import front_end_errors
+
+if TYPE_CHECKING:
+    from .. import Goldy
 
 class CommandListener():
     """Class that handles the invoking of commands."""
@@ -46,9 +53,15 @@ class CommandListener():
             command:Tuple[str, Command] = utils.cache_lookup(interaction["data"]["name"], commands_cache)
 
             if command is not None:
-                await command[1].invoke(
+                gold_platter = GoldPlatter(
                     data = interaction, 
-                    type = objects.PlatterType.SLASH_CMD
+                    type = objects.PlatterType.SLASH_CMD, 
+                    goldy = self.goldy, 
+                    command = command[1]
+                )
+
+                await command[1].invoke(
+                    gold_platter
                 )
 
         return None
@@ -56,6 +69,10 @@ class CommandListener():
 
     async def on_prefix_cmd(self, message: MessageData) -> None:
         guild = self.goldy.guilds.get_guild(message["guild_id"])
+
+        # If user is bot return right away.
+        if message["author"].get("bot", False):
+            return
 
         if guild is not None:
             # Check if prefix is correct.
@@ -69,9 +86,15 @@ class CommandListener():
 
                 if command[1].allow_prefix_cmd:
                     # TODO: Add error handling for the TypeErrors that can occur here due to missing parameters.
-                    await command[1].invoke(
+                    gold_platter = GoldPlatter(
                         data = message, 
-                        type = objects.PlatterType.PREFIX_CMD
+                        type = objects.PlatterType.PREFIX_CMD, 
+                        goldy = self.goldy, 
+                        command = command[1]
                     )
-
+                    
+                    await command[1].invoke(
+                        gold_platter
+                    )
+        
         return None

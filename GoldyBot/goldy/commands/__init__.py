@@ -8,7 +8,7 @@ from discord_typings.interactions.commands import ChoicesStringOptionData
 from nextcore.http import Route
 
 from .. import utils, nextcore_utils
-from ... import errors
+from ..nextcore_utils import front_end_errors
 from ..objects import GoldPlatter, PlatterType
 from ... import LoggerAdapter, goldy_bot_logger
 from ..extensions import Extension, extensions_cache
@@ -131,19 +131,16 @@ class Command():
         return self.__loaded
 
 
-    async def invoke(self, data: MessageData|InteractionData, type: PlatterType) -> None:
+    async def invoke(self, gold_platter: GoldPlatter) -> None:
         """Runs/triggers this command. This method is mostly supposed to be used internally."""
-        self.logger.debug(f"Attempting to invoke '{type.name}'...")
-        
-        gold_plater = GoldPlatter(data, type, goldy=self.goldy, command=self)
+        self.logger.debug(f"Attempting to invoke '{gold_platter.type.name}'...")
 
         # TODO: Add all permission and argument management stuff here...
 
-
         # Prefix/normal command.
         # ------------------------
-        if gold_plater.type.value == PlatterType.PREFIX_CMD.value:
-            data:MessageData = data
+        if gold_platter.type.value == PlatterType.PREFIX_CMD.value:
+            data:MessageData = gold_platter.data
 
             self.logger.info(
                 Colours.BLUE.apply(
@@ -151,20 +148,39 @@ class Command():
                 )
             )
 
-            params = nextcore_utils.invoke_data_to_params(data, type)
+            params = nextcore_utils.invoke_data_to_params(data, gold_platter.type)
 
             # Run callback.
             # --------------
-            if self.in_extension:
-                await self.func(self.extension, gold_plater, *params)
-            else:
-                await self.func(gold_plater, *params)
+            try:
 
+                if self.in_extension:
+                    await self.func(self.extension, gold_platter, *params)
+                else:
+                    await self.func(gold_platter, *params)
+
+            except TypeError as e:
+                # This could mean the args are missing or it could very well be a normal type error so let's check and handle it respectively.
+                if f"{self.func.__name__}() missing" in e.args[0]:
+                    # If params are missing raise MissingArgument exception.
+                    raise front_end_errors.MissingArgument(
+                        missing_args = self.params[len(params):], 
+                        platter = gold_platter, 
+                        logger = self.logger
+                    )
+                
+                if f"{self.func.__name__}() takes from" in e.args[0]:
+                    raise front_end_errors.TooManyArguments(
+                        platter = gold_platter, 
+                        logger = self.logger
+                    )
+
+                raise e
 
         # Slash command.
         # ----------------
-        if gold_plater.type.value == PlatterType.SLASH_CMD.value:
-            data:InteractionData = data
+        if gold_platter.type.value == PlatterType.SLASH_CMD.value:
+            data:InteractionData = gold_platter.data
 
             self.logger.info(
                 Colours.CLAY.apply(
@@ -172,14 +188,14 @@ class Command():
                 )
             )
             
-            params = nextcore_utils.invoke_data_to_params(data, type)
+            params = nextcore_utils.invoke_data_to_params(data, gold_platter.type)
 
             # Run callback.
             # --------------
             if self.in_extension:
-                await self.func(self.extension, gold_plater, **params)
+                await self.func(self.extension, gold_platter, **params)
             else:
-                await self.func(gold_plater, **params)
+                await self.func(gold_platter, **params)
 
         return None
 
@@ -290,14 +306,3 @@ class Command():
         self.logger.info(
             f"Command '{self.name}' has been deleted!"
         )
-    
-    # Where I left off.
-    # TODO: Use code from goldy bot v4 to fill the rest.
-    # Like argument missing detection for prefix commands.
-
-    def any_args_missing(self, command_executers_args:tuple) -> bool:
-        """Checks if the args given by the command executer matches what parameters the command needs."""
-        if len(command_executers_args) == len(self.params[1:]):
-            return True
-        else:
-            return False

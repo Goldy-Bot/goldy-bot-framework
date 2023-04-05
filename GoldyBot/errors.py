@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 from devgoldyutils import Colours
+
 from . import goldy_bot_logger, log
 
 if TYPE_CHECKING:

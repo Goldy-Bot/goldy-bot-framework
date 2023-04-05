@@ -46,6 +46,6 @@ async def delete_msg(message:Message, reason:str=None) -> Message:
         headers = headers
     )
 
-    logger.debug(f"The message '{message.data['content'][:50]}...' in the channel '{message.data['channel_id']}' was deleted.")
+    logger.debug(f"A message in the channel '{message.data['channel_id']}' was deleted with reason: {reason}")
 
     return message

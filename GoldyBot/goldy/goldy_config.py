@@ -53,3 +53,8 @@ class GoldyConfig(Config):
             tuple_list.append((key, data[key]))
 
         return tuple_list
+    
+    @property
+    def ding_on_exit(self) -> bool:
+        """Returns whether goldy bot should play a ding sound effect on exit or not."""
+        return self.get("goldy", "ding_on_exit", default_value=False)
