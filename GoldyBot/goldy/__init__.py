@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import sys
+import time
+import pygame
 import asyncio
 
 from nextcore.http.client import HTTPClient
@@ -15,6 +17,7 @@ from devgoldyutils import Colours
 from .. import LoggerAdapter, goldy_bot_logger
 from ..errors import GoldyBotError
 from ..info import VERSION, COPYRIGHT
+from ..paths import Paths
 
 from .token import Token
 
@@ -179,6 +182,11 @@ class Goldy():
     
         self.logger.debug("Closing async_loop...")
         self.async_loop.stop()
+
+        if self.config.ding_on_exit:
+            pygame.mixer.init()
+            pygame.mixer.Sound(Paths.ASSETS + "/ding.mp3").play()
+            time.sleep(0.5)
 
 
 # Get goldy instance method.

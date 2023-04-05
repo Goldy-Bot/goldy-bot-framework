@@ -166,7 +166,7 @@ async def send_msg(
 
                 message_data = await r.json()
 
-                object.command.logger.debug(f"Interaction callback message '{text[:50]}...' was sent.")
+                object.command.logger.debug(f"Interaction callback message was sent.")
 
 
             # Follow up message.
@@ -187,7 +187,7 @@ async def send_msg(
 
                 message_data = await r.json()
 
-                object.command.logger.debug(f"Interaction follow up message '{text[:50]}...' was sent.")
+                object.command.logger.debug(f"Interaction follow up message was sent.")
 
         else:
             # Perform normal message response.
@@ -216,7 +216,7 @@ async def send_msg(
 
             message_data = await r.json()
 
-            object.command.logger.debug(f"The message '{text[:50]}...' was sent.")
+            object.command.logger.debug(f"Message was sent.")
 
 
         return objects.Message(message_data, goldy)

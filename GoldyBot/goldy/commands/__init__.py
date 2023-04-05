@@ -1,12 +1,14 @@
 from __future__ import annotations
 
 from devgoldyutils import Colours
-from typing import List, Callable, Tuple, TYPE_CHECKING
-from discord_typings import ApplicationCommandData, MessageData, InteractionData, ApplicationCommandPayload
+from typing import List, Callable, Tuple, TYPE_CHECKING, Dict
+from discord_typings import ApplicationCommandData, MessageData, InteractionData, ApplicationCommandPayload, ApplicationCommandOptionData, ApplicationCommandOptionInteractionData
+from discord_typings.interactions.commands import ChoicesStringOptionData
 
 from nextcore.http import Route
 
-from .. import utils
+from .. import utils, nextcore_utils
+from ..nextcore_utils import front_end_errors
 from ..objects import GoldPlatter, PlatterType
 from ... import LoggerAdapter, goldy_bot_logger
 from ..extensions import Extension, extensions_cache
@@ -28,6 +30,7 @@ class Command():
         name: str = None, 
         description: str = None, 
         required_roles: List[str] = None, 
+        slash_options: Dict[str, ApplicationCommandOptionData] = None,
         allow_prefix_cmd: bool = True, 
         allow_slash_cmd: bool = True, 
         parent_cmd: Command = None
@@ -41,6 +44,8 @@ class Command():
         """The command's set description. None if there is no description set."""
         self.required_roles = required_roles
         """The code names for the roles needed to access this command."""
+        self.slash_options = slash_options
+        """Allows you to customize slash command arguments and make them beautiful 🥰."""
         self.allow_prefix_cmd = allow_prefix_cmd
         """If the creation of a prefix command is allowed."""
         self.allow_slash_cmd = allow_slash_cmd
@@ -60,18 +65,24 @@ class Command():
         
         if self.description is None:
             self.description = "This command has no description. Sorry about that."
+
+        if self.required_roles is None:
+            self.required_roles = []
+
+        if self.slash_options is None:
+            self.slash_options = {}
         
         # Get list of function params.
         self.params = list(self.func.__code__.co_varnames)
-        self.__params_amount = self.func.__code__.co_argcount
         
         # Check if command is inside extension by checking if self is first parameter.
         self.__in_extension = False
 
         if self.params[0] == "self":
             self.__in_extension = True
-            self.__params_amount -= 1
             self.params.pop(0)
+
+        self.params.pop(0) # Remove 'platter' argument.
 
         self.list_of_application_command_data:List[Tuple[str, ApplicationCommandData]] | None = None
 
@@ -120,19 +131,16 @@ class Command():
         return self.__loaded
 
 
-    async def invoke(self, data:MessageData|InteractionData, type:PlatterType|int) -> None:
+    async def invoke(self, gold_platter: GoldPlatter) -> None:
         """Runs/triggers this command. This method is mostly supposed to be used internally."""
-        self.logger.debug(f"Attempting to invoke '{type.name}'...")
-        
-        gold_plater = GoldPlatter(data, type, goldy=self.goldy, command=self)
+        self.logger.debug(f"Attempting to invoke '{gold_platter.type.name}'...")
 
         # TODO: Add all permission and argument management stuff here...
 
-
         # Prefix/normal command.
         # ------------------------
-        if gold_plater.type.value == PlatterType.PREFIX_CMD.value:
-            data:MessageData = data
+        if gold_platter.type.value == PlatterType.PREFIX_CMD.value:
+            data:MessageData = gold_platter.data
 
             self.logger.info(
                 Colours.BLUE.apply(
@@ -140,27 +148,54 @@ class Command():
                 )
             )
 
-            if self.in_extension:
-                await self.func(self.extension, gold_plater)
-            else:
-                await self.func(gold_plater)
+            params = nextcore_utils.invoke_data_to_params(data, gold_platter.type)
 
+            # Run callback.
+            # --------------
+            try:
+
+                if self.in_extension:
+                    await self.func(self.extension, gold_platter, *params)
+                else:
+                    await self.func(gold_platter, *params)
+
+            except TypeError as e:
+                # This could mean the args are missing or it could very well be a normal type error so let's check and handle it respectively.
+                if f"{self.func.__name__}() missing" in e.args[0]:
+                    # If params are missing raise MissingArgument exception.
+                    raise front_end_errors.MissingArgument(
+                        missing_args = self.params[len(params):], 
+                        platter = gold_platter, 
+                        logger = self.logger
+                    )
+                
+                if f"{self.func.__name__}() takes from" in e.args[0]:
+                    raise front_end_errors.TooManyArguments(
+                        platter = gold_platter, 
+                        logger = self.logger
+                    )
+
+                raise e
 
         # Slash command.
         # ----------------
-        if gold_plater.type.value == PlatterType.SLASH_CMD.value:
-            data:InteractionData = data
+        if gold_platter.type.value == PlatterType.SLASH_CMD.value:
+            data:InteractionData = gold_platter.data
 
             self.logger.info(
                 Colours.CLAY.apply(
                     f"Slash command invoked by '{data['member']['user']['username']}#{data['member']['user']['discriminator']}'."
                 )
             )
+            
+            params = nextcore_utils.invoke_data_to_params(data, gold_platter.type)
 
+            # Run callback.
+            # --------------
             if self.in_extension:
-                await self.func(self.extension, gold_plater)
+                await self.func(self.extension, gold_platter, **params)
             else:
-                await self.func(gold_plater)
+                await self.func(gold_platter, **params)
 
         return None
 
@@ -171,15 +206,18 @@ class Command():
 
         list_of_application_command_data = []
 
+        # Creating payload.
+        # ------------------
+        payload = ApplicationCommandPayload(
+            name = self.name,
+            description = self.description,
+            options = nextcore_utils.params_to_options(self),
+            type = 1
+        )
+
         # Add slash command for each allowed guild.
         # -------------------------------------------
         for guild in self.goldy.guilds.allowed_guilds:
-
-            payload = ApplicationCommandPayload(
-                name = self.name,
-                description = self.description,
-                type = 1
-            )
 
             r = await self.goldy.http_client.request(
                 Route(
@@ -268,14 +306,3 @@ class Command():
         self.logger.info(
             f"Command '{self.name}' has been deleted!"
         )
-    
-    # Where I left off.
-    # TODO: Use code from goldy bot v4 to fill the rest.
-    # Like argument missing detection for prefix commands.
-
-    def any_args_missing(self, command_executers_args:tuple) -> bool:
-        """Checks if the args given by the command executer matches what parameters the command needs."""
-        if len(command_executers_args) == len(self.params[1:]):
-            return True
-        else:
-            return False

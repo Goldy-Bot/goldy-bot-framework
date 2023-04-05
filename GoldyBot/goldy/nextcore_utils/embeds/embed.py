@@ -1,5 +1,8 @@
+from __future__ import annotations
+
 from typing import List
 from discord_typings import EmbedData, EmbedFieldData
+from ..colours import Colours
 
 class EmbedField(dict):
     """A class used to create an embed field for an embed."""
@@ -24,7 +27,7 @@ class EmbedField(dict):
 
 class Embed(dict):
     """A class used to create a discord embed."""
-    def __init__(self, title:str=None, description:str=None, fields:List[EmbedField]=None, **extra) -> None:
+    def __init__(self, title:str=None, description:str=None, fields:List[EmbedField]=None, color:Colours|int=None, colour:Colours|int=None, **extra) -> None:
         """
         Creates a discord embed. 😋
         
@@ -43,6 +46,18 @@ class Embed(dict):
 
             for field in fields:
                 self.data["fields"].append(field)
+
+        if color is None and colour is None:
+            colour = Colours.INVISIBLE.value
+
+        if color is not None:
+            colour = color
+
+        if colour is not None:
+            if isinstance(colour, Colours):
+                colour = colour.value
+            
+            self.data["color"] = colour
 
         self.data.update(extra)
 
