@@ -1,31 +1,14 @@
 import sys; sys.path.insert(0, '..')
+import os
 
-import js2py
-from js2py.es6 import js6_to_js5
 import GoldyBot
+import time
+from javascript import require, eval_js, globalThis
 
 GoldyBot.Goldy()
 
-context = js2py.EvalJs({'GoldyBot': GoldyBot})  
+globalThis.__setattr__("GoldyBot", GoldyBot) # SUCCESS
 
-js_code = """
-export default class YourExtension {
-   constructor() {
-      super();
-   }
+bruh = require("./bruh.mjs")
 
-   async hello(platter) {
-      await platter.send_message("hello", {
-         "reply": true
-      });
-   }
-}
-
-function load() {
-   new YourExtension();
-}
-"""
-
-js2py.eval_js6('let a = () => 11; a()')
-
-#context.execute(js6_to_js5(js_code))
+print(">>", bruh().constructor.name)
