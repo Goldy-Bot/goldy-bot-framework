@@ -8,6 +8,6 @@ __pycache__
 .coverage
 .vscode
 
-demo
+demo/*
 !demo/run.py
 !demo/cli_demo.py
