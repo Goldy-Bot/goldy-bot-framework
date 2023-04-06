@@ -7,7 +7,7 @@ import logging as log
 from ... import errors
 from ..nextcore_utils import Colours
 from .embeds.embed import Embed
-from ..objects.gold_platter import GoldPlatter
+from ..objects.golden_platter import GoldenPlatter
 
 class FrontEndErrors(errors.GoldyBotError):
     def __init__(
@@ -15,7 +15,7 @@ class FrontEndErrors(errors.GoldyBotError):
             title: str,
             description: str,
             message: str,
-            platter: GoldPlatter, 
+            platter: GoldenPlatter, 
             embed_colour = Colours.AKI_ORANGE,
             logger: log.Logger = None
         ):
@@ -29,7 +29,8 @@ class FrontEndErrors(errors.GoldyBotError):
                         colour = embed_colour
                     )
                 ],
-                reply = True
+                reply = True,
+                delete_after = 4
             )
         )
 
@@ -37,7 +38,7 @@ class FrontEndErrors(errors.GoldyBotError):
 
 
 class MissingArgument(FrontEndErrors):
-    def __init__(self, missing_args: list, platter: GoldPlatter, logger: log.Logger = None):
+    def __init__(self, missing_args: list, platter: GoldenPlatter, logger: log.Logger = None):
         command_args_string = ""
         for param in platter.command.params:
             command_args_string += f"{{{param}}} "
@@ -60,13 +61,13 @@ class MissingArgument(FrontEndErrors):
 
 
 class TooManyArguments(FrontEndErrors):
-    def __init__(self, platter: GoldPlatter, logger: log.Logger = None):
+    def __init__(self, platter: GoldenPlatter, logger: log.Logger = None):
         command_args_string = ""
         for param in platter.command.params:
             command_args_string += f"{{{param}}} "
 
         super().__init__(
-            title = "❤ You gave me too many arguments.", 
+            title = ":heart: You gave me too many arguments.", 
             description = f"""
 **Command Usage -> ``!{platter.command.name} {command_args_string[:-1]}``**
 """, 

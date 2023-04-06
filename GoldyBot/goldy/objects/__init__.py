@@ -1,6 +1,6 @@
 from .message import Message
 from .member import Member
-from .gold_platter import GoldPlatter, PlatterType
+from .golden_platter import GoldenPlatter, PlatterType
 
-Ctx = GoldPlatter
-Context = GoldPlatter
+Ctx = GoldenPlatter
+Context = GoldenPlatter

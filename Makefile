@@ -11,3 +11,9 @@ docker-build:
 
 docker-compose:
 	docker compose --env-file ./demo/.env up
+
+build-clean-docs:
+	cd docs && make clean && make html
+
+build-docs:
+	cd docs && make html

@@ -45,7 +45,7 @@ def invoke_data_to_params(data: MessageData | InteractionData, platter_type: Pla
     
     if platter_type.value == PlatterType.SLASH_CMD.value:
         params = {}
-        for option in data["data"]["options"]:
+        for option in data["data"].get("options", []):
             params[option["name"]] = option["value"]
 
         return params

@@ -36,8 +36,15 @@ dynamic = ["version"]
 
 [project.optional-dependencies]
 dev = [
-  "pytest",
-  "pytest-cov",
+    "Sphinx",
+    "sphinxext-opengraph",
+    "sphinx-inline-tabs",
+    "furo",
+    "pytest",
+    "pytest-cov",
+]
+api = [
+    "js2py"
 ]
 
 [project.urls]

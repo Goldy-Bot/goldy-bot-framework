@@ -2,6 +2,7 @@ build
 GoldyBot.egg-info
 dist
 env
+docs/_build
 __pycache__
 .pytest_cache
 .coverage

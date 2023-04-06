@@ -7,13 +7,13 @@ from aiohttp import FormData
 from nextcore.http import Route
 from nextcore.common import json_dumps
 
-from ... import objects
+from ... import objects, utils
 
 # TODO: Add more options to allow using channel instead of platter.
 
 @overload
 async def send_msg(
-    platter: objects.GoldPlatter, 
+    platter: objects.GoldenPlatter, 
     text: str = None, 
     embeds: List[EmbedData] = None, 
     reply: bool = False, 
@@ -105,10 +105,11 @@ async def send_msg(
     ...
 
 async def send_msg(
-    object: objects.GoldPlatter | objects.Member, 
+    object: objects.GoldenPlatter | objects.Member, 
     text: str = None, 
     embeds: List[EmbedData] = None, 
-    reply = False, 
+    reply: bool = False, 
+    delete_after: float = None,
     **extra: MessageData | InteractionCallbackData
 ) -> objects.Message:
     
@@ -127,7 +128,7 @@ async def send_msg(
 
 
     # TODO: Add support for member and channel objects.
-    if isinstance(object, objects.GoldPlatter):
+    if isinstance(object, objects.GoldenPlatter):
 
         if object.type.value == 1:
             # Perform interaction response.
@@ -219,7 +220,16 @@ async def send_msg(
             object.command.logger.debug(f"Message was sent.")
 
 
-        return objects.Message(message_data, goldy)
+        message = objects.Message(message_data, goldy)
+
+        if delete_after is not None:
+            utils.delay(
+                coro = message.delete(f"delete_after was set to {delete_after} seconds"), 
+                seconds = delete_after, 
+                goldy = goldy
+            )
+
+        return message
     
 
     if isinstance(object, objects.Member):

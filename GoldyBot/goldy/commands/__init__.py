@@ -9,7 +9,7 @@ from nextcore.http import Route
 
 from .. import utils, nextcore_utils
 from ..nextcore_utils import front_end_errors
-from ..objects import GoldPlatter, PlatterType
+from ..objects import GoldenPlatter, PlatterType
 from ... import LoggerAdapter, goldy_bot_logger
 from ..extensions import Extension, extensions_cache
 
@@ -131,7 +131,7 @@ class Command():
         return self.__loaded
 
 
-    async def invoke(self, gold_platter: GoldPlatter) -> None:
+    async def invoke(self, gold_platter: GoldenPlatter) -> None:
         """Runs/triggers this command. This method is mostly supposed to be used internally."""
         self.logger.debug(f"Attempting to invoke '{gold_platter.type.name}'...")
 

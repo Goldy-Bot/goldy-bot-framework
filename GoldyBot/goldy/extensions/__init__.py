@@ -20,22 +20,25 @@ class Extension():
     The base class for a Goldy Bot extension. 
 
     ---------------
-    ### ***``Example:``***
 
-    This is how you set up an extension in a GoldyBot module. 😍
+    ⭐ Example:
+    -------------
+    This is how you set up an extension in a GoldyBot module::
+    
+        class YourExtension(GoldyBot.Extension):
+            def __init__(self):
+                super().__init__()
 
-    ```python
-    class YourExtension(GoldyBot.Extension):
-        def __init__(self):
-            super().__init__()
+            @GoldyBot.command()
+            async def hello(self, platter: GoldyBot.GoldenPlatter):
+                await platter.send_message("👋hello", reply=True)
 
-        @GoldyBot.command()
-        async def uwu(self:YourExtension, ctx):
-            await send(ctx, f'Hi, {ctx.author.mention}! OwO!')
+        def load():
+            YourExtension()
 
-    def load():
-        YourExtension()
-    ```
+    More at our `docs`_.
+
+    .. _docs: https://goldybot.devgoldy.me/goldy.extensions.html#how-to-create-an-extension
     """
 
     def __init__(self):

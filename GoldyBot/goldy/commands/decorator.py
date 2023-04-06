@@ -20,15 +20,15 @@ def command(
     Add a command to Goldy Bot with this decorator.
     
     ---------------
-    ### ***``Example:``***
-
-    This is how you create a command in GoldyBot. 😀
-
-    ```python
-    @GoldyBot.command()
-    async def uwu(ctx):
-        await send(ctx, f'Hi, {ctx.author.mention}! UwU!')
-    ```
+    
+    ⭐ Example:
+    -------------
+    This is how you create a command in GoldyBot::
+    
+        @GoldyBot.command()
+        async def uwu(ctx):
+            await send(ctx, f'Hi, {ctx.author.mention}! UwU!')
+    
     """
     def decorate(func):
         def inner(func) -> Command:
