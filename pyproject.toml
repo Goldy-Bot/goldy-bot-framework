@@ -29,7 +29,8 @@ dependencies = [
     "python-decouple>=3.7",
     "motor",
     "cmd2",
-    "pygame"
+    "pygame",
+    "regex"
 ]
 
 dynamic = ["version"]
@@ -44,7 +45,7 @@ dev = [
     "pytest-cov",
 ]
 api = [
-    "js2py"
+    "javascript"
 ]
 
 [project.urls]
