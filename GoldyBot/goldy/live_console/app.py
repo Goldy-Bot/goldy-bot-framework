@@ -30,7 +30,7 @@ class LiveConsoleApp(cmd2.Cmd):
         self.goldy.async_loop.create_task(self.goldy.extension_loader.reload((lambda x: [x[1]] if x is not None else None)(extension)))
 
     def do_quit(self, _: cmd2.Statement):
-        self.logger.debug("Exiting...")
+        self.logger.info("Exiting...")
         self.goldy.stop("Console master commanded me to stop!")
 
     def do_exit(self, _: cmd2.Statement):
