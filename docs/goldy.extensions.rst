@@ -1,6 +1,5 @@
 :og:description: In goldy bot instead of cogs or whatever you may call them we have extensions.
-   Extensions are.... well.... EXTENSIONS! They are modules that extend the goldy bot framework. 
-   You can create an extension for ANYTHING, a music bot, commands to lookup game stats and a lot more exciting commands. ☁ The skies your limit.
+   Extensions are.... well.... EXTENSIONS! They are modules that extend the goldy bot framework.
 
 ➕Extensions
 ==============
