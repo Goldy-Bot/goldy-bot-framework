@@ -113,7 +113,7 @@ class Command():
     def extension(self) -> Extension | None:
         """Finds and returns the object of the command's extension. Returns None if command is not in any extension."""
         if self.in_extension:
-            return utils.cache_lookup(self.extension_name, extensions_cache)[1]
+            return (lambda x: x[1] if x is not None else None)(utils.cache_lookup(self.extension_name, extensions_cache))
         
         return None
 
@@ -266,13 +266,21 @@ class Command():
         return None
 
 
-    async def load(self) -> None:
+    async def load(self) -> bool:
         """Loads and creates the command."""
+        if self.in_extension:
+
+            if self.extension is None: # If the extension doesn't don't load this command.
+                self.logger.warn(
+                    f"Not loading command '{self.name}' because the extension '{self.extension_name}' is being ignored or has failed to load!"
+                )
+                return False
+
+            self.extension.commands.append(self)
+            self.logger.debug(f"Added to extension '{self.extension.code_name}'.")
+
         if self.allow_slash_cmd:
             await self.create_slash()
-
-        if self.extension is not None:
-            self.extension.add_command(self)
 
         self.__loaded = True
 
@@ -280,29 +288,21 @@ class Command():
             f"Command '{self.name}' has been loaded!"
         )
 
-        return None
+        return True
     
 
     async def unload(self) -> None:
-        """Unloads and removes the command."""
+        """Unloads and removes the command from cache."""
 
         if self.allow_slash_cmd:
             await self.remove_slash()
 
         self.__loaded = False
 
+        commands_cache.remove((self.name, self))
+
         self.logger.debug(
             f"Command '{self.name}' has been unloaded!"
         )
 
         return None
-    
-    async def delete(self) -> None:
-        """Completely deletes this command. Unloads it and removes it from cache."""
-        await self.unload()
-
-        commands_cache.remove((self.name, self))
-
-        self.logger.info(
-            f"Command '{self.name}' has been deleted!"
-        )

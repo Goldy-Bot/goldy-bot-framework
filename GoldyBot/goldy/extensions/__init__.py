@@ -44,7 +44,6 @@ class Extension():
     def __init__(self):
         """Tells Goldy Bot to Load this class as an extension."""
         self.goldy = get_goldy_instance()
-        self.ignored_extensions_list = self.goldy.config.ignored_extensions
 
         self.logger = LoggerAdapter(
             LoggerAdapter(goldy_bot_logger, prefix = "Extensions"), 
@@ -52,15 +51,15 @@ class Extension():
         )
 
         # Cached commands list.
-        self.__commands:List[Command] = [
+        self.commands: List[Command] = [
 
         ]
 
         self.__loaded_path = os.path.realpath(self.__class__.__module__) + ".py"
 
-        self.__ignored = False
-        if self.code_name in self.ignored_extensions_list:
-            self.__ignored = True
+        if self.code_name.lower() in [extension.lower() for extension in self.goldy.config.ignored_extensions]:
+            self.logger.info(f"Not loading the extension '{self.code_name}' as it's ignored.")
+            return False
 
         # Adding to cache and loading commands.
         # ---------------------------------------        
@@ -77,28 +76,15 @@ class Extension():
     def loaded_path(self) -> str:
         "The path where this extension was loaded."
         return self.__loaded_path
-    
-    @property
-    def is_ignored(self):
-        """Returns if the extension is being ignored."""
-        return self.__ignored
 
-    def add_command(self, command:Command) -> None:
-        """Add this command to this extension."""
-        self.__commands.append(command)
-        self.logger.debug(f"Added the command '{command.name}' to {self.code_name}.")
-        return None
-    
-    def get_commands(self) -> List[Command]:
-        """Returns all the commands loaded with this extension."""
-        return self.__commands
-
-    async def delete(self) -> None:
+    async def unload(self) -> None:
         """Unloads and deletes itself from cache and all the commands with it."""
-        for command in self.get_commands():
-            await command.delete()
+        for command in self.commands:
+            await command.unload()
 
-        extensions_cache.remove((self.code_name, self))
+        extensions_cache.remove(
+            (self.code_name, self)
+        )
 
         self.logger.debug(f"Extension '{self.code_name}' removed!")
 
