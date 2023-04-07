@@ -43,6 +43,7 @@ dev = [
     "furo",
     "pytest",
     "pytest-cov",
+    "myst-parser"
 ]
 api = [
     "javascript"

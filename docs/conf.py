@@ -23,11 +23,13 @@ extensions = [
     "sphinx.ext.viewcode", 
     "sphinx.ext.autodoc",
     "sphinxext.opengraph",
-    "sphinx_inline_tabs"
+    "sphinx_inline_tabs",
+    "myst_parser"
 ]
 
 templates_path = ['_templates']
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
+source_suffix = ['.rst', '.md']
 
 html_theme_options = {
     "dark_css_variables": {

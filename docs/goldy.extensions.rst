@@ -2,7 +2,7 @@
 ==============
 
 ⭐ How to create an Extension:
-================================
+-------------------------------
 In goldy bot instead of cogs or whatever you may call them we have extensions.
 
    Extensions are.... well.... EXTENSIONS! They are modules that extend the goldy bot framework. 
