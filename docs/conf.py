@@ -31,6 +31,16 @@ templates_path = ['_templates']
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 source_suffix = ['.rst', '.md']
 
+# Opengraph Settings
+# -------------------
+ogp_site_url = "https://goldybot.devgoldy.me"
+ogp_social_cards = {
+    "line_color": "#bf5c00",
+    "width": 500
+}
+ogp_image = "_static/logo.png"
+
+
 html_theme_options = {
     "dark_css_variables": {
         "color-brand-primary": "orange",
