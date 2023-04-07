@@ -1,3 +1,5 @@
+:og:description: The documentation for the goldy bot v5 framework programming api.
+
 📘 Documentation
 ==================
 The documentation for the goldy bot v5 framework programming api.
