@@ -3,51 +3,16 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-💛 Goldy Bot V5
-=====================
-Yet another another rewrite of Goldy Bot, a discord bot framework for my own bots.
+.. include:: ../README.md
+   :parser: myst_parser.sphinx_
 
+
+👀 Take a peak out our other sections.
+=======================================
 .. toctree::
    :maxdepth: 1
 
-   cli
-   goldy
-
-
-Logging
---------
-.. automodule:: GoldyBot.logging
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-Config
--------
-.. automodule:: GoldyBot.config
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-Errors
--------
-.. automodule:: GoldyBot.errors
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-Info
------
-.. automodule:: GoldyBot.info
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-Paths
-------
-.. automodule:: GoldyBot.paths
-   :members:
-   :undoc-members:
-   :show-inheritance:
+   documentation
 
 
 Indices and tables
