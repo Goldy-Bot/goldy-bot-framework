@@ -86,9 +86,7 @@ class Goldy():
         self.command_listener = CommandListener(self)
         """Class that handles the invoking of commands."""
         self.extension_loader = ExtensionLoader(self, raise_on_extension_loader_error)
-        """Class that handles extension loading."""
-        self.extension_reloader = ExtensionReloader(self)
-        """Class that handles extension reloading."""
+        """Class that handles extension loading and reloading."""
         self.live_console = LiveConsole(self)
         """The goldy bot live console."""
         self.guilds = Guilds(self)
@@ -207,7 +205,6 @@ from .database import Database
 from .presence import Presence, Status, ActivityTypes
 from .goldy_config import GoldyConfig
 from .extensions.extension_loader import ExtensionLoader
-from .extensions.extension_reloader import ExtensionReloader
 from .commands.loader import CommandLoader
 from .commands.listener import CommandListener
 from .live_console import LiveConsole
