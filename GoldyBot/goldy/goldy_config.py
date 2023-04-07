@@ -58,3 +58,8 @@ class GoldyConfig(Config):
     def bot_dev(self) -> str:
         """The discord id of the bot developer. If none this will default to me (https://github.com/THEGOLDENPRO)."""
         return self.get("goldy", "bot_admin", default_value="332592361307897856")
+
+    @property
+    def ding_on_exit(self) -> bool:
+        """Returns whether goldy bot should play a ding sound effect on exit or not."""
+        return self.get("goldy", "ding_on_exit", default_value=False)

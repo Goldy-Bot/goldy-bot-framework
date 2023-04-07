@@ -7,13 +7,13 @@ class Paths:
 
     # File templates.
     # -----------------
-    FILE_TEMPLATES = str(GOLDY_BOT_ROOT) + "/file_templates"
+    ASSETS = str(GOLDY_BOT_ROOT) + "/assets"
 
-    TOKEN_ENV_TEMPLATE = FILE_TEMPLATES + "/token.env"
+    TOKEN_ENV_TEMPLATE = ASSETS + "/token.env"
 
-    GOLDY_JSON_TEMPLATE = FILE_TEMPLATES + "/goldy.json"
+    GOLDY_JSON_TEMPLATE = ASSETS + "/goldy.json"
 
-    RUN_SCRIPT_TEMPLATE = FILE_TEMPLATES + "/run.py"
+    RUN_SCRIPT_TEMPLATE = ASSETS + "/run.py"
 
     # Internal Extensions
     # ---------------------

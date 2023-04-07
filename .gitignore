@@ -2,10 +2,12 @@ build
 GoldyBot.egg-info
 dist
 env
+docs/_build
 __pycache__
 .pytest_cache
 .coverage
+.vscode
 
-demo/.env
-demo/goldy.json
-demo/extensions
+demo/*
+!demo/run.py
+!demo/cli_demo.py

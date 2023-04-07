@@ -39,9 +39,10 @@ class ExtensionReloader():
         self.logger.info(f"Reloading these extensions --> {[x.code_name for x in extensions]}")
 
         for extension in extensions:
-            # Delete all commands in extension.
-            await extension.delete()
+            # Unload all commands in extension.
+            await extension.unload()
 
+            # Get the full path the extension was loaded from so we can load it again with ExtensionLoader().
             if not extension.loaded_path in loaded_paths:
                 loaded_paths.append(extension.loaded_path)
 

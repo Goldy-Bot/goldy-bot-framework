@@ -15,7 +15,7 @@ logger = LoggerAdapter(goldy_bot_logger, prefix="Member")
 
 @dataclass
 class Member(DictDataclass):
-    data:UserData
+    data:UserData = field(repr=False)
     goldy:Goldy = field(repr=False)
 
     id:str = field(init=False)
@@ -24,7 +24,7 @@ class Member(DictDataclass):
     """Members username. E.g. the ``The Golden Pro`` part of ``The Golden Pro#5675``."""
     discriminator:str = field(init=False)
     """Member's discriminator, their # tag. E.g the ``5675`` part of ``The Golden Pro#5675``."""
-    avatar_url:str = field(init=False)
+    avatar_url:str = field(init=False, repr=False)
     """The url to the member's profile picture."""
 
     def __post_init__(self):

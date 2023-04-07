@@ -10,7 +10,7 @@ if TYPE_CHECKING:
 
 logger = LoggerAdapter(goldy_bot_logger, prefix="delete_msg")
 
-async def delete_msg(message:Message, reason:str = None) -> Message:
+async def delete_msg(message:Message, reason:str=None) -> Message:
     """
     Allows you to delete a message that has been sent.
     
@@ -46,6 +46,6 @@ async def delete_msg(message:Message, reason:str = None) -> Message:
         headers = headers
     )
 
-    logger.debug(f"The message '{message.data['content'][:50]}...' in the channel '{message.data['channel_id']}' was deleted.")
+    logger.debug(f"A message in the channel '{message.data['channel_id']}' was deleted with reason: {reason}")
 
     return message

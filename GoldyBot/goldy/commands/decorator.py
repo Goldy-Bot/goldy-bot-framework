@@ -1,39 +1,41 @@
 from __future__ import annotations
-from ... import get_goldy_instance
-from typing import List
+
+from typing import List, Dict
+from discord_typings import ApplicationCommandOptionData
 
 from . import Command
-from ...errors import GoldyBotError
-
+from ... import errors
+from ... import get_goldy_instance
 
 
 def command(
-    name:str = None, 
-    description:str = None, 
-    required_roles:List[str]=None, 
-    slash_cmd_only=False, 
-    normal_cmd_only=False
-    ):
+    name: str = None, 
+    description: str = None, 
+    required_roles: List[str]=None, 
+    slash_options: Dict[str,  ApplicationCommandOptionData] = None,
+    slash_cmd_only:bool = False, 
+    normal_cmd_only:bool = False
+):
     """
     Add a command to Goldy Bot with this decorator.
     
     ---------------
-    ### ***``Example:``***
+    
+    ⭐ Example:
+    -------------
+    This is how you create a command in GoldyBot::
 
-    This is how you create a command in GoldyBot. 😀
-
-    ```python
-    @GoldyBot.command()
-    async def uwu(ctx):
-        await send(ctx, f'Hi, {ctx.author.mention}! UwU!')
-    ```
+        @GoldyBot.command()
+        async def hello(platter: GoldyBot.GoldenPlatter):
+            await platter.send_message("👋hello", reply=True)
+    
     """
     def decorate(func):
         def inner(func) -> Command:
             goldy = get_goldy_instance()
 
             if goldy is None:
-                raise GoldyBotError("Please initialize goldy class before registering commands.")
+                raise errors.GoldyBotError("Please initialize goldy class before registering commands.")
 
             create_slash = True; create_normal = True
 
@@ -41,13 +43,14 @@ def command(
             if normal_cmd_only: create_slash = False
 
             return Command(
-                goldy, 
-                func, 
-                name, 
-                description, 
-                required_roles, 
-                allow_prefix_cmd=create_normal, 
-                allow_slash_cmd=create_slash
+                goldy = goldy, 
+                func = func, 
+                name = name, 
+                description = description, 
+                required_roles = required_roles, 
+                slash_options = slash_options,
+                allow_prefix_cmd = create_normal, 
+                allow_slash_cmd = create_slash
             )
         
         return inner(func)

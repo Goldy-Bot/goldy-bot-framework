@@ -1,0 +1,28 @@
+name: Docs
+on: [push, pull_request, workflow_dispatch]
+permissions:
+    contents: write
+jobs:
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v3
+      - name: Install dependencies
+        run: |
+          pip install .[dev]
+      - name: Sphinx build
+        run: |
+          sphinx-build docs _build
+      - name: Generate CNAME file using my python script because for some reason GitHub is dumb and doesn't carry over my FUCKING CNAME file for FUCK SAKE.
+        run: |
+          python add_cname.py
+
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v3
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
+        with:
+          publish_branch: gh-pages
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: _build/
+          force_orphan: true

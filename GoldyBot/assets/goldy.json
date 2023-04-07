@@ -11,6 +11,7 @@
             "{guild_id_here}" : "uwu_hangout_guild"
         },
 
-        "bot_dev": null
+        "bot_dev": null,
+        "ding_on_exit": false
     }
 }

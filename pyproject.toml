@@ -23,17 +23,31 @@ classifiers = [
 dependencies = [
     "requests",
     "importlib-metadata; python_version<'3.8'",
-    "devgoldyutils>=2.3.7",
+    "devgoldyutils>=2.4.3",
     "nextcore@git+https://github.com/nextsnake/nextcore",
     "click>=8.1.3",
     "python-decouple>=3.7",
     "motor",
-    "pytest",
-    "pytest-cov",
-    "cmd2"
+    "cmd2",
+    "pygame",
+    "regex"
 ]
 
 dynamic = ["version"]
+
+[project.optional-dependencies]
+dev = [
+    "Sphinx",
+    "sphinxext-opengraph",
+    "sphinx-inline-tabs",
+    "furo",
+    "pytest",
+    "pytest-cov",
+    "myst-parser"
+]
+api = [
+    "javascript"
+]
 
 [project.urls]
 GitHub = "https://github.com/Goldy-Bot/Goldy-Bot-V5"
