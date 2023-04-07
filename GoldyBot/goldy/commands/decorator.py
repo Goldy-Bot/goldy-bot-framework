@@ -24,10 +24,10 @@ def command(
     ⭐ Example:
     -------------
     This is how you create a command in GoldyBot::
-    
+
         @GoldyBot.command()
-        async def uwu(ctx):
-            await send(ctx, f'Hi, {ctx.author.mention}! UwU!')
+        async def hello(platter: GoldyBot.GoldenPlatter):
+            await platter.send_message("👋hello", reply=True)
     
     """
     def decorate(func):
