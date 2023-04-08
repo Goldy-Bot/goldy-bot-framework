@@ -17,6 +17,12 @@ class LiveConsoleApp(cmd2.Cmd):
         super().__init__()
 
     def do_reload(self, extension_name: cmd2.Statement):
+        # Reload goldy.json...
+        # ---------------------
+        self.goldy.config.__init__()
+
+        # Reload extensions...
+        # ----------------------
         extension = None
         if not extension_name == "":
             extension:Tuple[str, Extension] | None = utils.cache_lookup(extension_name, extensions_cache)
@@ -27,7 +33,18 @@ class LiveConsoleApp(cmd2.Cmd):
         
         self.logger.info(f"Reloading extension(s)...")
         self.logger.warning(f"This may take a minute to begin...")
-        self.goldy.async_loop.create_task(self.goldy.extension_loader.reload((lambda x: [x[1]] if x is not None else None)(extension)))
+        self.goldy.async_loop.create_task(
+            self.goldy.extension_loader.reload((lambda x: [x[1]] if x is not None else None)(extension))
+        )
+
+        # Rerun guilds setup...
+        # ----------------------
+        self.goldy.guilds.guilds.clear()
+
+        self.goldy.async_loop.create_task(
+            self.goldy.guilds.setup()
+        )
+
 
     def do_quit(self, _: cmd2.Statement):
         self.logger.info("Exiting...")
