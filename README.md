@@ -50,15 +50,17 @@ goldybot setup normal
 
 3. **Run goldy!** ⚡
 
-Make sure to enter your Discord BOT token and mongoDB database token in the ``.env`` file generated in your folder.
+Make sure to enter your Discord BOT token and mongoDB database url in the ``.env`` file generated in your folder.
 ```env
 DISCORD_TOKEN="DISCORD BOT TOKEN HERE"
-MONGODB_TOKEN="MONGO DATABASE TOKEN HERE"
+MONGODB_URL="MONGO DATABASE URL HERE"
 ```
 
 Also make sure to add your discord guild to ``allowed_guilds`` in ``goldy.json``.
 
-You may change ``"uwu_hangout_guild"`` to anything you like but just remember this will be the code_name of the guild within goldy bot and you'll use this code_name to reference it.
+You may change ``"uwu_hangout_guild"`` to anything you like but just remember this will be the code_name of the guild within goldy bot and you'll use this code_name to reference it later.
+
+You may also want to add your discord member id to ``"bot_dev"``, like so: ``"bot_dev": "332592361307897856"``. If you don't you may not be able to run specific bot admin commands on discord.
 
 ```json
 {
@@ -73,7 +75,9 @@ You may change ``"uwu_hangout_guild"`` to anything you like but just remember th
         "allowed_guilds" : {
             "{guild_id_here}" : "uwu_hangout_guild"
         }
-    }
+    },
+
+    "bot_dev": null
 }
 ```
 
