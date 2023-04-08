@@ -18,28 +18,28 @@ class NoDiscordToken(GoldyBotError):
 class NoDatabaseToken(GoldyBotError):
     def __init__(self):
         super().__init__(
-            "No MongoDB database token was entered! Create and enter a MongoDB database token into the .env file at root or pass it in when initializing Goldy class with the Token class. See '' for more info."
+            "No MongoDB database url was entered! Create and enter a MongoDB database url into the .env file at root or pass it in when initializing Goldy class with the Token class. See '' for more info."
         )
 
 @dataclass
 class Token:
     """Handles grabbing the token in many various ways."""
     discord_token:str|None = field(repr=False, default=None)
-    database_token:str|None = field(repr=False, default=None)
+    database_url:str|None = field(repr=False, default=None)
 
     def __post_init__(self):
         self.logger = LoggerAdapter(goldy_bot_logger, "Token")
 
-        discord_token, mongodb_token = self.get_token_from_env()
+        discord_token, mongodb_url = self.get_token_from_env()
 
         self.discord_token = (lambda entered_token: discord_token if entered_token is None else entered_token)(self.discord_token)
-        self.database_token = (lambda entered_token: mongodb_token if entered_token is None else entered_token)(self.database_token)
+        self.database_url = (lambda entered_token: mongodb_url if entered_token is None else entered_token)(self.database_url)
 
         if self.discord_token is None:
             self.create_token_env_file()
             raise NoDiscordToken()
 
-        if self.database_token is None:
+        if self.database_url is None:
             self.create_token_env_file()
             raise NoDatabaseToken()
 
@@ -71,7 +71,7 @@ class Token:
         Tuple index order:
 
         - ``Discord Bot Token``
-        - ``MongoDB Token``
+        - ``MongoDB Url``
         """
         self.logger.debug("Searching current working directory for .env file if exists...")
         config = AutoConfig(
@@ -86,9 +86,9 @@ class Token:
             default=None
         )
 
-        self.logger.debug("Grabbing database token...")
+        self.logger.debug("Grabbing database url...")
         database_token = config(
-            "MONGODB_TOKEN", 
+            "MONGODB_URL", 
             default=None
         )
 
@@ -97,7 +97,7 @@ class Token:
         if discord_token == "DISCORD BOT TOKEN HERE":
             discord_token = None
 
-        if database_token == "MONGO DATABASE TOKEN HERE":
+        if database_token == "MONGO DATABASE URL HERE":
             database_token = None
 
         self.logger.debug("Done")

@@ -24,13 +24,13 @@ class Database():
     """Goldy Bot's class to interface with a Mongo Database asynchronously."""
     def __init__(self, goldy:Goldy):
         self.goldy = goldy
-        self.database_token_url = self.goldy.token.database_token
+        self.database_url = self.goldy.token.database_url
         self.async_loop = asyncio.get_event_loop()
         self.logger = LoggerAdapter(goldy_bot_logger, prefix="Database")
 
         # Initializing MongoDB database.
         try:
-            self.client:pymongo.MongoClient = motor.motor_asyncio.AsyncIOMotorClient(self.database_token_url, serverSelectionTimeoutMS=2000)
+            self.client:pymongo.MongoClient = motor.motor_asyncio.AsyncIOMotorClient(self.database_url, serverSelectionTimeoutMS=2000)
             self.async_loop.run_until_complete(self.client.server_info())
             self.logger.info("AsyncIOMotorClient " + Colours.GREEN.apply_to_string("Connected!"))
         except ServerSelectionTimeoutError as e:
