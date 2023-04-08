@@ -2,15 +2,19 @@ from __future__ import annotations
 
 import os
 import pathlib
-from typing import List, overload
+from typing import List, overload, TYPE_CHECKING
 import importlib.util
 
 from .. import Goldy, GoldyBotError
 from ... import goldy_bot_logger, LoggerAdapter
 from ...paths import Paths
+from . import extensions_cache
+
+if TYPE_CHECKING:
+    from . import Extension
 
 class ExtensionLoader():
-    """Class that handles extension loading."""
+    """Class that handles extension loading and reloading."""
     def __init__(self, goldy:Goldy, raise_on_load_error:bool|None = True) -> None:
         self.goldy = goldy
         self.raise_on_load_error = raise_on_load_error
@@ -75,6 +79,7 @@ class ExtensionLoader():
 
         return paths
 
+
     @overload
     def load(self) -> None:
         """Loads all extensions goldy bot can find. Basically lets goldy bot search for extensions herself because your a lazy brat."""
@@ -114,4 +119,39 @@ class ExtensionLoader():
                     self.logger.error(error_str)
         
         # TODO: Find a very lite way to return a list of extensions that were loaded somehow.
+        return None
+    
+
+    @overload
+    async def reload(self) -> None:
+        """Reloads all extensions loaded in goldy bot."""
+        ...
+    
+    @overload
+    async def reload(self, extensions: List[Extension]) -> None:
+        """Reloads each extension in the list."""
+        ...
+
+    async def reload(self, extensions: List[Extension] = None) -> None:
+        """Reloads each extension in this list. If extensions is kept none, goldy bot will reload all the extensions loaded itself."""
+        if extensions is None:
+            extensions = [x[1] for x in extensions_cache]
+
+        loaded_paths = []
+
+        self.logger.info(f"Reloading these extensions --> {[x.code_name for x in extensions]}")
+
+        for extension in extensions:
+            # Unload all commands in extension.
+            await extension.unload()
+
+            # Get the full path the extension was loaded from so we can load it again with ExtensionLoader().
+            if not extension.loaded_path in loaded_paths:
+                loaded_paths.append(extension.loaded_path)
+
+        self.load(loaded_paths)
+
+        # Load commands again.
+        await self.goldy.command_loader.load()
+
         return None

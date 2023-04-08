@@ -2,8 +2,7 @@ from __future__ import annotations
 
 from devgoldyutils import Colours
 from typing import List, Callable, Tuple, TYPE_CHECKING, Dict
-from discord_typings import ApplicationCommandData, MessageData, InteractionData, ApplicationCommandPayload, ApplicationCommandOptionData, ApplicationCommandOptionInteractionData
-from discord_typings.interactions.commands import ChoicesStringOptionData
+from discord_typings import ApplicationCommandData, MessageData, InteractionData, ApplicationCommandPayload, ApplicationCommandOptionData, GuildMemberData
 
 from nextcore.http import Route
 
@@ -68,6 +67,9 @@ class Command():
 
         if self.required_roles is None:
             self.required_roles = []
+        else:
+            # This makes sure the GoldyBot.Perms enum objects are converted to their string values.
+            self.required_roles = [str(role) for role in self.required_roles]
 
         if self.slash_options is None:
             self.slash_options = {}
@@ -130,74 +132,131 @@ class Command():
         """Returns whether this command has been loaded."""
         return self.__loaded
 
-
     async def invoke(self, gold_platter: GoldenPlatter) -> None:
         """Runs/triggers this command. This method is mostly supposed to be used internally."""
         self.logger.debug(f"Attempting to invoke '{gold_platter.type.name}'...")
 
-        # TODO: Add all permission and argument management stuff here...
+        if await self.__got_perms(gold_platter):
 
-        # Prefix/normal command.
-        # ------------------------
-        if gold_platter.type.value == PlatterType.PREFIX_CMD.value:
-            data:MessageData = gold_platter.data
+            # Prefix/normal command.
+            # ------------------------
+            if gold_platter.type.value == PlatterType.PREFIX_CMD.value:
+                data:MessageData = gold_platter.data
 
-            self.logger.info(
-                Colours.BLUE.apply(
-                    f"Prefix command invoked by '{data['author']['username']}#{data['author']['discriminator']}'."
-                )
-            )
-
-            params = nextcore_utils.invoke_data_to_params(data, gold_platter.type)
-
-            # Run callback.
-            # --------------
-            try:
-
-                if self.in_extension:
-                    await self.func(self.extension, gold_platter, *params)
-                else:
-                    await self.func(gold_platter, *params)
-
-            except TypeError as e:
-                # This could mean the args are missing or it could very well be a normal type error so let's check and handle it respectively.
-                if f"{self.func.__name__}() missing" in e.args[0]:
-                    # If params are missing raise MissingArgument exception.
-                    raise front_end_errors.MissingArgument(
-                        missing_args = self.params[len(params):], 
-                        platter = gold_platter, 
-                        logger = self.logger
+                self.logger.info(
+                    Colours.BLUE.apply(
+                        f"Prefix command invoked by '{data['author']['username']}#{data['author']['discriminator']}'."
                     )
+                )
+
+                params = nextcore_utils.invoke_data_to_params(data, gold_platter.type)
+
+                # Run callback.
+                # --------------
+                try:
+
+                    if self.in_extension:
+                        await self.func(self.extension, gold_platter, *params)
+                    else:
+                        await self.func(gold_platter, *params)
+
+                except TypeError as e:
+                    # This could mean the args are missing or it could very well be a normal type error so let's check and handle it respectively.
+                    if f"{self.func.__name__}() missing" in e.args[0]:
+                        # If params are missing raise MissingArgument exception.
+                        raise front_end_errors.MissingArgument(
+                            missing_args = self.params[len(params):], 
+                            platter = gold_platter, 
+                            logger = self.logger
+                        )
+                    
+                    if f"{self.func.__name__}() takes from" in e.args[0]:
+                        raise front_end_errors.TooManyArguments(
+                            platter = gold_platter, 
+                            logger = self.logger
+                        )
+
+                    raise e
+
+            # Slash command.
+            # ----------------
+            if gold_platter.type.value == PlatterType.SLASH_CMD.value:
+                data:InteractionData = gold_platter.data
+
+                self.logger.info(
+                    Colours.CLAY.apply(
+                        f"Slash command invoked by '{data['member']['user']['username']}#{data['member']['user']['discriminator']}'."
+                    )
+                )
                 
-                if f"{self.func.__name__}() takes from" in e.args[0]:
-                    raise front_end_errors.TooManyArguments(
-                        platter = gold_platter, 
-                        logger = self.logger
-                    )
+                params = nextcore_utils.invoke_data_to_params(data, gold_platter.type)
 
-                raise e
+                # Run callback.
+                # --------------
+                if self.in_extension:
+                    await self.func(self.extension, gold_platter, **params)
+                else:
+                    await self.func(gold_platter, **params)
 
-        # Slash command.
-        # ----------------
-        if gold_platter.type.value == PlatterType.SLASH_CMD.value:
-            data:InteractionData = gold_platter.data
+            return True
+        
+        # If member has no perms raise MissingPerms exception.
+        raise front_end_errors.MissingPerms(gold_platter, self.logger)
+    
+    async def __got_perms(self, platter: GoldenPlatter) -> bool:
+        """Internal method that checks if the command author has the perms to run this command."""
+        logger = LoggerAdapter(self.logger, prefix=Colours.PURPLE.apply("Permission System"))
 
-            self.logger.info(
-                Colours.CLAY.apply(
-                    f"Slash command invoked by '{data['member']['user']['username']}#{data['member']['user']['discriminator']}'."
-                )
+        if not self.required_roles == []:
+            logger.debug("Checking if member has perms...")
+
+            # If the required roles contain 'bot_dev' and the bot dev is running the command allow the command to execute.
+            # --------------------------------------------------------------------------------------------------------------
+            if "bot_dev" in self.required_roles:
+                if platter.author.id == self.goldy.config.bot_dev:
+                    return True
+
+            # Check if member has any of the required roles.
+            #----------------------------------------------------
+
+            # Get the member's guild data.
+            r = await self.goldy.http_client.request(
+                Route(
+                    "GET",
+                    "/guilds/{guild_id}/members/{user_id}",
+                    guild_id = platter.guild.id,
+                    user_id = platter.author.id
+                ),
+                rate_limit_key = self.goldy.nc_authentication.rate_limit_key,
+                headers = self.goldy.nc_authentication.headers,
             )
-            
-            params = nextcore_utils.invoke_data_to_params(data, gold_platter.type)
 
-            # Run callback.
-            # --------------
-            if self.in_extension:
-                await self.func(self.extension, gold_platter, **params)
-            else:
-                await self.func(gold_platter, **params)
+            member_data: GuildMemberData = await r.json()
 
-        return None
+            for role_code_name in self.required_roles:
+
+                if not role_code_name in ["bot_dev"]:
+                    try:
+                        role_id_uwu = platter.guild.roles[role_code_name]
+                    except KeyError:
+                        # Maybe there is a better way of handling this but I'll leave this as temporary solution for now.
+                        logger.error(
+                            f"This guild ({platter.guild.code_name}) hasn't been configured to include the required role '{role_code_name}' you entered for the command '{self.name}'."
+                        )
+                        return False
+
+                    # Loop through each role of the member and check if the role id is equal to that required.
+                    for member_role_id in member_data["roles"]:
+                        if str(member_role_id) == role_id_uwu:
+                            logger.debug(f"The author has the required role '{role_code_name}'.")
+                            return True
+                    
+
+                    # TODO: Might be better to create a Role() object and add a .has_role() method to Member object.
+
+            return False
+        
+        return True
 
 
     async def create_slash(self) -> List[ApplicationCommandData]:

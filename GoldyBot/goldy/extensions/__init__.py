@@ -63,10 +63,11 @@ class Extension():
 
         # Adding to cache and loading commands.
         # ---------------------------------------        
-        self.logger.debug("Adding myself to cache...")
         extensions_cache.append(
             (self.code_name, self)
         )
+
+        self.logger.info("Extension initialized!")
 
     @property
     def code_name(self) -> str:

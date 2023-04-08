@@ -6,7 +6,7 @@ from discord_typings import UserData
 from devgoldyutils import DictDataclass
 
 from ... import goldy_bot_logger, LoggerAdapter
-from ...urls import USER_AVATAR
+from ..nextcore_utils.urls import USER_AVATAR
 
 if TYPE_CHECKING:
     from .. import Goldy
@@ -28,6 +28,8 @@ class Member(DictDataclass):
     """The url to the member's profile picture."""
 
     def __post_init__(self):
+        super().__post_init__()
+
         self.logger = logger
 
         self.id = self.get("id")
