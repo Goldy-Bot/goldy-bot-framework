@@ -62,7 +62,7 @@ class SlashOption(dict):
 
     """
 
-    def __init__(self, name:str=None, description:str=None, choices:List[SlashOptionChoice]=None, **extra: ApplicationCommandOptionData) -> None:
+    def __init__(self, name:str=None, description:str=None, choices:List[SlashOptionChoice]=None, required=True, **extra: ApplicationCommandOptionData) -> None:
         """
         Creates a slash command option. 😋
         
@@ -90,6 +90,8 @@ class SlashOption(dict):
 
         if choices is not None:
             self.data["choices"] = choices
+
+        self.data["required"] = required
 
         self.data.update(extra)
         
