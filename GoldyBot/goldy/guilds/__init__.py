@@ -18,7 +18,7 @@ class Guilds():
         
         self.guilds:List[Tuple[str|int, Guild]] = []
 
-    # TODO: In the future we might have to add some sort of way to reload the guild config of a guild from the database. (or just run setup again on that particular guild of that works well)
+    # TODO: In the future we might have to add some sort of way to reload the guild config of a guild from the database. (or just run setup again on that particular guild if that works well)
     # I can see this being needed if the v5 framework is going to be running public invite-able bots.
     # Also maybe we should rerun the setup when we reload.
 
