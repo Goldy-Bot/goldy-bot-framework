@@ -81,7 +81,8 @@ class Extension():
     async def unload(self) -> None:
         """Unloads and deletes itself from cache and all the commands with it."""
         for command in self.commands:
-            await command.unload()
+            if command.loaded:
+                await command.unload()
 
         extensions_cache.remove(
             (self.code_name, self)

@@ -1,18 +1,21 @@
 from __future__ import annotations
 
-from typing import List, Dict
+from typing import List, Dict, TYPE_CHECKING
 from discord_typings import ApplicationCommandOptionData
 
 from . import Command
 from ... import errors
 from ... import get_goldy_instance
 
+if TYPE_CHECKING:
+    from GoldyBot import SlashOption
+
 
 def command(
     name: str = None, 
     description: str = None, 
     required_roles: List[str]=None, 
-    slash_options: Dict[str,  ApplicationCommandOptionData] = None,
+    slash_options: Dict[str, SlashOption] = None,
     slash_cmd_only:bool = False, 
     normal_cmd_only:bool = False
 ):

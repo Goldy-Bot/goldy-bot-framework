@@ -19,6 +19,7 @@ from .goldy.utils import *
 
 from .goldy.nextcore_utils import ( 
     Embed, EmbedField, 
+    SlashOption, SlashOptionChoice,
     send_msg, delete_msg
 )
 

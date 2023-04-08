@@ -12,7 +12,7 @@ if TYPE_CHECKING:
 
 def params_to_options(command: Command) -> List[ApplicationCommandOptionData]:
     """A utility function that converts goldy command parameters to slash command options."""
-    options:List[ApplicationCommandOptionData] = []
+    options: List[ApplicationCommandOptionData] = []
 
     # Discord chat input regex as of https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-naming
     chat_input_patten = regex.compile(r"^[-_\p{L}\p{N}\p{sc=Deva}\p{sc=Thai}]{1,32}$", regex.UNICODE)
@@ -22,8 +22,13 @@ def params_to_options(command: Command) -> List[ApplicationCommandOptionData]:
             raise errors.InvalidParameter(command, param)
 
         if param in command.slash_options:
+            option_data = command.slash_options[param]
+            
+            if option_data.get("name") is None:
+                option_data["name"] = param
+
             options.append(
-                command.slash_options[param]
+                option_data
             )
         
         else:

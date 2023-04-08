@@ -5,6 +5,7 @@ from typing import List, Callable, Tuple, TYPE_CHECKING, Dict
 from discord_typings import ApplicationCommandData, MessageData, InteractionData, ApplicationCommandPayload, ApplicationCommandOptionData, GuildMemberData
 
 from nextcore.http import Route
+from nextcore.http.errors import BadRequestError
 
 from .. import utils, nextcore_utils
 from ..nextcore_utils import front_end_errors
@@ -86,7 +87,11 @@ class Command():
 
         self.params.pop(0) # Remove 'platter' argument.
 
-        self.list_of_application_command_data:List[Tuple[str, ApplicationCommandData]] | None = None
+        self.params = self.params[:self.func.__code__.co_argcount - 2] # Filters out other variables resulting in just function parameters. It's weird I know.
+
+        # TODO: We should probably make this parameter stuff a util function.
+
+        self.list_of_application_command_data: List[Tuple[str, ApplicationCommandData]] | None = None
 
         self.__loaded = False
 
@@ -306,6 +311,9 @@ class Command():
         """Un-registers the slash command."""
         self.logger.debug(f"Removing slash command for '{self.name}'...")
 
+        if self.list_of_application_command_data is None:
+            return
+
         for slash_command in self.list_of_application_command_data:
 
             await self.goldy.http_client.request(
@@ -339,7 +347,12 @@ class Command():
             self.logger.debug(f"Added to extension '{self.extension.code_name}'.")
 
         if self.allow_slash_cmd:
-            await self.create_slash()
+            try:
+                await self.create_slash()
+            except BadRequestError as e:
+                self.logger.error(f"We got a BadRequest error from discord when loading the slash command '{self.name}', double check if you haven't entered anything wrong. \nError: {e}")
+                await self.unload()
+                return False
 
         self.__loaded = True
 

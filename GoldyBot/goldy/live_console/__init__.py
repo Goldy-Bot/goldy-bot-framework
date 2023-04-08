@@ -30,7 +30,10 @@ class LiveConsole(threading.Thread):
 
         while self.__stop is False:
             print("")
-            app.onecmd(input("> "))
+            try:
+                app.onecmd(input("> "))
+            except cmd2.exceptions.EmptyStatement:
+                pass
 
     def stop(self):
         self.__stop = True

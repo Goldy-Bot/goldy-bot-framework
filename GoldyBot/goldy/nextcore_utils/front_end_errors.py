@@ -54,7 +54,7 @@ class MissingArgument(FrontEndErrors):
             description = f"""
 *You missed the argument(s): ``{missing_args_string[:-2]}``*
 
-**Command Usage -> ``!{platter.command.name} {command_args_string[:-1]}``**
+**Command Usage -> ``{platter.guild.prefix}{platter.command.name} {command_args_string[:-1]}``**
 """, 
             message = f"The command author missed the arguments -> '{missing_args_string[:-2]}'.",
             platter = platter, 
@@ -71,7 +71,7 @@ class TooManyArguments(FrontEndErrors):
         super().__init__(
             title = ":heart: You gave me too many arguments.", 
             description = f"""
-**Command Usage -> ``!{platter.command.name} {command_args_string[:-1]}``**
+**Command Usage -> ``{platter.guild.prefix}{platter.command.name} {command_args_string[:-1]}``**
 """, 
             message = f"The command author passed too many arguments.",
             platter = platter, 
