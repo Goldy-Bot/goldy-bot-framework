@@ -74,10 +74,3 @@ Extension Loader
    :members:
    :undoc-members:
    :show-inheritance:
-
-Extension Reloader
---------------------
-.. automodule:: GoldyBot.goldy.extensions.extension_reloader
-   :members:
-   :undoc-members:
-   :show-inheritance:

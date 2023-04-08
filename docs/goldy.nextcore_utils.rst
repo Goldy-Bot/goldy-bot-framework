@@ -5,6 +5,7 @@
 
    goldy.nextcore_utils.messages
    goldy.nextcore_utils.embeds
+   goldy.nextcore_utils.slash_options
 
 
 Colours

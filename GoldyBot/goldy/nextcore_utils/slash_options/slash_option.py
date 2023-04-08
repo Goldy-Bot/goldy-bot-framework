@@ -28,7 +28,7 @@ class SlashOptionChoice(dict):
         
 
 class SlashOption(dict):
-    """
+    r"""
     A class used to create a slash command option.
     
     ---------------
@@ -49,15 +49,15 @@ class SlashOption(dict):
                 required = True
             )
         })
-        async def bear(self, platter: GoldyBot.GoldenPlatter, bear_name):
+        async def bear(self, platter: GoldyBot.GoldenPlatter, bear_name: str):
             if bear_name == "goldilocks":
-                return await platter.send_message("Goldilocks is not a bear you fool!", reply=True)
+                return await platter.send_message("*Goldilocks is not a bear you fool!*", reply=True)
 
-            text = f'''
-    > Once upon a time there were three bears, who lived together in a house of their own in the woods. 
-    > One of them was a little, small wee bear; one was a middle-sized bear, and the other was a great, huge bear named **{bear_name.title()}**...
-            '''
-            
+            text = \
+                "*> In the woods, there lived three bears in their cozy house. " \
+                "There was a small wee bear, a middle-sized bear, " \
+                f"and a great, huge bear known as* **{bear_name.title()}**..." \
+
             await platter.send_message(text, reply=True)
 
     """
