@@ -12,13 +12,14 @@ from .paths import Paths
 
 from .goldy import Goldy, get_goldy_instance
 from .goldy.token import Token
+from .goldy.perms import Perms
 from .goldy.extensions import Extension
 from .goldy.commands.decorator import command
 from .goldy.utils import *
 
 from .goldy.nextcore_utils import ( 
     Embed, EmbedField, 
-    send_msg, delete_msg 
+    send_msg, delete_msg
 )
 
 from .goldy.objects.golden_platter import GoldenPlatter, PlatterType

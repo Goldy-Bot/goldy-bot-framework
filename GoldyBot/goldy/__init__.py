@@ -135,7 +135,7 @@ class Goldy():
         self.logger.warn(Colours.YELLOW.apply_to_string("Goldy Bot is shutting down..."))
         self.logger.info(Colours.BLUE.apply_to_string(f"Reason: {error[0]}"))
 
-        await self.__stop_async()
+        await self.__stop()
 
     async def pre_setup(self):
         """Method ran before actual setup. This is used to fetch some data from discord needed by goldy when running the actual setup."""
@@ -165,7 +165,13 @@ class Goldy():
 
         self.async_loop.create_task(self.shard_manager.dispatcher.dispatch("critical", "Goldy Exiting: " + reason)) # Raises critical error within nextcore and stops it.
 
-    async def __stop_async(self):
+    async def stop_async(self, reason:str = "Unknown Reason"):
+        """Shuts down goldy bot asynchronously."""
+        self.live_console.stop()
+
+        await self.shard_manager.dispatcher.dispatch("critical", "Goldy Exiting: " + reason)
+
+    async def __stop(self):
         """This is an internal method and NOT to be used by you. Use the ``Goldy().stop()`` instead. This method is ran when nextcore raises a critical error."""
         await self.presence.change(Status.INVISIBLE) # Set bot to invisible before shutting off.
         

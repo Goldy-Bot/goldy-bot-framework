@@ -18,9 +18,14 @@ class Guilds():
         
         self.guilds:List[Tuple[str|int, Guild]] = []
 
+    # TODO: In the future we might have to add some sort of way to reload the guild config of a guild from the database. (or just run setup again on that particular guild of that works well)
+    # I can see this being needed if the v5 framework is going to be running public invite-able bots.
+    # Also maybe we should rerun the setup when we reload.
+
     async def setup(self):
         """Adds guilds specified in goldy.json to the database if not already added."""
         # TODO: Find better way to organize this code, it's too long and complex for my liking.
+        # 08/04/2023: idk is it really that complex... i'll come back to it later...
 
         database = self.goldy.database.get_goldy_database(DatabaseEnums.GOLDY_MAIN)
 

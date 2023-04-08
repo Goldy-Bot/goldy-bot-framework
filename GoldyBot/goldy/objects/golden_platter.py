@@ -8,6 +8,7 @@ if TYPE_CHECKING:
     from ...goldy import Goldy
     from .message import Message
     from ..commands import Command
+    from ..guilds import Guild
 
 
 class PlatterType(Enum):
@@ -33,13 +34,15 @@ class GoldenPlatter():
         self.command = command
         """The object for this command. 😱"""
 
-        self.type:PlatterType = (lambda x: PlatterType(x) if isinstance(x, int) else x)(type)
+        self.type: PlatterType = (lambda x: PlatterType(x) if isinstance(x, int) else x)(type)
         """The type of command this is."""
 
         if self.type.value == PlatterType.SLASH_CMD.value:
             self.author = Member(data["member"]["user"], goldy)
         else:
             self.author = Member(data["author"], goldy)
+
+        self.guild: Guild = self.goldy.guilds.get_guild(data["guild_id"])
 
         self.interaction_responded = False
         """An internal property that is set by the ``nextcore_utils.send_msg()`` method when a slash command is responded to."""

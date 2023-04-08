@@ -7,7 +7,7 @@ import logging as log
 from ... import errors
 from ..nextcore_utils import Colours
 from .embeds.embed import Embed
-from ..objects.golden_platter import GoldenPlatter
+from ..objects.golden_platter import GoldenPlatter, PlatterType
 
 class FrontEndErrors(errors.GoldyBotError):
     def __init__(
@@ -17,6 +17,7 @@ class FrontEndErrors(errors.GoldyBotError):
             message: str,
             platter: GoldenPlatter, 
             embed_colour = Colours.AKI_ORANGE,
+            delete_after = 6,
             logger: log.Logger = None
         ):
 
@@ -30,7 +31,8 @@ class FrontEndErrors(errors.GoldyBotError):
                     )
                 ],
                 reply = True,
-                delete_after = 4
+                delete_after = (lambda: None if platter.type.value == PlatterType.SLASH_CMD.value else delete_after)(),
+                flags = (lambda: 1 << 6 if platter.type.value == PlatterType.SLASH_CMD.value else None)()
             )
         )
 
@@ -72,6 +74,18 @@ class TooManyArguments(FrontEndErrors):
 **Command Usage -> ``!{platter.command.name} {command_args_string[:-1]}``**
 """, 
             message = f"The command author passed too many arguments.",
+            platter = platter, 
+            embed_colour = Colours.RED,
+            logger = logger
+        )
+
+
+class MissingPerms(FrontEndErrors):
+    def __init__(self, platter: GoldenPlatter, logger: log.Logger = None):
+        super().__init__(
+            title = ":heart: No Perms!", 
+            description = "Sorry, you don't have the perms to run this command.",
+            message = f"The command author '{platter.author.username}#{platter.author.discriminator}' doesn't have the perms to run this command.",
             platter = platter, 
             embed_colour = Colours.RED,
             logger = logger

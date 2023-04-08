@@ -47,17 +47,18 @@ class GoldyConfig(Config):
 
         # Removes template from dict if it exists.
         if "{guild_id_here}" in data: del data["{guild_id_here}"]
-        
+
         # Append each allowed guild as tuple.
         for key in data:
             tuple_list.append((key, data[key]))
 
         return tuple_list
-    
+
     @property
     def bot_dev(self) -> str:
         """The discord id of the bot developer. If none this will default to me (https://github.com/THEGOLDENPRO)."""
-        return self.get("goldy", "bot_admin", default_value="332592361307897856")
+        my_discord_id = "332592361307897856"
+        return (lambda x: my_discord_id if x is None else x)(self.get("goldy", "bot_dev", default_value=my_discord_id))
 
     @property
     def ding_on_exit(self) -> bool:
