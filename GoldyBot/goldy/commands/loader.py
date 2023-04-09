@@ -1,6 +1,8 @@
 from __future__ import annotations
-
 from typing import List, overload, TYPE_CHECKING
+from discord_typings import ApplicationCommandPayload
+
+from nextcore.http import Route
 
 from .. import Goldy
 from ... import goldy_bot_logger, LoggerAdapter
@@ -27,18 +29,51 @@ class CommandLoader():
         ...
 
     async def load(self, commands:List[Command] = None) -> None:
-        """Loads all commands that have been initialized in goldy bot."""
+        """Loads/creates all commands that have been initialized in goldy bot."""
         if commands is None:
             commands = [x[1] for x in commands_cache]
 
+        slash_command_payloads: List[ApplicationCommandPayload] = []
+
         for command in commands:
 
-            if not command.loaded:
-                await command.load()
-
-            else:
-                self.logger.debug(
-                    f"Not loading command '{command.name}' as it's already loaded."
+            if command.extension is None: # If the extension doesn't exist don't load this command.
+                self.logger.warn(
+                    f"Not loading command '{command.name}' because the extension '{command.extension_name}' is being ignored or has failed to load!"
                 )
-        
+                continue
+
+            command.extension.commands.append(command)
+            self.logger.debug(f"Added command '{command.name}' to extension '{command.extension.name}'.")
+
+            if command.allow_slash_cmd:
+                slash_command_payloads.append(command.slash_cmd_payload)
+
+            command.__loaded = True
+
+            self.logger.debug(
+                f"Command '{command.name}' loaded and slash cmd payload grabbed."
+            )
+
+
+        # Create slash commands for each allowed guild.
+        # ----------------------------------------------
+        for guild in self.goldy.guilds.allowed_guilds:
+
+            r = await self.goldy.http_client.request(
+                Route(
+                    "PUT",
+                    "/applications/{application_id}/guilds/{guild_id}/commands",
+                    application_id = self.goldy.application_data["id"],
+                    guild_id = guild[0],
+                ),
+                rate_limit_key = self.goldy.nc_authentication.rate_limit_key,
+                headers = self.goldy.nc_authentication.headers,
+                json = slash_command_payloads
+            )
+
+            self.logger.debug(f"Created slash cmds for guild '{guild[1]}'.")
+
+        self.logger.info("All commands loaded!")
+
         return None

@@ -139,7 +139,7 @@ class ExtensionLoader():
 
         loaded_paths = []
 
-        self.logger.info(f"Reloading these extensions --> {[x.code_name for x in extensions]}")
+        self.logger.info(f"Reloading these extensions --> {[x.name for x in extensions]}")
 
         for extension in extensions:
             # Unload all commands in extension.

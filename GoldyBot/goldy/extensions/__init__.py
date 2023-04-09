@@ -47,7 +47,7 @@ class Extension():
 
         self.logger = LoggerAdapter(
             LoggerAdapter(goldy_bot_logger, prefix = "Extensions"), 
-            prefix = Colours.GREY.apply(self.code_name)
+            prefix = Colours.GREY.apply(self.name)
         )
 
         # Cached commands list.
@@ -57,20 +57,20 @@ class Extension():
 
         self.__loaded_path = os.path.realpath(self.__class__.__module__) + ".py"
 
-        if self.code_name.lower() in [extension.lower() for extension in self.goldy.config.ignored_extensions]:
-            self.logger.info(f"Not loading the extension '{self.code_name}' as it's ignored.")
+        if self.name.lower() in [extension.lower() for extension in self.goldy.config.ignored_extensions]:
+            self.logger.info(f"Not loading the extension '{self.name}' as it's ignored.")
             return False
 
         # Adding to cache and loading commands.
         # ---------------------------------------        
         extensions_cache.append(
-            (self.code_name, self)
+            (self.name, self)
         )
 
         self.logger.info("Extension initialized!")
 
     @property
-    def code_name(self) -> str:
+    def name(self) -> str:
         return self.__class__.__name__
     
     @property
@@ -81,13 +81,12 @@ class Extension():
     async def unload(self) -> None:
         """Unloads and deletes itself from cache and all the commands with it."""
         for command in self.commands:
-            if command.loaded:
-                await command.unload()
+            await command.unload()
 
         extensions_cache.remove(
-            (self.code_name, self)
+            (self.name, self)
         )
 
-        self.logger.debug(f"Extension '{self.code_name}' removed!")
+        self.logger.debug(f"Extension '{self.name}' removed!")
 
         return None

@@ -74,68 +74,51 @@ class Command():
 
         if self.slash_options is None:
             self.slash_options = {}
-        
-        # Get list of function params.
-        self.params = list(self.func.__code__.co_varnames)
-        
-        # Check if command is inside extension by checking if self is first parameter.
-        self.__in_extension = False
 
-        if self.params[0] == "self":
-            self.__in_extension = True
-            self.params.pop(0)
-
-        self.params.pop(0) # Remove 'platter' argument.
-
-        self.params = self.params[:self.func.__code__.co_argcount - 2] # Filters out other variables resulting in just function parameters. It's weird I know.
-
-        # TODO: We should probably make this parameter stuff a util function.
-
-        self.list_of_application_command_data: List[Tuple[str, ApplicationCommandData]] | None = None
-
-        self.__loaded = False
+        self.params = nextcore_utils.get_function_parameters(self)
+        """List of command function parameters."""
 
         commands_cache.append(
             (self.name, self)
         )
 
+        self.__loaded = False
+
         self.logger.debug("Command initialized!")
 
     @property
-    def in_extension(self) -> bool:
-        """Returns true if the command is in an extension."""
-        if self.__in_extension:
-            return True
-        return False
-
-    @property
-    def extension_name(self) -> str | None:
+    def extension_name(self) -> str:
         """Returns extension's code name."""
-        if self.in_extension:
-            return str(self.func).split(" ")[1].split(".")[0]
-
-        return None
+        return str(self.func).split(" ")[1].split(".")[0]
 
     @property
     def extension(self) -> Extension | None:
-        """Finds and returns the object of the command's extension. Returns None if command is not in any extension."""
-        if self.in_extension:
-            return (lambda x: x[1] if x is not None else None)(utils.cache_lookup(self.extension_name, extensions_cache))
-        
-        return None
+        """Finds and returns the object of the command's extension. Returns None if command's extension is not found."""
+        return (lambda x: x[1] if x is not None else None)(utils.cache_lookup(self.extension_name, extensions_cache))
+    
+    @property
+    def slash_cmd_payload(self):
+        """Returns the payload needed to create a slash command."""
+        return ApplicationCommandPayload(
+            name = self.name,
+            description = self.description,
+            options = nextcore_utils.params_to_options(self),
+            type = 1
+        )
+    
+    @property
+    def is_loaded(self) -> bool:
+        """Returns whether the command has been loaded by the command loader or not."""
+        return self.__loaded
 
     @property
     def is_child(self):
-        """Returns if command is child or not. Basically is it a subcommand or not essentially."""
+        """Returns if command is child or not. Basically is it a subcommand or not, essentially."""
         if self.parent_cmd is None:
             return False
         else:
             return True
-    
-    @property
-    def loaded(self) -> bool:
-        """Returns whether this command has been loaded."""
-        return self.__loaded
+
 
     async def invoke(self, gold_platter: GoldenPlatter) -> None:
         """Runs/triggers this command. This method is mostly supposed to be used internally."""
@@ -160,10 +143,7 @@ class Command():
                 # --------------
                 try:
 
-                    if self.in_extension:
-                        await self.func(self.extension, gold_platter, *params)
-                    else:
-                        await self.func(gold_platter, *params)
+                    await self.func(self.extension, gold_platter, *params)
 
                 except TypeError as e:
                     # This could mean the args are missing or it could very well be a normal type error so let's check and handle it respectively.
@@ -198,10 +178,7 @@ class Command():
 
                 # Run callback.
                 # --------------
-                if self.in_extension:
-                    await self.func(self.extension, gold_platter, **params)
-                else:
-                    await self.func(gold_platter, **params)
+                await self.func(self.extension, gold_platter, **params)
 
             return True
         
@@ -263,118 +240,17 @@ class Command():
         
         return True
 
-
-    async def create_slash(self) -> List[ApplicationCommandData]:
-        """Creates and registers a slash command in goldy bot. E.g.``/goldy``"""
-        self.logger.debug(f"Creating slash command for '{self.name}'...")
-
-        list_of_application_command_data = []
-
-        # Creating payload.
-        # ------------------
-        payload = ApplicationCommandPayload(
-            name = self.name,
-            description = self.description,
-            options = nextcore_utils.params_to_options(self),
-            type = 1
-        )
-
-        # Add slash command for each allowed guild.
-        # -------------------------------------------
-        for guild in self.goldy.guilds.allowed_guilds:
-
-            r = await self.goldy.http_client.request(
-                Route(
-                    "POST",
-                    "/applications/{application_id}/guilds/{guild_id}/commands",
-                    application_id = self.goldy.application_data["id"],
-                    guild_id = guild[0],
-                ),
-                rate_limit_key = self.goldy.nc_authentication.rate_limit_key,
-                headers = self.goldy.nc_authentication.headers,
-                json = payload
-            )
-
-            list_of_application_command_data.append(
-                (
-                    guild[0],
-                    await r.json()
-                )
-            )
-
-            self.logger.debug(f"Created slash for guild '{guild[1]}'.")
-
-        self.list_of_application_command_data = list_of_application_command_data
-        return list_of_application_command_data
-    
-    async def remove_slash(self) -> None:
-        """Un-registers the slash command."""
-        self.logger.debug(f"Removing slash command for '{self.name}'...")
-
-        if self.list_of_application_command_data is None:
-            return
-
-        for slash_command in self.list_of_application_command_data:
-
-            await self.goldy.http_client.request(
-                Route(
-                    "GET",
-                    "/applications/{application_id}/guilds/{guild_id}/commands/{command_id}",
-                    application_id = self.goldy.application_data["id"],
-                    guild_id = slash_command[0],
-                    command_id = slash_command[1]["id"],
-                ),
-                rate_limit_key = self.goldy.nc_authentication.rate_limit_key,
-                headers = self.goldy.nc_authentication.headers
-            )
-
-            self.logger.debug(f"Deleted slash for guild with id '{slash_command[0]}'.")
-
-        return None
-
-
-    async def load(self) -> bool:
-        """Loads and creates the command."""
-        if self.in_extension:
-
-            if self.extension is None: # If the extension doesn't don't load this command.
-                self.logger.warn(
-                    f"Not loading command '{self.name}' because the extension '{self.extension_name}' is being ignored or has failed to load!"
-                )
-                return False
-
-            self.extension.commands.append(self)
-            self.logger.debug(f"Added to extension '{self.extension.code_name}'.")
-
-        if self.allow_slash_cmd:
-            try:
-                await self.create_slash()
-            except BadRequestError as e:
-                self.logger.error(f"We got a BadRequest error from discord when loading the slash command '{self.name}', double check if you haven't entered anything wrong. \nError: {e}")
-                await self.unload()
-                return False
-
-        self.__loaded = True
-
-        self.logger.info(
-            f"Command '{self.name}' has been loaded!"
-        )
-
-        return True
-    
-
     async def unload(self) -> None:
         """Unloads and removes the command from cache."""
 
-        if self.allow_slash_cmd:
-            await self.remove_slash()
-
         self.__loaded = False
 
-        commands_cache.remove((self.name, self))
+        commands_cache.remove(
+            (self.name, self)
+        )
 
         self.logger.debug(
-            f"Command '{self.name}' has been unloaded!"
+            f"Command '{self.name}' has been unloaded and removed from cache!"
         )
 
         return None
