@@ -60,6 +60,10 @@ class SlashOption(dict):
 
             await platter.send_message(text, reply=True)
 
+    .. note::
+
+        Try choosing option Goldilocks :)
+
     """
 
     def __init__(self, name:str=None, description:str=None, choices:List[SlashOptionChoice]=None, required=True, **extra: ApplicationCommandOptionData) -> None:

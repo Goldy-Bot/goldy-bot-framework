@@ -54,3 +54,23 @@ def invoke_data_to_params(data: MessageData | InteractionData, platter_type: Pla
             params[option["name"]] = option["value"]
 
         return params
+    
+
+def get_function_parameters(command: Command) -> List[str]:
+    """Returns the function parameters of a command respectively."""
+    
+    # Get list of function params.
+    func_params = list(command.func.__code__.co_varnames)
+    
+    # Check if command is inside extension by checking if self is first parameter.
+    if func_params[0] == "self":
+        command.__in_extension = True
+        func_params.pop(0)
+
+    # Removes 'platter' argument.
+    func_params.pop(0)
+
+    # Filters out other variables resulting in just function parameters. It's weird I know.
+    params = func_params[:command.func.__code__.co_argcount - 2]
+
+    return params

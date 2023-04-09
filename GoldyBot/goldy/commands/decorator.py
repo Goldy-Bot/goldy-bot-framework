@@ -29,16 +29,19 @@ def command(
     This is how you create a command in GoldyBot::
 
         @GoldyBot.command()
-        async def hello(platter: GoldyBot.GoldenPlatter):
+        async def hello(self, platter: GoldyBot.GoldenPlatter):
             await platter.send_message("👋hello", reply=True)
+
+    .. warning::
+
+        Do note that standalone commands are no longer a thing in goldy bot v5 so you WILL need a register this command inside an Extension. Visit `here`_ to find out how to create extensions.
+
+    .. _here: https://goldybot.devgoldy.me/goldy.extensions.html#how-to-create-an-extension
     
     """
     def decorate(func):
         def inner(func) -> Command:
             goldy = get_goldy_instance()
-
-            if goldy is None:
-                raise errors.GoldyBotError("Please initialize goldy class before registering commands.")
 
             create_slash = True; create_normal = True
 
