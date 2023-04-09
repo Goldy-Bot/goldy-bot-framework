@@ -29,7 +29,7 @@
 My goal is to have a functional framework that's fast and lightweight and has the least code possible to maintain.
 
 ### ⚡ Nextcore
-[Nextcore](https://github.com/nextsnake/nextcore) is the perfect api wrapper for v5, it's fast, low level, can be easily modified. Additionally, Nextcore provides a ton of control, this gives me the freedom to build my framework exactly the way I want it, without any unnecessary overhead like if I stayed with nextcord/discord.py.
+[Nextcore](https://github.com/nextsnake/nextcore) is the perfect api wrapper for v5, it's fast, low level and can be easily modified. Additionally, Nextcore provides a ton of control, this gives me the freedom to build my framework exactly the way I want it, without any unnecessary overhead like if I stayed with nextcord/discord.py.
 
 ## *Install/Set Up* - ``Normal``
 
