@@ -1,3 +1,5 @@
+DISCORD_CDN = "https://cdn.discordapp.com/"
+
 from .embeds.embed import Embed, EmbedField
 from .slash_options.slash_option import SlashOption, SlashOptionChoice
 

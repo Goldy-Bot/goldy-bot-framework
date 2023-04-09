@@ -26,7 +26,27 @@ class EmbedField(dict):
         
 
 class Embed(dict):
-    """A class used to create a discord embed."""
+    """
+    A class used to create a discord embed.
+    
+    -------------
+
+    ⭐Example:
+    -------------
+    This is how you can create a simple Embed in goldy bot::
+
+        await platter.send_message(
+            "👋hello", reply=True, 
+            embeds = [
+                GoldyBot.Embed(title="OwO!", description="wow!", colour=Colours.AKI_PINK)
+            ]
+        )
+
+    .. note::
+
+        Don't forget to import ``from GoldyBot.nextcore_utils import Colours`` for colours.
+
+    """
     def __init__(self, title:str=None, description:str=None, fields:List[EmbedField]=None, color:Colours|int=None, colour:Colours|int=None, **extra) -> None:
         """
         Creates a discord embed. 😋

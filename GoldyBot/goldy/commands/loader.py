@@ -44,7 +44,6 @@ class CommandLoader():
                 continue
 
             command.extension.commands.append(command)
-            self.logger.debug(f"Added command '{command.name}' to extension '{command.extension.name}'.")
 
             if command.allow_slash_cmd:
                 slash_command_payloads.append(command.slash_cmd_payload)

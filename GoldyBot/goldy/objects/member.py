@@ -6,7 +6,7 @@ from discord_typings import UserData
 from devgoldyutils import DictDataclass
 
 from ... import goldy_bot_logger, LoggerAdapter
-from ..nextcore_utils.urls import USER_AVATAR
+from ..nextcore_utils import DISCORD_CDN
 
 if TYPE_CHECKING:
     from .. import Goldy
@@ -35,7 +35,4 @@ class Member(DictDataclass):
         self.id = self.get("id")
         self.username = self.get("username")
         self.discriminator = self.get("discriminator")
-        self.avatar_url = USER_AVATAR.format(
-            user_id = self.id, 
-            user_avatar_hash = self.get("avatar")
-        )
+        self.avatar_url = DISCORD_CDN + f"avatars/{self.id}/{self.get('avatar')}.png?size=4096"
