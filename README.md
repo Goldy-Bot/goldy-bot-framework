@@ -25,8 +25,6 @@
 
 </p>
 
-<br>
-
 ### 🏆 Goal
 My goal is to have a functional framework that's fast and lightweight and has the least code possible to maintain.
 
