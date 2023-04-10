@@ -12,19 +12,14 @@ class SlashOptionChoice(dict):
         
         ⭐ Documentation at https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-choice-structure
         """
-        self.data: StrCommandOptionChoiceData | IntCommandOptionChoiceData = {}
+        data: StrCommandOptionChoiceData | IntCommandOptionChoiceData = {}
 
-        self.type: Literal["string"] | Literal["integer"] = "string"
+        data["name"] = name
+        data["value"] = value
 
-        if isinstance(value, int):
-            self.type = "integer"
+        data.update(extra)
 
-        self.data["name"] = name
-        self.data["value"] = value
-
-        self.data.update(extra)
-
-        super().__init__(self.data)
+        super().__init__(data)
         
 
 class SlashOption(dict):
@@ -85,7 +80,7 @@ class SlashOption(dict):
         # I didn't want to FUCKING have two separate SlashOption classes just for string choices and integer choices FUCK that, so I'm settling with this solution.
         if choices is not None:
 
-            if choices[0].type == "integer":
+            if isinstance(choices[0]["value"], int):
                 self.data["type"] = 4
 
 
