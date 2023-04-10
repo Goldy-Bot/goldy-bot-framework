@@ -82,7 +82,7 @@ class SlashOption(dict):
 
         # If the choices are integer choices set the type of this slash option to 4.
         # This is because type 4 in the discord api means application options with integer choices and type 3 means application options with string choices, FUCK YOU DISCORD!
-        # I didn't want to FUCKING have two separate SlashOption classes just for string choices and integer choices so I settled with this messy solution.
+        # I didn't want to FUCKING have two separate SlashOption classes just for string choices and integer choices FUCK that, so I'm settling with this solution.
         if choices is not None:
 
             if choices[0].type == "integer":
