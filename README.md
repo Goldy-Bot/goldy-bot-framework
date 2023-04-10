@@ -29,7 +29,7 @@
 My goal is to have a functional framework that's fast and lightweight and has the least code possible to maintain. 
 
 ### 💛 Is goldy bot for you?
-Do note that the whole point of this framework is to make it easier for me to develop discord bots so you may dislike the way certain things are implemented; if so I highly recommend you not use the framework because more and more things will be implemented my way in the future so it's best to seek an API wrapper like nextcord for your discord bot development needs instead.
+Do note that the whole point of this framework is to make it easier for me to develop discord bots so you may dislike the way certain things are implemented; if so I highly recommend you not use the framework because more and more things will be implemented my way in the future so it's best to seek an API wrapper like [nextcord](https://github.com/nextcord/nextcord) for your discord bot development needs instead.
 
 ### ⚡ Nextcore
 [Nextcore](https://github.com/nextsnake/nextcore) is the perfect api wrapper for v5, it's fast, low level and can be easily modified. Additionally, Nextcore provides a ton of control, this gives me the freedom to build my framework exactly the way I want it, without any unnecessary overhead like if I stayed with nextcord/discord.py.
