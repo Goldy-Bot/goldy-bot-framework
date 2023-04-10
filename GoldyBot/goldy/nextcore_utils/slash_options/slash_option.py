@@ -59,6 +59,10 @@ class SlashOption(dict):
 
         Try choosing option Goldilocks :)
 
+    .. warning::
+
+        Each SlashOptionChoice MUST have the same value type or else you'll get an invalid form body error from discord :)
+
     """
 
     def __init__(self, name:str=None, description:str=None, choices:List[SlashOptionChoice]=None, required=True, **extra: ApplicationCommandOptionData) -> None:
