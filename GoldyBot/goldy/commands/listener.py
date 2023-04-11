@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from typing import Tuple, TYPE_CHECKING
-from devgoldyutils import Colours
+from devgoldyutils import Colours, pprint
 from discord_typings import InteractionCreateData, MessageData
 
 from . import commands_cache, Command
@@ -70,7 +70,7 @@ class CommandListener():
             # Message components.
             # --------------------
             if interaction["type"] == 3:
-                #print(">>", interaction)
+                #pprint(interaction)
                 ...
 
         return None
