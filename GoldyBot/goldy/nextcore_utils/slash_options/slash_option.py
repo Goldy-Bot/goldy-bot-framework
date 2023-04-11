@@ -1,8 +1,10 @@
 from __future__ import annotations
 
-from typing import List, Literal
+from typing import List
 from discord_typings import ApplicationCommandOptionData
 from discord_typings.interactions.commands import StrCommandOptionChoiceData, IntCommandOptionChoiceData
+
+from GoldyBot.errors import GoldyBotError
 
 class SlashOptionChoice(dict):
     """A class used to create slash option choice."""
@@ -75,7 +77,15 @@ class SlashOption(dict):
 
         if description is None:
             description = "This option has no description. Sorry about that."
-        
+
+        # Check if all choices are same type.
+        if choices is not None:
+            allowed_type = type(choices[0]["value"])
+
+            for choice in choices:
+                if not type(choice["value"]) == allowed_type:
+                    raise GoldyBotError("All choices got to have the same value type!")
+
 
         self.data["type"] = 3
 

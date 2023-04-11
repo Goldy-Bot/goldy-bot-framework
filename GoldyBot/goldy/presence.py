@@ -65,6 +65,7 @@ class Presence():
                 presence["status"] = Status(status.lower()).value
             
             else:
+                # TODO: Let's remove this.
                 raise InvalidTypeInMethod("status in 'presence.change()' has to be either Status enum or string.")
         
         if not activity is None:
