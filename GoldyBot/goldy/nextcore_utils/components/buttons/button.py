@@ -19,7 +19,7 @@ class ButtonStyle(Enum):
     RED = DANGER
 
 
-random_custom_id = 1
+random_custom_id = 1 # I know there's better ways to do this dw.
 
 class Button(BowlRecipe):
     """A class used to create a slash command button."""

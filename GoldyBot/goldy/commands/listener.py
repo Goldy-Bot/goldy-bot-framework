@@ -43,26 +43,35 @@ class CommandListener():
 
     async def on_slash_cmd(self, interaction: InteractionCreateData) -> None:
         # Only respond to slash command interactions.
-        if not interaction["type"] == 2:
-            return
 
         guild = self.goldy.guilds.get_guild(interaction["guild_id"])
 
         if guild is not None:
 
-            command:Tuple[str, Command] = utils.cache_lookup(interaction["data"]["name"], commands_cache)
+            # Slash command.
+            # ---------------
+            if interaction["type"] == 2:
 
-            if command is not None:
-                gold_platter = GoldenPlatter(
-                    data = interaction, 
-                    type = objects.PlatterType.SLASH_CMD, 
-                    goldy = self.goldy, 
-                    command = command[1]
-                )
+                command:Tuple[str, Command] = utils.cache_lookup(interaction["data"]["name"], commands_cache)
 
-                await command[1].invoke(
-                    gold_platter
-                )
+                if command is not None:
+                    gold_platter = GoldenPlatter(
+                        data = interaction, 
+                        type = objects.PlatterType.SLASH_CMD, 
+                        goldy = self.goldy, 
+                        command = command[1]
+                    )
+
+                    await command[1].invoke(
+                        gold_platter
+                    )
+
+            
+            # Message components.
+            # --------------------
+            if interaction["type"] == 3:
+                #print(">>", interaction)
+                ...
 
         return None
 
