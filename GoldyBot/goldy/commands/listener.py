@@ -1,14 +1,13 @@
 from __future__ import annotations
 
 from typing import Tuple, TYPE_CHECKING
-from devgoldyutils import Colours, pprint
+from devgoldyutils import Colours
 from discord_typings import InteractionCreateData, MessageData
 
 from . import commands_cache, Command
 from .. import utils, objects
 from ... import LoggerAdapter, goldy_bot_logger
 from ..objects.golden_platter import GoldenPlatter
-from ..nextcore_utils import front_end_errors
 
 if TYPE_CHECKING:
     from .. import Goldy

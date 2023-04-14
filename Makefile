@@ -3,8 +3,11 @@ run:
 	cd demo && python run.py
 
 test:
-	cd tests
-	pytest
+	ruff .
+	cd tests && pytest -v
+
+test-v:
+	cd tests && pytest -vv
 
 docker-build:
 	docker build -t devgoldy/goldybot .

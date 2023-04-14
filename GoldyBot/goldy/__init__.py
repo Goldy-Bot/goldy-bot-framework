@@ -99,7 +99,7 @@ class Goldy():
             )
         except KeyboardInterrupt:
             self.stop("Keyboard interrupt detected!")
-        except RuntimeError as e:
+        except RuntimeError:
             # I really do hope this doesn't torture me in the future. 💀
             pass
 

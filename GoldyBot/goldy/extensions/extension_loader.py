@@ -50,7 +50,7 @@ class ExtensionLoader():
         for path in [external_path, internal_path]:
             path_object = pathlib.Path(path)
 
-            if path_object.exists() == False:
+            if path_object.exists() is False:
                 self.logger.warn(f"Couldn't find extension path at '{path_object}'!")
                 continue
 
@@ -64,7 +64,7 @@ class ExtensionLoader():
 
                     if file.is_dir():
                         
-                        if not "__init__.py" in [x.name for x in file.iterdir()]:
+                        if "__init__.py" not in [x.name for x in file.iterdir()]:
                             self.logger.debug(f"Module '{file.name}' has no __init__.py so I'm ignoring it...")
                             continue
 
@@ -146,7 +146,7 @@ class ExtensionLoader():
             await extension.unload()
 
             # Get the full path the extension was loaded from so we can load it again with ExtensionLoader().
-            if not extension.loaded_path in loaded_paths:
+            if extension.loaded_path not in loaded_paths:
                 loaded_paths.append(extension.loaded_path)
 
         self.load(loaded_paths)

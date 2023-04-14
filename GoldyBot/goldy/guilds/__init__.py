@@ -59,7 +59,7 @@ class Guilds():
             else:
                 for item in guild_config_template:
 
-                    if not item in guild_config:
+                    if item not in guild_config:
                         guild_config[item] = guild_config_template[item]
 
                 await database.edit("guild_configs", query={"_id":guild[0]}, data=guild_config)

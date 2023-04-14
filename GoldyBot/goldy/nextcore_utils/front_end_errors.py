@@ -73,7 +73,7 @@ class TooManyArguments(FrontEndErrors):
             description = f"""
 **Command Usage -> ``{platter.guild.prefix}{platter.command.name} {command_args_string[:-1]}``**
 """, 
-            message = f"The command author passed too many arguments.",
+            message = "The command author passed too many arguments.",
             platter = platter, 
             embed_colour = Colours.RED,
             logger = logger

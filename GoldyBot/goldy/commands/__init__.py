@@ -217,7 +217,7 @@ class Command():
 
             for role_code_name in self.required_roles:
 
-                if not role_code_name in ["bot_dev"]:
+                if role_code_name not in ["bot_dev"]:
                     try:
                         role_id_uwu = platter.guild.roles[role_code_name]
                     except KeyError:

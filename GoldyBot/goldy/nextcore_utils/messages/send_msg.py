@@ -136,7 +136,7 @@ async def send_msg(
 
             # Callback message.
             # ------------------
-            if object.interaction_responded == False:
+            if object.interaction_responded is False:
 
                 await goldy.http_client.request(
                     Route(
@@ -167,7 +167,7 @@ async def send_msg(
 
                 message_data = await r.json()
 
-                object.command.logger.debug(f"Interaction callback message was sent.")
+                object.command.logger.debug("Interaction callback message was sent.")
 
 
             # Follow up message.
@@ -188,7 +188,7 @@ async def send_msg(
 
                 message_data = await r.json()
 
-                object.command.logger.debug(f"Interaction follow up message was sent.")
+                object.command.logger.debug("Interaction follow up message was sent.")
 
         else:
             # Perform normal message response.
@@ -217,7 +217,7 @@ async def send_msg(
 
             message_data = await r.json()
 
-            object.command.logger.debug(f"Message was sent.")
+            object.command.logger.debug("Message was sent.")
 
 
         message = objects.Message(message_data, goldy)
