@@ -160,8 +160,9 @@ class Command():
                             platter = gold_platter, 
                             logger = self.logger
                         )
-
-                    raise e
+                    
+                    # TODO: When exceptions raise in commands wrap them in a goldy bot command exception.
+                    raise e 
 
             # Slash command.
             # ----------------
