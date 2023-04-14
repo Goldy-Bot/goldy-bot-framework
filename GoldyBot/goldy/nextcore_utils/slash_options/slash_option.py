@@ -46,7 +46,7 @@ class SlashOption(dict):
                 required = True
             )
         })
-        async def bear(self, platter: GoldyBot.GoldenPlatter, bear_name: str):
+        async def bear(self, platter: GoldyBot.GoldPlatter, bear_name: str):
             if bear_name == "goldilocks":
                 return await platter.send_message("*Goldilocks is not a bear you fool!*", reply=True)
 

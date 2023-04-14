@@ -24,14 +24,14 @@ random_custom_id = 1 # I know there's better ways to do this dw.
 class Button(BowlRecipe):
     """A class used to create a slash command button."""
     @overload
-    def __init__(self, style: ButtonStyle | int, label: str, custom_id: str = None, emoji: str = None, **extra: ButtonComponentData):
+    def __init__(self, style: ButtonStyle | int, label: str, custom_id: str = None, emoji: str = None, **extra: ButtonComponentData) -> ButtonComponentData:
         ...
 
     @overload
-    def __init__(self, style: Literal[5], label: str, url: str, emoji: str = None, **extra: ButtonComponentData):
+    def __init__(self, style: Literal[5], label: str, url: str, emoji: str = None, **extra: ButtonComponentData) -> ButtonComponentData:
         ...
 
-    def __init__(self, style: ButtonStyle | int, label: str, custom_id: str = None, url: str = None, emoji: str = None, **extra: ButtonComponentData) -> None:
+    def __init__(self, style: ButtonStyle | int, label: str, custom_id: str = None, url: str = None, emoji: str = None, **extra: ButtonComponentData) -> ButtonComponentData:
         """
         Creates a discord button to use in action rows. 😋
         

@@ -27,7 +27,7 @@ def command(
     This is how you create a command in GoldyBot::
 
         @GoldyBot.command()
-        async def hello(self, platter: GoldyBot.GoldenPlatter):
+        async def hello(self, platter: GoldyBot.GoldPlatter):
             await platter.send_message("👋hello", reply=True)
 
     .. warning::

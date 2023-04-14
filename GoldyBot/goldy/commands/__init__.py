@@ -9,7 +9,7 @@ from nextcore.http.errors import BadRequestError
 
 from .. import utils, nextcore_utils
 from ..nextcore_utils import front_end_errors
-from ..objects import GoldenPlatter, PlatterType
+from ..objects import GoldPlatter, PlatterType
 from ... import LoggerAdapter, goldy_bot_logger
 from ..extensions import Extension, extensions_cache
 
@@ -120,7 +120,7 @@ class Command():
             return True
 
 
-    async def invoke(self, gold_platter: GoldenPlatter) -> None:
+    async def invoke(self, gold_platter: GoldPlatter) -> None:
         """Runs/triggers this command. This method is mostly supposed to be used internally."""
         self.logger.debug(f"Attempting to invoke '{gold_platter.type.name}'...")
 
@@ -185,7 +185,7 @@ class Command():
         # If member has no perms raise MissingPerms exception.
         raise front_end_errors.MissingPerms(gold_platter, self.logger)
     
-    async def __got_perms(self, platter: GoldenPlatter) -> bool:
+    async def __got_perms(self, platter: GoldPlatter) -> bool:
         """Internal method that checks if the command author has the perms to run this command."""
         logger = LoggerAdapter(self.logger, prefix=Colours.PURPLE.apply("Permission System"))
 

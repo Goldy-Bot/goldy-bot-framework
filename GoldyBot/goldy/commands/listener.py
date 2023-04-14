@@ -7,7 +7,7 @@ from discord_typings import InteractionCreateData, MessageData
 from . import commands_cache, Command
 from .. import utils, objects
 from ... import LoggerAdapter, goldy_bot_logger
-from ..objects.golden_platter import GoldenPlatter
+from ..objects.golden_platter import GoldPlatter
 
 if TYPE_CHECKING:
     from .. import Goldy
@@ -54,7 +54,7 @@ class CommandListener():
                 command:Tuple[str, Command] = utils.cache_lookup(interaction["data"]["name"], commands_cache)
 
                 if command is not None:
-                    gold_platter = GoldenPlatter(
+                    gold_platter = GoldPlatter(
                         data = interaction, 
                         type = objects.PlatterType.SLASH_CMD, 
                         goldy = self.goldy, 
@@ -93,7 +93,7 @@ class CommandListener():
             if command is not None:
 
                 if command[1].allow_prefix_cmd:
-                    gold_platter = GoldenPlatter(
+                    gold_platter = GoldPlatter(
                         data = message, 
                         type = objects.PlatterType.PREFIX_CMD, 
                         goldy = self.goldy, 

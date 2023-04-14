@@ -1,6 +1,6 @@
 from __future__ import annotations
-from typing import overload, List
-from discord_typings import MessageReferenceData, InteractionMessageCallbackData, MessageData, EmbedData, InteractionCallbackData
+from typing import overload, List, TYPE_CHECKING
+from discord_typings import MessageReferenceData, InteractionMessageCallbackData, MessageData, InteractionCallbackData
 from discord_typings.resources.channel import MessageBase
 
 from aiohttp import FormData
@@ -9,13 +9,18 @@ from nextcore.common import json_dumps
 
 from ... import objects, utils
 
+if TYPE_CHECKING:
+    from ..components import GoldenBowl
+    from ..embeds.embed import Embed
+
 # TODO: Add more options to allow using channel instead of platter.
 
 @overload
 async def send_msg(
-    platter: objects.GoldenPlatter, 
+    platter: objects.GoldPlatter, 
     text: str = None, 
-    embeds: List[EmbedData] = None, 
+    embeds: List[Embed] = None, 
+    bowls: List[GoldenBowl] = None, 
     reply: bool = False, 
     **extra: MessageData | InteractionCallbackData
 ) -> objects.Message: # Work in progress...
@@ -32,6 +37,8 @@ async def send_msg(
         The content of the message.
     ``embeds``
         Embeds to include in the message.
+    ``bowls``
+        Components to include in the message.
     ``reply``
         Whether goldy bot should liberally reply to the message the command was invoked.
     ``**extra``
@@ -48,7 +55,8 @@ async def send_msg(
 async def send_msg(
     channel, 
     text: str = None,
-    embeds: List[EmbedData] = None, 
+    embeds: List[Embed] = None, 
+    bowls: List[GoldenBowl] = None, 
     **extra: MessageData | InteractionCallbackData
 ) -> objects.Message: # TODO: Add type to channel when channel object is available.
     """
@@ -64,6 +72,8 @@ async def send_msg(
         The content of the message.
     ``embeds``
         Embeds to include in the message.
+    ``bowls``
+        Components to include in the message.
     ``**extra``
         Allows you to pass the extra parameters that are missing.
         
@@ -78,7 +88,8 @@ async def send_msg(
 async def send_msg(
     member: objects.Member, 
     text: str = None, 
-    embeds: List[EmbedData] = None, 
+    embeds: List[Embed] = None, 
+    bowls: List[GoldenBowl] = None, 
     **extra: MessageData | InteractionCallbackData
 ) -> objects.Message:
     """
@@ -94,6 +105,8 @@ async def send_msg(
         The content of the message.
     ``embeds``
         Embeds to include in the message.
+    ``bowls``
+        Components to include in the message.
     ``**extra``
         Allows you to pass the extra parameters that are missing.
 
@@ -105,9 +118,10 @@ async def send_msg(
     ...
 
 async def send_msg(
-    object: objects.GoldenPlatter | objects.Member, 
+    object: objects.GoldPlatter | objects.Member, 
     text: str = None, 
-    embeds: List[EmbedData] = None, 
+    embeds: List[Embed] = None, 
+    bowls: List[GoldenBowl] = None, 
     reply: bool = False, 
     delete_after: float = None,
     **extra: MessageData | InteractionCallbackData
@@ -124,11 +138,14 @@ async def send_msg(
     if embeds is not None:
         payload["embeds"] = embeds
 
+    if bowls is not None:
+        payload["components"] = bowls
+
     payload.update(extra)
 
 
     # TODO: Add support for member and channel objects.
-    if isinstance(object, objects.GoldenPlatter):
+    if isinstance(object, objects.GoldPlatter):
 
         if object.type.value == 1:
             # Perform interaction response.
