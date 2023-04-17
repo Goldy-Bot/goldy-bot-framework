@@ -18,7 +18,7 @@ class ButtonStyle(Enum):
     GREEN = SUCCESS
     RED = DANGER
 
-
+# TODO: Create random custom id based on hash of button dict and time it was made.
 random_custom_id = 1 # I know there's better ways to do this dw.
 
 class Button(BowlRecipe):

@@ -70,6 +70,9 @@ class CommandListener():
             # --------------------
             if interaction["type"] == 3:
                 #pprint(interaction)
+                # TODO: Listen for buttons registered in goldy bot.
+
+                # TODO: Add button to cache.
                 ...
 
         return None

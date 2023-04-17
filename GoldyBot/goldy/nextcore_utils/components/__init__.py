@@ -3,6 +3,9 @@ from __future__ import annotations
 from typing import List
 from discord_typings import ActionRowData, ComponentData
 
+# TODO: Add functionality to register recipes callback just like a command with a decorator. 
+# (i think a bowl recipe should also be a command object too or at least should contain a command object.)
+
 class BowlRecipe(dict):
     """A bowl recipe is equivalent to an item or message component. This is inherited by all messages components in Goldy Bot. This can be passed into a GoldenBowl() class."""
     def __init__(self, data: ComponentData) -> ComponentData:
