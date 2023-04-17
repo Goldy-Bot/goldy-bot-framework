@@ -16,7 +16,7 @@ from ..extensions import Extension, extensions_cache
 if TYPE_CHECKING:
     from ... import Goldy
 
-commands_cache:List[Tuple[str, object]] = []
+commands_cache: List[Tuple[str, object]] = []
 """
 This cache contains all the commands that have been registered and it's memory location to the class.
 """
@@ -121,7 +121,7 @@ class Command():
 
 
     async def invoke(self, gold_platter: GoldPlatter) -> None:
-        """Runs/triggers this command. This method is mostly supposed to be used internally."""
+        """Runs/triggers this command. This method is usually used internally."""
         self.logger.debug(f"Attempting to invoke '{gold_platter.type.name}'...")
 
         if await self.__got_perms(gold_platter):
