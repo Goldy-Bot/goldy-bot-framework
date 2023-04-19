@@ -8,6 +8,7 @@ from ...goldy import get_goldy_instance
 from ... import goldy_bot_logger, LoggerAdapter
 
 if TYPE_CHECKING:
+    from ... import Goldy
     from ..commands import Command
 
 extensions_cache: List[Tuple[str, object]] = []
@@ -43,7 +44,7 @@ class Extension():
 
     def __init__(self):
         """Tells Goldy Bot to Load this class as an extension."""
-        self.goldy = get_goldy_instance()
+        self.goldy: Goldy = get_goldy_instance()
 
         self.logger = LoggerAdapter(
             LoggerAdapter(goldy_bot_logger, prefix = "Extensions"), 
