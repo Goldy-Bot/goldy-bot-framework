@@ -34,7 +34,7 @@ class BowlRecipe(dict):
 
     async def invoke(self, platter: objects.GoldPlatter) -> None:
         """Runs/triggers this recipe. This method is usually used internally."""
-        self.logger.debug(f"Attempting to invoke RECIPE...")
+        self.logger.debug("Attempting to invoke RECIPE...")
 
         try:
             await self.callback(

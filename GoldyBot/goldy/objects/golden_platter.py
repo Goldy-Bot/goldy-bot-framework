@@ -7,7 +7,6 @@ from discord_typings import MessageData, InteractionData, EmbedData
 if TYPE_CHECKING:
     from ...goldy import Goldy
     from .message import Message
-    from ..commands import Command
     from ..guilds import Guild
     from ..nextcore_utils.components import GoldenBowl
     from logging import Logger
