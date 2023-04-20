@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import sys
 import pathlib
 from typing import List, overload, TYPE_CHECKING
 import importlib.util
@@ -15,7 +16,7 @@ if TYPE_CHECKING:
 
 class ExtensionLoader():
     """Class that handles extension loading and reloading."""
-    def __init__(self, goldy:Goldy, raise_on_load_error:bool|None = True) -> None:
+    def __init__(self, goldy: Goldy, raise_on_load_error: bool | None = True) -> None:
         self.goldy = goldy
         self.raise_on_load_error = raise_on_load_error
 
@@ -51,7 +52,7 @@ class ExtensionLoader():
             path_object = pathlib.Path(path)
 
             if path_object.exists() is False:
-                self.logger.warn(f"Couldn't find extension path at '{path_object}'!")
+                self.logger.warn(f"Couldn't find extension folder path at '{path_object}'!")
                 continue
 
             self.logger.info(f"Found extension folder at '{path}'.")
@@ -86,23 +87,28 @@ class ExtensionLoader():
         ...
     
     @overload
-    def load(self, extension_paths:List[str]) -> None:
+    def load(self, extension_paths: List[str]) -> None:
         """Loads each extension in this list of paths."""
         ...
 
-    def load(self, extension_paths:List[str] = None) -> None:
+    def load(self, extension_paths: List[str] = None) -> None:
         """Loads each extension in this list of paths. If extension_paths is kept none, goldy bot will search for extensions to load itself."""
         if extension_paths is None:
             extension_paths = self.__find_all_paths()
 
         for path in extension_paths:
             # Specify and get the module.
+            self.logger.debug(f"Loading the extension at '{path}'...")
             spec_module = importlib.util.spec_from_file_location(path[:-3], path)
             module_py = importlib.util.module_from_spec(spec_module)
 
             # Run module and load function.
             try:
+                # For some reason if I don't do this shit blows up. (extensions won't be able to import modules in it's own directories)
+                sys.modules[module_py.__name__] = module_py
+
                 # Run module.
+                self.logger.debug(f"Running extension at '{path}'...") # TODO: Change path to extension name for better logging maybe.
                 spec_module.loader.exec_module(module_py)
 
                 # Run load function.
@@ -127,10 +133,11 @@ class ExtensionLoader():
                     raise GoldyBotError(error_str)
                 else:
                     self.logger.error(error_str)
-        
+
         # TODO: Find a very lite way to return a list of extensions that were loaded somehow.
+        # I could do this by returning a list of tuples from self.__find_all_paths() that contain the extension's name and path instead of just path.
         return None
-    
+
 
     @overload
     async def reload(self) -> None:

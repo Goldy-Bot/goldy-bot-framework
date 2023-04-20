@@ -50,6 +50,7 @@ class Goldy():
         self.intents = 1 << 9 | 1 << 15
 
         self.http_client = HTTPClient()
+        """Nextcore http client, use this if you would like to perform low level requests."""
 
         self.shard_manager = ShardManager(
             authentication = self.nc_authentication,
@@ -63,8 +64,9 @@ class Goldy():
                 afk = False
             )
         )
+        """Nextcore shard manager, use if you would like to take control of the shards."""
 
-        self.application_data:ApplicationData = None
+        self.application_data: ApplicationData = None
 
         # Add to cache.
         cache["goldy_core_instance"] = self
