@@ -99,20 +99,30 @@ class ExtensionLoader():
             # Specify and get the module.
             spec_module = importlib.util.spec_from_file_location(path[:-3], path)
             module_py = importlib.util.module_from_spec(spec_module)
-            
-            # Run module.
-            spec_module.loader.exec_module(module_py)
 
-            # Get load function from module.
+            # Run module and load function.
             try:
+                # Run module.
+                spec_module.loader.exec_module(module_py)
+
+                # Run load function.
                 self.logger.debug(f"Calling the 'load()' function in the extension at {path}...")
                 load_function = getattr(module_py, "load")
                 load_function()
 
                 self.logger.debug("Successfully ran the load function!")
-            except AttributeError as e:
-                error_str = f"We encountered an error while trying to load extension at '{path}'! You most likely forgot the 'load()' function. \nERROR --> {e}"
-
+            except Exception as e:
+                if isinstance(e, AttributeError):
+                    error_str = \
+                        f"We encountered an error while trying to load the extension at '{path}'! " \
+                        f"You likely forgot the 'load()' function. " \
+                        "Check out https://goldybot.devgoldy.me/goldy.extensions.html#how-to-create-an-extension" \
+                        f"\nERROR --> {e}"
+                else:
+                    error_str = \
+                        f"We encountered an error while trying to load the extension at '{path}'! " \
+                        f"\nERROR --> {e}"
+                
                 if self.raise_on_load_error:
                     raise GoldyBotError(error_str)
                 else:
