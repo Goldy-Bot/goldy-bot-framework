@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import List, Callable, Any, Tuple
 from discord_typings import ActionRowData, ComponentData
-from devgoldyutils import LoggerAdapter
+from devgoldyutils import LoggerAdapter, Colours
 
 from GoldyBot import goldy_bot_logger
 from ... import objects
@@ -16,7 +16,7 @@ This list contains all the recipes that have been registered and it's memory loc
 
 class BowlRecipe(dict):
     """A bowl recipe is equivalent to an item or message component. This is inherited by all messages components in Goldy Bot. This can be passed into a GoldenBowl() class."""
-    def __init__(self, data: ComponentData, callback: RECIPE_CALLBACK = None) -> ComponentData:
+    def __init__(self, data: ComponentData, name: str, callback: RECIPE_CALLBACK = None) -> ComponentData:
         """
         Creates an component in discord to use in action rows. 😋
         
@@ -27,7 +27,7 @@ class BowlRecipe(dict):
 
         self.logger = LoggerAdapter(
             logger = LoggerAdapter(goldy_bot_logger, prefix=self.__class__.__name__),
-            prefix = data.get('label', None)
+            prefix = Colours.PINK_GREY.apply(name)
         )
 
         super().__init__(data)

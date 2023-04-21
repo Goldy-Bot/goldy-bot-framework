@@ -86,4 +86,4 @@ class Button(BowlRecipe):
 
         data.update(extra)
 
-        super().__init__(data, callback)
+        super().__init__(data, data["label"], callback)
