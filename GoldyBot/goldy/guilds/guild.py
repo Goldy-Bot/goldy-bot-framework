@@ -1,11 +1,17 @@
-from typing import List, Dict
+from __future__ import annotations
+
+from typing import List, Dict, TYPE_CHECKING
 from dataclasses import dataclass, field
+
+if TYPE_CHECKING:
+    from .. import Goldy
 
 @dataclass
 class Guild:
     """A dataclass representing a Goldy Bot guild."""
     id:str
     code_name:str
+    goldy:Goldy = field(repr=False)
 
     config_dict:dict = field(repr=False)
 

@@ -68,7 +68,7 @@ class Guilds():
             # Add guild to list.
             # --------------------
             self.guilds.append(
-                (guild[0], Guild(id=guild[0], code_name=guild[1], config_dict=guild_config))
+                (guild[0], Guild(id=guild[0], code_name=guild[1], goldy=self.goldy, config_dict=guild_config))
             )
 
 
