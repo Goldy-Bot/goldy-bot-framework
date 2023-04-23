@@ -8,7 +8,7 @@ from ... import LoggerAdapter, goldy_bot_logger
 if TYPE_CHECKING:
     from ... import objects
 
-logger = LoggerAdapter(goldy_bot_logger, prefix="delete_msg")
+logger = LoggerAdapter(goldy_bot_logger, prefix="delete_channel")
 
 async def delete_channel(channel: objects.Channel, reason: str = None) -> objects.Channel:
     """
@@ -25,7 +25,7 @@ async def delete_channel(channel: objects.Channel, reason: str = None) -> object
 
     Returns
     -------
-    ``GoldyBot.goldy.objects.channel.Channel``
+    :py:meth:`~GoldyBot.goldy.objects.channel.Channel`
         The channel that was deleted.
     """
     goldy = channel.goldy

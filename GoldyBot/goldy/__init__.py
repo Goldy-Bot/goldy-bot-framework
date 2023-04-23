@@ -25,7 +25,7 @@ from .token import Token
 if sys.platform == "win32":
     asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
-cache:Dict[str, Any] = {
+cache: Dict[str, Any] = {
     "goldy_core_instance": None,
 }
 

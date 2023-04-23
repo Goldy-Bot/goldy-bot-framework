@@ -27,7 +27,7 @@ class Channel(DictDataclass):
         
         self.id = self.get("id")
     
-    async def delete(self, reason:str=None) -> Channel:
+    async def delete(self, reason: str = None) -> Channel:
         return await nextcore_utils.delete_channel(self, reason)
 
 

@@ -11,7 +11,7 @@ if TYPE_CHECKING:
     from ... import Goldy
 
 class LiveConsoleApp(cmd2.Cmd):
-    def __init__(self, goldy:Goldy, logger:log.Logger) -> None:
+    def __init__(self, goldy: Goldy, logger: log.Logger) -> None:
         self.goldy = goldy
         self.logger = logger
         super().__init__()
