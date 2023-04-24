@@ -6,7 +6,7 @@ from ..colours import Colours
 
 class EmbedField(dict):
     """A class used to create an embed field for an embed."""
-    def __init__(self, name:str, value:str, inline:bool=None, **extra):
+    def __init__(self, name: str, value: str, inline: bool=None, **extra):
         """
         Creates an embed field. 😋
         
@@ -47,7 +47,7 @@ class Embed(dict):
         Don't forget to import ``from GoldyBot.nextcore_utils import Colours`` for colours.
 
     """
-    def __init__(self, title:str=None, description:str=None, fields:List[EmbedField]=None, color:Colours|int=None, colour:Colours|int=None, **extra) -> None:
+    def __init__(self, title: str=None, description: str=None, fields: List[EmbedField] = None, color: Colours | int = None, colour: Colours | int = None, **extra) -> None:
         """
         Creates a discord embed. 😋
         
