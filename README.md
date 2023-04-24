@@ -37,7 +37,7 @@ Do note that the whole point of this framework is to make it easier for me to de
 
 These instructions assume you have a [MongoDB database](https://www.mongodb.com/), [Git](https://git-scm.com/) and [Python](https://www.python.org/) installed.
 
-> ℹ GoldyBot will connect to your mongoDB database and create stuff.
+> ℹ We recommend a clean mongo database, GoldyBot will connect to your mongoDB database and create stuff the first time you run.
 
 1. ~~**Install package from pypi.**~~ *not on there yet... here's a git install*
 ```sh
