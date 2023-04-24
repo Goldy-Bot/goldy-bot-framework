@@ -14,3 +14,10 @@ Asynchronous Delay
    :members:
    :undoc-members:
    :show-inheritance:
+
+Is Lambda
+-------------------
+.. automodule:: GoldyBot.goldy.utils._lambda
+   :members:
+   :undoc-members:
+   :show-inheritance:

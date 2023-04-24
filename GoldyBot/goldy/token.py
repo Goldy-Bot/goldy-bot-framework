@@ -44,7 +44,7 @@ class Token:
             raise NoDatabaseToken()
 
     def create_token_env_file(self) -> bool:
-        if not ".env" in os.listdir("."):
+        if ".env" not in os.listdir("."):
             self.logger.debug("Creating .env file in root dir...")
 
             # Open template env file.

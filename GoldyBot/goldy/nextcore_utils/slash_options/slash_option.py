@@ -1,8 +1,10 @@
 from __future__ import annotations
 
-from typing import List, Literal
+from typing import List
 from discord_typings import ApplicationCommandOptionData
 from discord_typings.interactions.commands import StrCommandOptionChoiceData, IntCommandOptionChoiceData
+
+from GoldyBot.errors import GoldyBotError
 
 class SlashOptionChoice(dict):
     """A class used to create slash option choice."""
@@ -12,19 +14,14 @@ class SlashOptionChoice(dict):
         
         ⭐ Documentation at https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-choice-structure
         """
-        self.data: StrCommandOptionChoiceData | IntCommandOptionChoiceData = {}
+        data: StrCommandOptionChoiceData | IntCommandOptionChoiceData = {}
 
-        self.type: Literal["string"] | Literal["integer"] = "string"
+        data["name"] = name
+        data["value"] = value
 
-        if isinstance(value, int):
-            self.type = "integer"
+        data.update(extra)
 
-        self.data["name"] = name
-        self.data["value"] = value
-
-        self.data.update(extra)
-
-        super().__init__(self.data)
+        super().__init__(data)
         
 
 class SlashOption(dict):
@@ -49,7 +46,7 @@ class SlashOption(dict):
                 required = True
             )
         })
-        async def bear(self, platter: GoldyBot.GoldenPlatter, bear_name: str):
+        async def bear(self, platter: GoldyBot.GoldPlatter, bear_name: str):
             if bear_name == "goldilocks":
                 return await platter.send_message("*Goldilocks is not a bear you fool!*", reply=True)
 
@@ -64,6 +61,10 @@ class SlashOption(dict):
 
         Try choosing option Goldilocks :)
 
+    .. warning::
+
+        Each SlashOptionChoice MUST have the same value type or else you'll get an invalid form body error from discord :)
+
     """
 
     def __init__(self, name:str=None, description:str=None, choices:List[SlashOptionChoice]=None, required=True, **extra: ApplicationCommandOptionData) -> None:
@@ -76,16 +77,24 @@ class SlashOption(dict):
 
         if description is None:
             description = "This option has no description. Sorry about that."
-        
+
+        # Check if all choices are same type.
+        if choices is not None:
+            allowed_type = type(choices[0]["value"])
+
+            for choice in choices:
+                if not type(choice["value"]) == allowed_type:
+                    raise GoldyBotError("All choices got to have the same value type!")
+
 
         self.data["type"] = 3
 
         # If the choices are integer choices set the type of this slash option to 4.
         # This is because type 4 in the discord api means application options with integer choices and type 3 means application options with string choices, FUCK YOU DISCORD!
-        # I didn't want to FUCKING have two separate SlashOption classes just for string choices and integer choices so I settled with this messy solution.
+        # I didn't want to FUCKING have two separate SlashOption classes just for string choices and integer choices FUCK that, so I'm settling with this solution.
         if choices is not None:
 
-            if choices[0].type == "integer":
+            if isinstance(choices[0]["value"], int):
                 self.data["type"] = 4
 
 

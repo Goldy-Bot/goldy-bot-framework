@@ -11,7 +11,7 @@ if TYPE_CHECKING:
     from ... import Goldy
 
 class LiveConsoleApp(cmd2.Cmd):
-    def __init__(self, goldy:Goldy, logger:log.Logger) -> None:
+    def __init__(self, goldy: Goldy, logger: log.Logger) -> None:
         self.goldy = goldy
         self.logger = logger
         super().__init__()
@@ -25,14 +25,14 @@ class LiveConsoleApp(cmd2.Cmd):
         # ----------------------
         extension = None
         if not extension_name == "":
-            extension:Tuple[str, Extension] | None = utils.cache_lookup(extension_name, extensions_cache)
+            extension: Tuple[str, Extension] | None = utils.cache_lookup(extension_name, extensions_cache, False)
 
             if extension is None:
                 self.logger.error(f"The extension '{extension_name}' was not found.")
                 return False
         
-        self.logger.info(f"Reloading extension(s)...")
-        self.logger.warning(f"This may take a minute to begin...")
+        self.logger.info("Reloading extension(s)...")
+        self.logger.warning("This may take a minute to begin...")
         self.goldy.async_loop.create_task(
             self.goldy.extension_loader.reload((lambda x: [x[1]] if x is not None else None)(extension))
         )

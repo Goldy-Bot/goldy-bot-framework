@@ -9,7 +9,7 @@ from ...errors import GoldyBotError
 from .guild import Guild
 
 class Guilds():
-    def __init__(self, goldy:Goldy) -> None:
+    def __init__(self, goldy: Goldy) -> None:
         self.goldy = goldy
         self.allowed_guilds = goldy.config.allowed_guilds
 
@@ -31,8 +31,6 @@ class Guilds():
 
         for guild in self.allowed_guilds:
 
-            # Add guild to database.
-            # --------------------------------
             guild_config_template = {
                 "_id": guild[0],
                 "code_name": guild[1],
@@ -42,37 +40,49 @@ class Guilds():
                 "roles": {
 
                 },
+
                 "channels": {
 
                 },
 
-                "allowed_extensions": [],
-                "disallowed_extensions": [],
-                "hidden_extensions": [],
+                "extensions": {
+                    "allowed": [],
+                    "disallowed": [],
+                    "hidden": []
+                },
+
             }
 
-            guild_config = await database.find_one("guild_configs", query={"_id":guild[0]})
+            # Add guild to database.
+            # --------------------------------
+            guild_config = await database.find_one("guild_configs", query = {"_id": guild[0]})
 
             if guild_config is None:
                 guild_config = guild_config_template
-                await database.insert("guild_configs", data=guild_config)
+                await database.insert("guild_configs", data = guild_config)
+
             else:
-                for item in guild_config_template:
+                # Check if any keys are missing in the guild config, if it is update the config with that new item.
+                # ---------------------------------------------------------------------------------------------------
+                if not guild_config_template.keys() == guild_config.keys():
+                    
+                    # If there is an item in the template that isn't in the database add it.
+                    for item in guild_config_template:
 
-                    if not item in guild_config:
-                        guild_config[item] = guild_config_template[item]
+                        if item not in guild_config:
+                            guild_config[item] = guild_config_template[item]
 
-                await database.edit("guild_configs", query={"_id":guild[0]}, data=guild_config)
-        
+                    await database.edit("guild_configs", query = {"_id": guild[0]}, data = guild_config)
+
 
             # Add guild to list.
             # --------------------
             self.guilds.append(
-                (guild[0], Guild(id=guild[0], code_name=guild[1], config_dict=guild_config))
+                (guild[0], Guild(guild_config, self.goldy))
             )
 
 
-    def get_guild(self, guild_id:str|int) -> Guild | None:
+    def get_guild(self, guild_id: str | int) -> Guild | None:
         """Finds and returns goldy bot guild by id."""
         cache_tuple = utils.cache_lookup(
             key=guild_id,

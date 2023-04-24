@@ -5,10 +5,10 @@ from devgoldyutils import Colours
 from discord_typings import InteractionCreateData, MessageData
 
 from . import commands_cache, Command
+from ..nextcore_utils.components import BowlRecipe, registered_recipes, GoldenBowl
 from .. import utils, objects
 from ... import LoggerAdapter, goldy_bot_logger
-from ..objects.golden_platter import GoldenPlatter
-from ..nextcore_utils import front_end_errors
+from ..objects.golden_platter import GoldPlatter
 
 if TYPE_CHECKING:
     from .. import Goldy
@@ -43,26 +43,48 @@ class CommandListener():
 
     async def on_slash_cmd(self, interaction: InteractionCreateData) -> None:
         # Only respond to slash command interactions.
-        if not interaction["type"] == 2:
-            return
 
         guild = self.goldy.guilds.get_guild(interaction["guild_id"])
 
         if guild is not None:
 
-            command:Tuple[str, Command] = utils.cache_lookup(interaction["data"]["name"], commands_cache)
+            # Slash command.
+            # ---------------
+            if interaction["type"] == 2:
 
-            if command is not None:
-                gold_platter = GoldenPlatter(
-                    data = interaction, 
-                    type = objects.PlatterType.SLASH_CMD, 
-                    goldy = self.goldy, 
-                    command = command[1]
-                )
+                command: Tuple[str, Command] = utils.cache_lookup(interaction["data"]["name"], commands_cache)
 
-                await command[1].invoke(
-                    gold_platter
-                )
+                if command is not None:
+                    gold_platter = GoldPlatter(
+                        data = interaction, 
+                        type = objects.PlatterType.SLASH_CMD, 
+                        command = command[1],
+                        goldy = self.goldy,
+                    )
+
+                    await command[1].invoke(
+                        gold_platter
+                    )
+
+            
+            # Message components.
+            # --------------------
+            if interaction["type"] == 3:
+                message_component: Tuple[str, BowlRecipe, GoldenBowl] = utils.cache_lookup(interaction["data"]["custom_id"], registered_recipes)
+
+                if message_component is not None:
+                    gold_platter = GoldPlatter(
+                        data = interaction, 
+                        type = objects.PlatterType.SLASH_CMD, 
+                        command = message_component[1],
+                        goldy = self.goldy,
+                    )
+
+                    await message_component[1].invoke(
+                        gold_platter,
+                        message_component[2].cmd_platter
+                    )
+
 
         return None
 
@@ -85,11 +107,11 @@ class CommandListener():
             if command is not None:
 
                 if command[1].allow_prefix_cmd:
-                    gold_platter = GoldenPlatter(
+                    gold_platter = GoldPlatter(
                         data = message, 
                         type = objects.PlatterType.PREFIX_CMD, 
-                        goldy = self.goldy, 
-                        command = command[1]
+                        command = command[1],
+                        goldy = self.goldy,
                     )
                     
                     await command[1].invoke(

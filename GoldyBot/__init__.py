@@ -21,9 +21,10 @@ from .goldy import nextcore_utils
 from .goldy.nextcore_utils import ( 
     Embed, EmbedField, 
     SlashOption, SlashOptionChoice,
+    GoldenBowl, BowlRecipe, Button, ButtonStyle,
     send_msg, delete_msg
 )
 
-from .goldy.objects.golden_platter import GoldenPlatter, PlatterType
+from .goldy.objects.golden_platter import GoldPlatter, PlatterType
 from .goldy.objects.message import Message
 from .goldy.objects.member import Member

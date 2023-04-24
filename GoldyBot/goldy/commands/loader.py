@@ -59,7 +59,8 @@ class CommandLoader():
         # ----------------------------------------------
         for guild in self.goldy.guilds.allowed_guilds:
 
-            r = await self.goldy.http_client.request(
+            # TODO: Get the application objects from this response and save it in the guild. Also add a method in command object to retrieve it.
+            await self.goldy.http_client.request(
                 Route(
                     "PUT",
                     "/applications/{application_id}/guilds/{guild_id}/commands",

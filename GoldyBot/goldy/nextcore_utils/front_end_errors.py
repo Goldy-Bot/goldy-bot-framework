@@ -5,9 +5,9 @@ For example if a command is missing a parameter it will raise a FrontEndError wh
 import logging as log
 
 from ... import errors
-from ..nextcore_utils import Colours
+from .colours import Colours
 from .embeds.embed import Embed
-from ..objects.golden_platter import GoldenPlatter, PlatterType
+from ..objects.golden_platter import GoldPlatter, PlatterType
 
 class FrontEndErrors(errors.GoldyBotError):
     def __init__(
@@ -15,7 +15,7 @@ class FrontEndErrors(errors.GoldyBotError):
             title: str,
             description: str,
             message: str,
-            platter: GoldenPlatter, 
+            platter: GoldPlatter, 
             embed_colour = Colours.AKI_ORANGE,
             delete_after = 6,
             logger: log.Logger = None
@@ -40,7 +40,7 @@ class FrontEndErrors(errors.GoldyBotError):
 
 
 class MissingArgument(FrontEndErrors):
-    def __init__(self, missing_args: list, platter: GoldenPlatter, logger: log.Logger = None):
+    def __init__(self, missing_args: list, platter: GoldPlatter, logger: log.Logger = None):
         command_args_string = ""
         for param in platter.command.params:
             command_args_string += f"{{{param}}} "
@@ -63,7 +63,7 @@ class MissingArgument(FrontEndErrors):
 
 
 class TooManyArguments(FrontEndErrors):
-    def __init__(self, platter: GoldenPlatter, logger: log.Logger = None):
+    def __init__(self, platter: GoldPlatter, logger: log.Logger = None):
         command_args_string = ""
         for param in platter.command.params:
             command_args_string += f"{{{param}}} "
@@ -73,7 +73,7 @@ class TooManyArguments(FrontEndErrors):
             description = f"""
 **Command Usage -> ``{platter.guild.prefix}{platter.command.name} {command_args_string[:-1]}``**
 """, 
-            message = f"The command author passed too many arguments.",
+            message = "The command author passed too many arguments.",
             platter = platter, 
             embed_colour = Colours.RED,
             logger = logger
@@ -81,12 +81,24 @@ class TooManyArguments(FrontEndErrors):
 
 
 class MissingPerms(FrontEndErrors):
-    def __init__(self, platter: GoldenPlatter, logger: log.Logger = None):
+    def __init__(self, platter: GoldPlatter, logger: log.Logger = None):
         super().__init__(
             title = ":heart: No Perms!", 
             description = "Sorry, you don't have the perms to run this command.",
             message = f"The command author '{platter.author.username}#{platter.author.discriminator}' doesn't have the perms to run this command.",
             platter = platter, 
             embed_colour = Colours.RED,
+            logger = logger
+        )
+
+
+class OnlyAuthorCanInvokeRecipe(FrontEndErrors):
+    def __init__(self, platter: GoldPlatter, logger: log.Logger = None):
+        super().__init__(
+            title = "🧡 Only Author Can Invoke", 
+            description = "Sorry, only the command author can invoke this.",
+            message = f"'{platter.author.username}#{platter.author.discriminator}' tried to invoke an 'author only' recipe.",
+            platter = platter, 
+            embed_colour = Colours.AKI_ORANGE,
             logger = logger
         )

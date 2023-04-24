@@ -9,14 +9,14 @@ from nextcore.http.errors import BadRequestError
 
 from .. import utils, nextcore_utils
 from ..nextcore_utils import front_end_errors
-from ..objects import GoldenPlatter, PlatterType
+from ..objects import GoldPlatter, PlatterType
 from ... import LoggerAdapter, goldy_bot_logger
 from ..extensions import Extension, extensions_cache
 
 if TYPE_CHECKING:
     from ... import Goldy
 
-commands_cache:List[Tuple[str, object]] = []
+commands_cache: List[Tuple[str, object]] = []
 """
 This cache contains all the commands that have been registered and it's memory location to the class.
 """
@@ -120,8 +120,8 @@ class Command():
             return True
 
 
-    async def invoke(self, gold_platter: GoldenPlatter) -> None:
-        """Runs/triggers this command. This method is mostly supposed to be used internally."""
+    async def invoke(self, gold_platter: GoldPlatter) -> None:
+        """Runs/triggers this command. This method is usually used internally."""
         self.logger.debug(f"Attempting to invoke '{gold_platter.type.name}'...")
 
         if await self.__got_perms(gold_platter):
@@ -160,8 +160,9 @@ class Command():
                             platter = gold_platter, 
                             logger = self.logger
                         )
-
-                    raise e
+                    
+                    # TODO: When exceptions raise in commands wrap them in a goldy bot command exception.
+                    raise e 
 
             # Slash command.
             # ----------------
@@ -185,7 +186,7 @@ class Command():
         # If member has no perms raise MissingPerms exception.
         raise front_end_errors.MissingPerms(gold_platter, self.logger)
     
-    async def __got_perms(self, platter: GoldenPlatter) -> bool:
+    async def __got_perms(self, platter: GoldPlatter) -> bool:
         """Internal method that checks if the command author has the perms to run this command."""
         logger = LoggerAdapter(self.logger, prefix=Colours.PURPLE.apply("Permission System"))
 
@@ -217,7 +218,7 @@ class Command():
 
             for role_code_name in self.required_roles:
 
-                if not role_code_name in ["bot_dev"]:
+                if role_code_name not in ["bot_dev"]:
                     try:
                         role_id_uwu = platter.guild.roles[role_code_name]
                     except KeyError:

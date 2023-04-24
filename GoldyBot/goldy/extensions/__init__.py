@@ -8,9 +8,10 @@ from ...goldy import get_goldy_instance
 from ... import goldy_bot_logger, LoggerAdapter
 
 if TYPE_CHECKING:
+    from ... import Goldy
     from ..commands import Command
 
-extensions_cache:List[Tuple[str, object]] = []
+extensions_cache: List[Tuple[str, object]] = []
 """
 This cache contains all the extensions that have been loaded and it's memory location to the class.
 """
@@ -30,7 +31,7 @@ class Extension():
                 super().__init__()
 
             @GoldyBot.command()
-            async def hello(self, platter: GoldyBot.GoldenPlatter):
+            async def hello(self, platter: GoldyBot.GoldPlatter):
                 await platter.send_message("👋hello", reply=True)
 
         def load():
@@ -43,7 +44,7 @@ class Extension():
 
     def __init__(self):
         """Tells Goldy Bot to Load this class as an extension."""
-        self.goldy = get_goldy_instance()
+        self.goldy: Goldy = get_goldy_instance()
 
         self.logger = LoggerAdapter(
             LoggerAdapter(goldy_bot_logger, prefix = "Extensions"), 
@@ -71,11 +72,12 @@ class Extension():
 
     @property
     def name(self) -> str:
+        """Name of extension."""
         return self.__class__.__name__
     
     @property
     def loaded_path(self) -> str:
-        "The path where this extension was loaded."
+        """The path where this extension was loaded."""
         return self.__loaded_path
 
     async def unload(self) -> None:

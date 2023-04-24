@@ -26,7 +26,7 @@ Here are quick examples to get started with extensions in Goldy Bot V5. 🌟
             super().__init__()
 
          @GoldyBot.command()
-         async def hello(self, platter: GoldyBot.GoldenPlatter):
+         async def hello(self, platter: GoldyBot.GoldPlatter):
             await platter.send_message("👋hello", reply=True)
 
       def load():

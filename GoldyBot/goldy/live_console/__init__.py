@@ -16,10 +16,10 @@ class LiveConsole(threading.Thread):
     def __init__(self, goldy:Goldy) -> None:
         """The goldy bot live console."""
         self.goldy = goldy
-        self.logger = LoggerAdapter(goldy_bot_logger, prefix=Colours.PURPLE.apply_to_string("Live_Console"))
+        self.logger = LoggerAdapter(goldy_bot_logger, prefix = Colours.PURPLE.apply_to_string("LiveConsole"))
 
         self.__stop = False
-        super().__init__(daemon=True)
+        super().__init__(daemon = True)
 
     def run(self) -> None:
         time.sleep(1)

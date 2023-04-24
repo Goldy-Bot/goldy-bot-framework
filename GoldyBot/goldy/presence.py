@@ -57,7 +57,7 @@ class Presence():
         old_presence = self.shard_manager.presence.copy()
         presence = self.shard_manager.presence
 
-        if not status is None:
+        if status is not None:
             if isinstance(status, Status):
                 presence["status"] = status.value
 
@@ -65,9 +65,10 @@ class Presence():
                 presence["status"] = Status(status.lower()).value
             
             else:
+                # TODO: Let's remove this.
                 raise InvalidTypeInMethod("status in 'presence.change()' has to be either Status enum or string.")
         
-        if not activity is None:
+        if activity is not None:
             presence["activities"] = [
                 PartialActivityData(
                     name=activity.name, 
@@ -76,7 +77,7 @@ class Presence():
                 )
             ]
                 
-        if not afk is None:
+        if afk is not None:
             presence["afk"] = afk
 
         for shard in self.shard_manager.active_shards:

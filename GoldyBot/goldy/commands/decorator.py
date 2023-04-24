@@ -1,10 +1,8 @@
 from __future__ import annotations
 
 from typing import List, Dict, TYPE_CHECKING
-from discord_typings import ApplicationCommandOptionData
 
 from . import Command
-from ... import errors
 from ... import get_goldy_instance
 
 if TYPE_CHECKING:
@@ -29,7 +27,7 @@ def command(
     This is how you create a command in GoldyBot::
 
         @GoldyBot.command()
-        async def hello(self, platter: GoldyBot.GoldenPlatter):
+        async def hello(self, platter: GoldyBot.GoldPlatter):
             await platter.send_message("👋hello", reply=True)
 
     .. warning::
