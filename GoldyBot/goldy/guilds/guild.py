@@ -1,7 +1,6 @@
 from __future__ import annotations
 
-from typing import List, Dict, TYPE_CHECKING
-from dataclasses import dataclass, field
+from typing import List, TYPE_CHECKING
 from GoldyBot.goldy.database import DatabaseEnums
 
 if TYPE_CHECKING:
@@ -52,7 +51,7 @@ class Guild():
         return self.config_dict["extensions"]["hidden"]
     
     async def update(self) -> None:
-        """Updates guild data by fetching from database."""
+        """Updates guild's data by fetching from database."""
         database = self.goldy.database.get_goldy_database(DatabaseEnums.GOLDY_MAIN)
 
         self.config_dict = await database.find_one("guild_configs", query = {"_id": self.id})
