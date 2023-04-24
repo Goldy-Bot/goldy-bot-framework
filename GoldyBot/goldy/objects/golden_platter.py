@@ -8,8 +8,8 @@ if TYPE_CHECKING:
     from ...goldy import Goldy
     from .message import Message
     from ..guilds import Guild
-    from ..nextcore_utils.components import GoldenBowl
-    from logging import Logger
+    from ..nextcore_utils.components import GoldenBowl, BowlRecipe
+    from ..commands import Command
 
 class PlatterType(Enum):
     PREFIX_CMD = 0
@@ -24,14 +24,16 @@ class GoldPlatter():
 
     ✨ Behold the golden platter. ✨😁
     """
-    def __init__(self, data: MessageData|InteractionData, type: PlatterType|int, goldy: Goldy, logger: Logger) -> None:
+    def __init__(self, data: MessageData|InteractionData, type: PlatterType|int, command: Command | BowlRecipe, goldy: Goldy) -> None:
         # TODO: We got to somehow test this stuff with pytest because this being error prone is sort of a catastrophe.
 
         self.data = data
         """The raw data received right from discord that triggered this prefix or slash command."""
+        self.command = command
+        """The command object."""
         self.goldy = goldy
         """An instance of the goldy class."""
-        self.logger = logger
+        self.logger = command.logger
         """Logger passed by command executer."""
 
         self.type: PlatterType = (lambda x: PlatterType(x) if isinstance(x, int) else x)(type)

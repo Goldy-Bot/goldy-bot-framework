@@ -5,7 +5,7 @@ For example if a command is missing a parameter it will raise a FrontEndError wh
 import logging as log
 
 from ... import errors
-from ..nextcore_utils import Colours
+from .colours import Colours
 from .embeds.embed import Embed
 from ..objects.golden_platter import GoldPlatter, PlatterType
 
@@ -88,5 +88,17 @@ class MissingPerms(FrontEndErrors):
             message = f"The command author '{platter.author.username}#{platter.author.discriminator}' doesn't have the perms to run this command.",
             platter = platter, 
             embed_colour = Colours.RED,
+            logger = logger
+        )
+
+
+class OnlyAuthorCanInvokeRecipe(FrontEndErrors):
+    def __init__(self, platter: GoldPlatter, logger: log.Logger = None):
+        super().__init__(
+            title = "🧡 Only Author Can Invoke", 
+            description = "Sorry, only the command author can invoke this.",
+            message = f"'{platter.author.username}#{platter.author.discriminator}' tried to invoke an 'author only' recipe.",
+            platter = platter, 
+            embed_colour = Colours.AKI_ORANGE,
             logger = logger
         )

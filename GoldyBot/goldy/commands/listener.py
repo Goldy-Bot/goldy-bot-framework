@@ -5,7 +5,7 @@ from devgoldyutils import Colours
 from discord_typings import InteractionCreateData, MessageData
 
 from . import commands_cache, Command
-from ..nextcore_utils.components import BowlRecipe, registered_recipes
+from ..nextcore_utils.components import BowlRecipe, registered_recipes, GoldenBowl
 from .. import utils, objects
 from ... import LoggerAdapter, goldy_bot_logger
 from ..objects.golden_platter import GoldPlatter
@@ -58,8 +58,8 @@ class CommandListener():
                     gold_platter = GoldPlatter(
                         data = interaction, 
                         type = objects.PlatterType.SLASH_CMD, 
+                        command = command[1],
                         goldy = self.goldy,
-                        logger = command[1].logger
                     )
 
                     await command[1].invoke(
@@ -70,18 +70,19 @@ class CommandListener():
             # Message components.
             # --------------------
             if interaction["type"] == 3:
-                message_component: Tuple[str, BowlRecipe] = utils.cache_lookup(interaction["data"]["custom_id"], registered_recipes)
+                message_component: Tuple[str, BowlRecipe, GoldenBowl] = utils.cache_lookup(interaction["data"]["custom_id"], registered_recipes)
 
                 if message_component is not None:
                     gold_platter = GoldPlatter(
                         data = interaction, 
                         type = objects.PlatterType.SLASH_CMD, 
+                        command = message_component[1],
                         goldy = self.goldy,
-                        logger = message_component[1].logger
                     )
 
                     await message_component[1].invoke(
-                        gold_platter
+                        gold_platter,
+                        message_component[2].cmd_platter
                     )
 
 
@@ -109,8 +110,8 @@ class CommandListener():
                     gold_platter = GoldPlatter(
                         data = message, 
                         type = objects.PlatterType.PREFIX_CMD, 
+                        command = command[1],
                         goldy = self.goldy,
-                        logger = command[1].logger
                     )
                     
                     await command[1].invoke(

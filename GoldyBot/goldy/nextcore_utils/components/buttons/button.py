@@ -20,7 +20,45 @@ class ButtonStyle(Enum):
     RED = DANGER
 
 class Button(BowlRecipe):
-    """A class used to create a slash command button."""
+    """
+    A class used to create a slash command button.
+
+    ---------------
+
+    ⭐ Example:
+    -------------
+    This is how you use a button in goldy bot::
+
+        @GoldyBot.command(
+            description = "Have you ever wanted to 💣nuke a city? WELL FUCK IT, NOW YOU CAN!", 
+            slash_options = {
+                "city": SlashOption(
+                    description = "The 🏢 city you would like to 💣nuke!"
+                )
+            }
+        )
+        async def nuke(self, platter: GoldyBot.GoldPlatter, city: str):
+
+            await platter.send_message(
+                f"Are you sure you would like to nuke **{city}**?",
+                bowls = [
+                    GoldenBowl([
+                        Button(ButtonStyle.GREEN, label="Yes", callback = self.nuke_city, city = city),
+                        Button(ButtonStyle.RED, label="No", callback = lambda x: x.send_message("👨‍🦱 Alright we're holding off captain."))
+                    ])
+                ]
+            )
+
+        
+        async def nuke_city(self, platter: GoldyBot.GoldPlatter, city: str):
+            casualties = random.randint(800, 10000)
+
+            await platter.send_message(
+                f"> 💣 You nuked {city}, there was {casualties} casualties.",
+                reply = True
+            )
+
+    """
     @overload
     def __init__(
         self, 
@@ -28,8 +66,9 @@ class Button(BowlRecipe):
         label: str, 
         callback: RECIPE_CALLBACK, 
         emoji: str = None, 
+        author_only: bool = True, 
         custom_id: str = None, 
-        **extra: ButtonComponentData
+        **callback_args: dict
     ) -> ButtonComponentData:
         ...
 
@@ -40,7 +79,7 @@ class Button(BowlRecipe):
         label: str, 
         url: str, 
         emoji: str = None, 
-        **extra: ButtonComponentData
+        author_only: bool = True, 
     ) -> ButtonComponentData:
         ...
 
@@ -51,8 +90,9 @@ class Button(BowlRecipe):
         custom_id: str = None, 
         url: str = None, 
         emoji: str = None, 
+        author_only: bool = True, 
         callback: RECIPE_CALLBACK = None, 
-        **extra: ButtonComponentData
+        **callback_args: dict
     ) -> ButtonComponentData:
         """
         Creates a discord button to use in action rows. 😋
@@ -84,6 +124,4 @@ class Button(BowlRecipe):
         else:
             data["custom_id"] = custom_id
 
-        data.update(extra)
-
-        super().__init__(data, data["label"], callback)
+        super().__init__(data, data["label"], author_only, callback, **callback_args)

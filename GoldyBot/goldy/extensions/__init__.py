@@ -72,11 +72,12 @@ class Extension():
 
     @property
     def name(self) -> str:
+        """Name of extension."""
         return self.__class__.__name__
     
     @property
     def loaded_path(self) -> str:
-        "The path where this extension was loaded."
+        """The path where this extension was loaded."""
         return self.__loaded_path
 
     async def unload(self) -> None:
