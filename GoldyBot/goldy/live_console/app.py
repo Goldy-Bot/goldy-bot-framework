@@ -25,7 +25,7 @@ class LiveConsoleApp(cmd2.Cmd):
         # ----------------------
         extension = None
         if not extension_name == "":
-            extension:Tuple[str, Extension] | None = utils.cache_lookup(extension_name, extensions_cache)
+            extension: Tuple[str, Extension] | None = utils.cache_lookup(extension_name, extensions_cache, False)
 
             if extension is None:
                 self.logger.error(f"The extension '{extension_name}' was not found.")
