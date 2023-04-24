@@ -21,3 +21,10 @@ Message
    :members:
    :undoc-members:
    :show-inheritance:
+
+Channel
+--------
+.. automodule:: GoldyBot.goldy.objects.channel
+   :members:
+   :undoc-members:
+   :show-inheritance:
