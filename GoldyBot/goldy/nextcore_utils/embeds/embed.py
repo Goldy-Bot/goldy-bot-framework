@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import List, overload
+from typing import List
 from discord_typings import EmbedData, EmbedFieldData, EmbedImageData
 from ..colours import Colours
 
