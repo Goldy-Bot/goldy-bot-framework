@@ -8,9 +8,9 @@ import asyncio
 from nextcore.http.client import HTTPClient
 
 from nextcore.http import BotAuthentication, UnauthorizedError, Route
-from nextcore.gateway import ShardManager
+from nextcore.gateway import ShardManager, GatewayOpcode
 
-from typing import Dict, Any
+from typing import Dict, Any, TYPE_CHECKING
 from discord_typings import UpdatePresenceData, PartialActivityData, ApplicationData
 from devgoldyutils import Colours
 
@@ -20,6 +20,9 @@ from ..info import VERSION, COPYRIGHT
 from ..paths import Paths
 
 from .token import Token
+
+if TYPE_CHECKING:
+    from . import objects
 
 # Fixes this https://github.com/nextsnake/nextcore/issues/189.
 if sys.platform == "win32":
@@ -66,6 +69,8 @@ class Goldy():
         )
         """Nextcore shard manager, use if you would like to take control of the shards."""
 
+        self.bot_user: objects.Member = None
+        """The bot's user/member object."""
         self.application_data: ApplicationData = None
 
         # Add to cache.
@@ -83,6 +88,8 @@ class Goldy():
         
         All properties return None when not found in the config.
         """
+        self.system = System(self)
+        """Goldy Bot class used to check how much resources Goldy is utilizing on the host system."""
         self.command_loader = CommandLoader(self)
         """Class that handles command loading."""
         self.command_listener = CommandListener(self)
@@ -92,6 +99,14 @@ class Goldy():
         self.live_console = LiveConsole(self)
         """The goldy bot live console."""
         self.guilds = Guilds(self)
+
+    @property
+    def latency(self) -> float | None:
+        """Returns the latency in milliseconds between discord and goldy bot. ``Goldy -> Discord -> Goldy``"""
+        try:
+            return self.shard_manager.active_shards[0].latency
+        except RuntimeError:
+            return None
 
     def start(self):
         """🧡🌆 Awakens Goldy Bot from her hibernation. 😴 Shortcut to ``asyncio.run(goldy.__start_async())`` and also handles various exceptions carefully."""
@@ -150,8 +165,23 @@ class Goldy():
             headers = self.nc_authentication.headers
         )
 
-        self.application_data = await r.json()
+        self.application_data: ApplicationData = await r.json()
         self.logger.debug("Application data requested!")
+
+        # Get bot's user object.
+        # ------------------------
+        r = await self.http_client.request(
+            Route(
+                "GET", 
+                "/users/@me"
+            ),
+            rate_limit_key = self.nc_authentication.rate_limit_key,
+            headers = self.nc_authentication.headers
+        )
+
+        bot_user = await r.json()
+        self.bot_user = Member(bot_user, self)
+        self.logger.debug("Bot's user object requested!")
 
     async def setup(self):
         """Method ran to set up goldy bot."""
@@ -209,6 +239,7 @@ get_goldy = get_goldy_instance
 
 # Root imports.
 # -------------
+from .system import System
 from .database import Database
 from .presence import Presence, Status, ActivityTypes
 from .goldy_config import GoldyConfig
@@ -216,4 +247,5 @@ from .extensions.extension_loader import ExtensionLoader
 from .commands.loader import CommandLoader
 from .commands.listener import CommandListener
 from .live_console import LiveConsole
+from .objects import Member
 from .guilds import Guilds

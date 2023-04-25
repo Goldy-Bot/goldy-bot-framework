@@ -40,7 +40,7 @@ class Activity:
 
 class Presence():
     """Class that allows you to control the status, game activity and more of Goldy Bot"""
-    def __init__(self, goldy:Goldy) -> None:
+    def __init__(self, goldy: Goldy) -> None:
         self.goldy = goldy
 
         self.logger = LoggerAdapter(

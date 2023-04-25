@@ -30,7 +30,8 @@ dependencies = [
     "motor",
     "cmd2",
     "pygame",
-    "regex"
+    "regex",
+    "psutil"
 ]
 
 dynamic = ["version"]

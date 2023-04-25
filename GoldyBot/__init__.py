@@ -3,8 +3,6 @@
 
 Copyright (C) 2023 - Goldy
 """
-from devgoldyutils import Colours
-
 from .logging import LoggerAdapter, log, goldy_bot_logger, LOGGER_NAME
 
 from .info import VERSION, DISPLAY_NAME
@@ -18,8 +16,9 @@ from .goldy.commands.decorator import command
 from .goldy.utils import *
 
 from .goldy import nextcore_utils
-from .goldy.nextcore_utils import ( 
-    Embed, EmbedField, 
+from .goldy.nextcore_utils import (
+    Colours,
+    Embed, EmbedField, EmbedImage,
     SlashOption, SlashOptionChoice,
     GoldenBowl, BowlRecipe, Button, ButtonStyle,
     send_msg, delete_msg
