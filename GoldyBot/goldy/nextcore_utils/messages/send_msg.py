@@ -133,7 +133,7 @@ async def send_msg(
     payload: MessageBase | InteractionMessageCallbackData = {}
 
     if text is not None:
-        payload["content"] = text
+        payload["content"] = str(text)
 
     if embeds is not None:
         payload["embeds"] = embeds
