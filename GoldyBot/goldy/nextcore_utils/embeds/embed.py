@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import List, overload
+from typing import List
 from discord_typings import EmbedData, EmbedFieldData, EmbedImageData
 from ..colours import Colours
 
@@ -140,8 +140,6 @@ class Embed(dict):
         This was added because of https://github.com/Goldy-Bot/Goldy-Bot-V5/issues/35.
         """
         data: EmbedData = super().copy()
-
-        from devgoldyutils import pprint
 
         for index, field in enumerate(data["fields"]):
             data["fields"][index]["value"] = field["value"].format(**keys)
