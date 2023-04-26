@@ -120,8 +120,6 @@ class Embed(dict):
 
         data.update(extra)
 
-        self.uwu = "daddy" # TODO: REMOVE THIS SH#T, DO NOT COMMIT!
-
         super().__init__(data)
 
     def format_description(self, **keys) -> None:
