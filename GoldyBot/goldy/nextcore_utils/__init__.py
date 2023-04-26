@@ -2,7 +2,7 @@ DISCORD_CDN = "https://cdn.discordapp.com/"
 
 from .embeds.embed import Embed, EmbedField, EmbedImage
 from .slash_options.slash_option import SlashOption, SlashOptionChoice
-from .components import GoldenBowl, BowlRecipe
+from .components import Recipe
 from .components.buttons.button import Button, ButtonStyle
 
 from .messages.send_msg import send_msg

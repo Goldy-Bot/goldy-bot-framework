@@ -1,6 +1,6 @@
 from __future__ import annotations
-from typing import overload, List, TYPE_CHECKING
-from discord_typings import MessageReferenceData, InteractionMessageCallbackData, MessageData, InteractionCallbackData
+from typing import overload, List, TYPE_CHECKING, Dict
+from discord_typings import MessageReferenceData, InteractionMessageCallbackData, MessageData, InteractionCallbackData, ActionRowData
 from discord_typings.resources.channel import MessageBase
 
 from aiohttp import FormData
@@ -10,7 +10,7 @@ from nextcore.common import json_dumps
 from ... import objects, utils
 
 if TYPE_CHECKING:
-    from ..components import GoldenBowl
+    from ..components import Recipe
     from ..embeds.embed import Embed
 
 # TODO: Add more options to allow using channel instead of platter.
@@ -20,7 +20,7 @@ async def send_msg(
     platter: objects.GoldPlatter, 
     text: str = None, 
     embeds: List[Embed] = None, 
-    bowls: List[GoldenBowl] = None, 
+    recipes: List[Recipe] = None, 
     reply: bool = False, 
     **extra: MessageData | InteractionCallbackData
 ) -> objects.Message: # Work in progress...
@@ -37,7 +37,7 @@ async def send_msg(
         The content of the message.
     ``embeds``
         Embeds to include in the message.
-    ``bowls``
+    ``recipes``
         Components to include in the message.
     ``reply``
         Whether goldy bot should liberally reply to the message the command was invoked.
@@ -56,7 +56,7 @@ async def send_msg(
     channel, 
     text: str = None,
     embeds: List[Embed] = None, 
-    bowls: List[GoldenBowl] = None, 
+    recipes: List[Recipe] = None, 
     **extra: MessageData | InteractionCallbackData
 ) -> objects.Message: # TODO: Add type to channel when channel object is available.
     """
@@ -72,7 +72,7 @@ async def send_msg(
         The content of the message.
     ``embeds``
         Embeds to include in the message.
-    ``bowls``
+    ``recipes``
         Components to include in the message.
     ``**extra``
         Allows you to pass the extra parameters that are missing.
@@ -89,7 +89,7 @@ async def send_msg(
     member: objects.Member, 
     text: str = None, 
     embeds: List[Embed] = None, 
-    bowls: List[GoldenBowl] = None, 
+    recipes: List[Recipe] = None, 
     **extra: MessageData | InteractionCallbackData
 ) -> objects.Message:
     """
@@ -105,7 +105,7 @@ async def send_msg(
         The content of the message.
     ``embeds``
         Embeds to include in the message.
-    ``bowls``
+    ``recipes``
         Components to include in the message.
     ``**extra``
         Allows you to pass the extra parameters that are missing.
@@ -121,7 +121,7 @@ async def send_msg(
     object: objects.GoldPlatter | objects.Member, 
     text: str = None, 
     embeds: List[Embed] = None, 
-    bowls: List[GoldenBowl] = None, 
+    recipes: List[Recipe] = None, 
     reply: bool = False, 
     delete_after: float = None,
     **extra: MessageData | InteractionCallbackData
@@ -138,12 +138,24 @@ async def send_msg(
     if embeds is not None:
         payload["embeds"] = embeds
 
-    if bowls is not None:
-        payload["components"] = bowls
+    if recipes is not None:
+        components: Dict[int, ActionRowData] = {}
 
-        # Bowls need the command platter object when checking if it was the author who invoke a recipe.
-        for bowl in bowls:
-            bowl.cmd_platter = object
+        count = 0
+        component_count = 0
+        for recipe in recipes:
+            # Recipes need the command platter object for when checking if it was the author who invoked a recipe.
+            recipe.cmd_platter = object 
+
+            if count / 5 == 0:
+                component_count += 1
+                components[component_count] = ActionRowData(type=1, components=[])
+
+            components[component_count]["components"].append(recipe)
+            
+            count += 1
+
+        payload["components"] = [components[component] for component in components]
 
     payload.update(extra)
 

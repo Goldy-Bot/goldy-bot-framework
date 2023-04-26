@@ -5,7 +5,7 @@ from devgoldyutils import Colours
 from discord_typings import InteractionCreateData, MessageData
 
 from . import commands_cache, Command
-from ..nextcore_utils.components import BowlRecipe, registered_recipes, GoldenBowl
+from ..nextcore_utils.components import Recipe, registered_recipes
 from .. import utils, objects
 from ... import LoggerAdapter, goldy_bot_logger
 from ..objects.golden_platter import GoldPlatter
@@ -70,7 +70,7 @@ class CommandListener():
             # Message components.
             # --------------------
             if interaction["type"] == 3:
-                message_component: Tuple[str, BowlRecipe, GoldenBowl] = utils.cache_lookup(interaction["data"]["custom_id"], registered_recipes)
+                message_component: Tuple[str, Recipe] = utils.cache_lookup(interaction["data"]["custom_id"], registered_recipes)
 
                 if message_component is not None:
                     gold_platter = GoldPlatter(
@@ -82,7 +82,7 @@ class CommandListener():
 
                     await message_component[1].invoke(
                         gold_platter,
-                        message_component[2].cmd_platter
+                        message_component[1].cmd_platter
                     )
 
 

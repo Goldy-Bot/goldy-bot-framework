@@ -20,7 +20,7 @@ from .goldy.nextcore_utils import (
     Colours,
     Embed, EmbedField, EmbedImage,
     SlashOption, SlashOptionChoice,
-    GoldenBowl, BowlRecipe, Button, ButtonStyle,
+    Recipe, Button, ButtonStyle,
     send_msg, delete_msg
 )
 

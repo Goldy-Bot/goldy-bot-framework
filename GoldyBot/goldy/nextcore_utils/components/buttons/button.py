@@ -5,7 +5,7 @@ from enum import Enum
 from typing import overload, Literal
 from discord_typings import ButtonComponentData
 
-from .. import BowlRecipe, RECIPE_CALLBACK
+from .. import Recipe, RECIPE_CALLBACK
 
 class ButtonStyle(Enum):
     PRIMARY = 1
@@ -19,7 +19,7 @@ class ButtonStyle(Enum):
     GREEN = SUCCESS
     RED = DANGER
 
-class Button(BowlRecipe):
+class Button(Recipe):
     """
     A class used to create a slash command button.
 
@@ -41,11 +41,9 @@ class Button(BowlRecipe):
 
             await platter.send_message(
                 f"Are you sure you would like to nuke **{city}**?",
-                bowls = [
-                    GoldenBowl([
-                        Button(ButtonStyle.GREEN, label="Yes", callback = self.nuke_city, city = city),
-                        Button(ButtonStyle.RED, label="No", callback = lambda x: x.send_message("👨‍🦱 Alright we're holding off captain."))
-                    ])
+                recipes = [
+                    Button(ButtonStyle.GREEN, label="Yes", callback = self.nuke_city, city = city),
+                    Button(ButtonStyle.RED, label="No", callback = lambda x: x.send_message("👨‍🦱 Alright we're holding off captain."))
                 ]
             )
 

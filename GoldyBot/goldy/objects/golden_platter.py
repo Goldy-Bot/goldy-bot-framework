@@ -8,7 +8,7 @@ if TYPE_CHECKING:
     from ...goldy import Goldy
     from .message import Message
     from ..guilds import Guild
-    from ..nextcore_utils.components import GoldenBowl, BowlRecipe
+    from ..nextcore_utils.components import Recipe
     from ..commands import Command
 
 class PlatterType(Enum):
@@ -24,7 +24,7 @@ class GoldPlatter():
 
     ✨ Behold the golden platter. ✨😁
     """
-    def __init__(self, data: MessageData|InteractionData, type: PlatterType|int, command: Command | BowlRecipe, goldy: Goldy) -> None:
+    def __init__(self, data: MessageData|InteractionData, type: PlatterType|int, command: Command | Recipe, goldy: Goldy) -> None:
         # TODO: We got to somehow test this stuff with pytest because this being error prone is sort of a catastrophe.
 
         self.data = data
@@ -53,7 +53,7 @@ class GoldPlatter():
         self, 
         text: str = None, 
         embeds: List[EmbedData] = None, 
-        bowls: List[GoldenBowl] = None, 
+        recipes: List[Recipe] = None, 
         reply: bool = False, 
         delete_after: float = None, 
         **extra
@@ -69,6 +69,8 @@ class GoldPlatter():
             The content of the message.
         ``embeds``
             Embeds to include in the message.
+        ``recipes``
+            Components to include in the message, e.g buttons and dropdowns.
         ``reply``
             Whether goldy bot should liberally reply to the message the command was invoked.
         ``delete_after``
@@ -82,7 +84,7 @@ class GoldPlatter():
             The message that was sent.
         
         """
-        return await nextcore_utils.send_msg(self, text, embeds, bowls, reply, delete_after, **extra)
+        return await nextcore_utils.send_msg(self, text, embeds, recipes, reply, delete_after, **extra)
 
 
 from .member import Member
