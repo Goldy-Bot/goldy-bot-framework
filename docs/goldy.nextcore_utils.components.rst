@@ -8,7 +8,7 @@
    :undoc-members:
    :show-inheritance:
 
-🥣 Bowls
+🧾 Recipe
 ----------
 .. automodule:: GoldyBot.goldy.nextcore_utils.components
    :members:
