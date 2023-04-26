@@ -9,21 +9,31 @@ class Goldy(GoldyBot.Extension):
 
         self.goldy_embed = GoldyBot.Embed(
             title = "💛 Goldy Bot - Stats",
-            description = """
-            ***__Version:__*
-            • GoldyBot: ``{version}``
-            • Nextcore: ``{nc_version}``
-            • Python: ``{py_version}``
+            fields = [
+                GoldyBot.EmbedField(
+                    name = "📦 __Resources:__", 
+                    value = """
+                    **• Ping: ``{ping}``
+                    • OS: ``{os}``
+                    • CPU: ``{cpu}%``
+                    • RAM: ``{ram} GB``
+                    • DISK: ``{disk} MB/s``
 
-            *__Resources:__*
-            • Ping: ``{ping}``
-            • OS: ``{os}``
-            • CPU: ``{cpu}%``
-            • RAM: ``{ram} GB``
-            • DISK: ``{disk} MB/s``
+                    - *Developed with {heart} By <@332592361307897856>***
+                    """,
+                    inline = True
+                ),
 
-            *Developed with {heart} By <@332592361307897856>***
-            """,
+                GoldyBot.EmbedField(
+                    name = "⚡ __Version:__",
+                    value = """
+                    **• GoldyBot: ``{version}``
+                    • Nextcore: ``{nc_version}``
+                    • Python: ``{py_version}``**
+                    """,
+                    inline = True
+                )
+            ],
             colour = Colours.YELLOW,
             thumbnail = GoldyBot.EmbedImage(self.goldy.bot_user.avatar_url)
         )
@@ -32,7 +42,9 @@ class Goldy(GoldyBot.Extension):
     async def goldy_cmd(self, platter: GoldyBot.GoldPlatter):
         embed = self.goldy_embed.copy()
 
-        embed["description"] = embed["description"].format(
+        await platter.send_message(dict(embed))
+
+        embed.format_fields(
             version = GoldyBot.info.VERSION,
             nc_version = nextcore.__version__,
             py_version = self.goldy.system.python_version,
