@@ -42,8 +42,6 @@ class Goldy(GoldyBot.Extension):
     async def goldy_cmd(self, platter: GoldyBot.GoldPlatter):
         embed = self.goldy_embed.copy()
 
-        await platter.send_message(dict(embed))
-
         embed.format_fields(
             version = GoldyBot.info.VERSION,
             nc_version = nextcore.__version__,
