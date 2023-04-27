@@ -10,7 +10,7 @@ test-v:
 	cd tests && pytest -vv
 
 docker-build:
-	docker build -t devgoldy/goldybot .
+	python scripts/docker_build.py
 
 docker-compose:
 	docker compose --env-file ./demo/.env up

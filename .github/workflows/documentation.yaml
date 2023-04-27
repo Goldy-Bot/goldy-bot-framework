@@ -16,7 +16,7 @@ jobs:
           sphinx-build docs _build
       - name: Generate CNAME file using my python script because for some reason GitHub is dumb and doesn't carry over my FUCKING CNAME file for FUCK SAKE.
         run: |
-          python add_cname.py
+          python scripts/add_cname.py
 
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
