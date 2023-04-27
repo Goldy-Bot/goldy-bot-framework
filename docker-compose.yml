@@ -4,7 +4,7 @@ services:
         image: mongo:latest
         environment:
             MONGO_INITDB_ROOT_USERNAME: root
-            MONGO_INITDB_ROOT_PASSWORD: "${MONGODB_PASSWORD}"
+            MONGO_INITDB_ROOT_PASSWORD: "${MONGODB_PASSWORD:-1234}"
         ports:
             - 27018:27017
         volumes:
@@ -14,14 +14,12 @@ services:
         image: devgoldy/goldybot
         environment:
             DISCORD_TOKEN: "${DISCORD_TOKEN}"
-            MONGODB_TOKEN: "mongodb://root:${MONGODB_PASSWORD}@mongodb:27017/"
+            MONGODB_URL: "mongodb://root:${MONGODB_PASSWORD:-1234}@mongodb:27017/"
 
             WAIT_HOSTS: "mongodb:27017"
             WAIT_HOSTS_TIMEOUT: 60
         volumes:
             - ${GOLDY_DIRECTORY}:/app/goldy
-        stdin_open: true
-        tty: true
 
 volumes:
     mongodb_data_container:
