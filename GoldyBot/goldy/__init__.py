@@ -144,7 +144,8 @@ class Goldy():
         await self.pre_setup()
         await self.setup()
 
-        self.live_console.start()
+        if self.system.in_docker is False: # Live console is disabled when running a docker container.
+            self.live_console.start()
 
         # Raise a error and exit whenever a critical error occurs.
         error = await self.shard_manager.dispatcher.wait_for(lambda reason: True, "critical")

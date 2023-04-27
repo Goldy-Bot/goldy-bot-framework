@@ -22,12 +22,12 @@ class System():
 
     @property
     def cpu(self) -> int:
-        """Returns amount of CPU Goldy Bot is using on this system."""
+        """Returns the percentage of CPU Goldy Bot is using on your system."""
         return self.process.cpu_percent(0)/psutil.cpu_count()
 
     @property
     def ram(self) -> int:
-        """Returns amount of ram Goldy Bot is using on this system."""
+        """Returns amount of ram Goldy Bot is using on your system in gigabytes."""
         return self.__convert_to_GB(self.process.memory_info().rss)
 
     @property
@@ -42,7 +42,16 @@ class System():
     
     @property
     def python_version(self) -> str:
+        """Returns the python version goldy bot is running in."""
         return platform.python_version()
+
+    @property
+    def in_docker(self) -> bool:
+        """Returns True/False whether goldy bot is running in a docker container."""
+        if "DOCKER" in os.environ:
+            return True
+        
+        return False
 
     def __convert_to_GB(self, size):
         return(f"{size/float(1<<30):,.2f}")

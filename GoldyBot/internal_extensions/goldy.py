@@ -47,7 +47,7 @@ class Goldy(GoldyBot.Extension):
             nc_version = nextcore.__version__,
             py_version = self.goldy.system.python_version,
             ping = (lambda x: "(Not Available)" if x is None else f"{round(x * 1000, 2)}ms")(self.goldy.latency),
-            os = self.goldy.system.os,
+            os = (lambda x: x[:22] + "..." if len(x) >= 26 else x)(self.goldy.system.os),
             cpu = self.goldy.system.cpu,
             ram = self.goldy.system.ram,
             disk = self.goldy.system.disk,
