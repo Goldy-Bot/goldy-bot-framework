@@ -99,7 +99,7 @@ python run.py
 
 ## 🐬 *Install/Set Up* - ``Docker``
 
-These instructions assume you have [Docker](https://www.docker.com/) installed and that you are running on Linux, althoght these same steps can be followed on windows too excluding the linux commands.
+These instructions assume you have [Docker](https://www.docker.com/) installed and that you are running on Linux, althought these same steps can be followed on windows too excluding the linux commands.
 
 1. **Clone the goldybot-docker repo.**
 ```sh
