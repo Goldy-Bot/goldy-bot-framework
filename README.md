@@ -101,7 +101,7 @@ python run.py
 
 These instructions assume you have [Docker](https://www.docker.com/) installed and that you are running on Linux, althought these same steps can be followed on windows too excluding the linux commands.
 
-1. **Clone the goldybot-docker repo.**
+1. **Clone the [goldybot-docker](https://github.com/Goldy-Bot/goldybot-docker) repo.**
 ```sh
 git clone https://github.com/Goldy-Bot/goldybot-docker
 ```
