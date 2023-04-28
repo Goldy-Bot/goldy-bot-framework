@@ -33,7 +33,7 @@ Do note that the whole point of this framework is to make it easier for me to de
 ### ⚡ Nextcore
 [Nextcore](https://github.com/nextsnake/nextcore) is the perfect api wrapper for v5, it's fast, low level and can be easily modified. Additionally, Nextcore provides a ton of control, this gives me the freedom to build my framework exactly the way I want it, without any unnecessary overhead like if I stayed with nextcord/discord.py.
 
-## *Install/Set Up* - ``Normal``
+## 🛠 *Install/Set Up* - ``Normal``
 
 These instructions assume you have a [MongoDB database](https://www.mongodb.com/), [Git](https://git-scm.com/) and [Python](https://www.python.org/) installed.
 
@@ -92,7 +92,13 @@ You may also want to add your discord member id to ``"bot_dev"``, like so: ``"bo
 python run.py
 ```
 
+<br>
 
+## 🐬 *Install/Set Up* - ``Docker``
+
+These instructions assume you have [Docker](https://www.docker.com/) installed.
+
+> *Instructions coming soon...*
 
 <br>
 
