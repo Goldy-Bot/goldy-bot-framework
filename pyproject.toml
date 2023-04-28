@@ -43,6 +43,7 @@ dev = [
     "sphinx-inline-tabs",
     "furo",
     "myst-parser",
+    "sphinx-copybutton",
     "pytest",
     "pytest-cov",
     "ruff"

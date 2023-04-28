@@ -24,7 +24,8 @@ extensions = [
     "sphinx.ext.autodoc",
     "sphinxext.opengraph",
     "sphinx_inline_tabs",
-    "myst_parser"
+    "myst_parser",
+    "sphinx_copybutton"
 ]
 
 templates_path = ['_templates']
