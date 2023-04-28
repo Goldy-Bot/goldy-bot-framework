@@ -8,5 +8,5 @@ os.system(
 )
 
 os.system(
-    f"docker build -t devgoldy/goldybot:latest ."
+    "docker build -t devgoldy/goldybot:latest ."
 )
