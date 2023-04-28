@@ -6,3 +6,7 @@ from GoldyBot.info import VERSION
 os.system(
     f"docker build -t devgoldy/goldybot:{VERSION} ."
 )
+
+os.system(
+    f"docker build -t devgoldy/goldybot:latest ."
+)
