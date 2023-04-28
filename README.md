@@ -122,14 +122,14 @@ GOLDY_DIRECTORY="./goldy"
 3. **🐬Docker compose!**
 Now you may run docker compose to create your 📦container.
 ```sh
-docker compose up
+sudo docker compose up
 ```
 
 Although you WILL get error an error from goldy bot asking you to configure your ``goldy.json`` file. You may follow the instructions [here](https://github.com/Goldy-Bot/Goldy-Bot-V5#json-configuration) on how to configure that. The ``goldy.json`` file can be found in the goldy directory at root. This goldy directory is an exposed docker folder allowing you to configure and add extensions to goldy bot with ease.
 
 Now run docker compose once again and goldy should be running after the mongodb database has booted.
 ```sh
-docker compose up
+sudo docker compose up
 ```
 
 <br>
