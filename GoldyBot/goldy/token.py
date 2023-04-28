@@ -12,7 +12,8 @@ from ..errors import GoldyBotError
 
 class NoDiscordToken(GoldyBotError):
     def __init__(self):
-        super().__init__("No Discord token was entered! Enter your discord token into the .env file at root or pass it in when initializing Goldy class with the Token class. See '' for more info."
+        super().__init__(
+            "No Discord token was entered! Enter your discord token into the .env file at root or pass it in when initializing Goldy class with the Token class. See '' for more info."
         )
 
 class NoDatabaseToken(GoldyBotError):
