@@ -29,7 +29,7 @@ dependencies = [
     "python-decouple>=3.7",
     "motor",
     "cmd2",
-    "pygame",
+    "pygame==2.3.0",
     "regex",
     "psutil"
 ]
