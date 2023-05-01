@@ -46,7 +46,7 @@ class GoldPlatter():
 
         self.guild: Guild = self.goldy.guilds.get_guild(data["guild_id"])
 
-        self.interaction_responded = False
+        self.__interaction_responded = False
         """An internal property that is set by the ``nextcore_utils.send_msg()`` method when a slash command is responded to."""
 
     async def send_message(

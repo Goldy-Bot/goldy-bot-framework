@@ -170,7 +170,7 @@ async def send_msg(
 
         # Callback message.
         # ------------------
-        if object.interaction_responded is False:
+        if object.__interaction_responded is False:
 
             await goldy.http_client.request(
                 Route(
@@ -186,7 +186,7 @@ async def send_msg(
                 }
             )
 
-            object.interaction_responded = True
+            object.__interaction_responded = True
 
             # Get and return message data of original interaction response. 
             r = await goldy.http_client.request(
