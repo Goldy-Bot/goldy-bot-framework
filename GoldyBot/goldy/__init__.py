@@ -4,6 +4,7 @@ import sys
 import time
 import pygame
 import asyncio
+from datetime import datetime
 
 from nextcore.http.client import HTTPClient
 
@@ -69,6 +70,9 @@ class Goldy():
         )
         """Nextcore shard manager, use if you would like to take control of the shards."""
 
+        self.start_up_time: datetime | None = None
+        """The datetime object of when the framework was booted up. Is None if the :py:meth:`~GoldyBot.Goldy.start` method isn't ran."""
+
         self.bot_user: objects.Member = None
         """The bot's user/member object."""
         self.application_data: ApplicationData = None
@@ -107,6 +111,14 @@ class Goldy():
             return self.shard_manager.active_shards[0].latency
         except RuntimeError:
             return None
+        
+    @property
+    def up_time(self) -> datetime | None:
+        """Returns a datetime object of goldy bot's uptime. Returns None if goldy bot was not started else it will ALWAYS return a datetime object."""
+        if self.start_up_time is not None:
+            return datetime.fromtimestamp(datetime.now().timestamp() - self.start_up_time.timestamp())
+    
+        return None
 
     def start(self):
         """🧡🌆 Awakens Goldy Bot from her hibernation. 😴 Shortcut to ``asyncio.run(goldy.__start_async())`` and also handles various exceptions carefully."""
@@ -123,6 +135,8 @@ class Goldy():
         return None
 
     async def __start_async(self):
+        self.start_up_time = datetime.now()
+
         await self.http_client.setup()
 
         # This should return once all shards have started to connect.

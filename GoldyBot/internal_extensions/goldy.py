@@ -11,6 +11,15 @@ class Goldy(GoldyBot.Extension):
             title = "💛 Goldy Bot - Stats",
             fields = [
                 GoldyBot.EmbedField(
+                    name = "🗒️ __Stats:__", 
+                    value = """
+                    **• UpTime: {up_time}
+                    • Guild Count: ``{guild_count}``**
+                    """,
+                    inline = False
+                ),
+
+                GoldyBot.EmbedField(
                     name = "📦 __Resources:__", 
                     value = """
                     **• Ping: ``{ping}``
@@ -19,6 +28,7 @@ class Goldy(GoldyBot.Extension):
                     • RAM: ``{ram} GB``
                     • DISK: ``{disk} MB/s``
 
+                    - *Find us on [GitHub](https://github.com/Goldy-Bot/Goldy-Bot-V5)*
                     - *Developed with {heart} By <@332592361307897856>***
                     """,
                     inline = True
@@ -51,6 +61,8 @@ class Goldy(GoldyBot.Extension):
             cpu = self.goldy.system.cpu,
             ram = self.goldy.system.ram,
             disk = self.goldy.system.disk,
+            up_time = f"<t:{int(self.goldy.start_up_time.timestamp())}:R>",
+            guild_count = "Soon™",
 
             heart = "🤍"
         )
