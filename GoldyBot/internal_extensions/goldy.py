@@ -28,7 +28,6 @@ class Goldy(GoldyBot.Extension):
                     • RAM: ``{ram} GB``
                     • DISK: ``{disk} MB/s``
 
-                    - *Find us on [GitHub](https://github.com/Goldy-Bot/Goldy-Bot-V5)*
                     - *Developed with {heart} By <@332592361307897856>***
                     """,
                     inline = True
