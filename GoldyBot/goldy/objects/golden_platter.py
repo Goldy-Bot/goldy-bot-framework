@@ -47,7 +47,7 @@ class GoldPlatter():
         self.guild: Guild = self.goldy.guilds.get_guild(data["guild_id"])
 
         self.__interaction_responded = False
-        """An internal property that is set by the ``nextcore_utils.send_msg()`` method when a slash command is responded to."""
+        """An internal property that is set by the :py:meth:`~GoldyBot.nextcore_utils.send_msg` method when a slash command is responded to."""
 
     async def send_message(
         self, 
