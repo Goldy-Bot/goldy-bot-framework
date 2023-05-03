@@ -164,20 +164,23 @@ async def send_msg(
     # 24/04/2023: Let's scrap this and stick with platters for sending messages. 
     # Although this means we will have to find a way to somehow convert a member object to a platter or embed it perhaps.
 
-    if object.type.value == 1:
+    # TODO: If object is instance of member convert it to a platter object.
+    platter: objects.GoldPlatter = object
+
+    if platter.type.value == 1:
         # Perform interaction response.
         # ------------------------------
 
         # Callback message.
         # ------------------
-        if object.__interaction_responded is False:
+        if platter.__interaction_responded is False:
 
             await goldy.http_client.request(
                 Route(
                     "POST", 
                     "/interactions/{interaction_id}/{interaction_token}/callback", 
-                    interaction_id = object.data["id"], 
-                    interaction_token = object.data["token"]
+                    interaction_id = platter.data["id"], 
+                    interaction_token = platter.data["token"]
                 ),
                 rate_limit_key = goldy.nc_authentication.rate_limit_key,
                 json = {
@@ -186,7 +189,7 @@ async def send_msg(
                 }
             )
 
-            object.__interaction_responded = True
+            platter.__interaction_responded = True
 
             # Get and return message data of original interaction response. 
             r = await goldy.http_client.request(
@@ -194,14 +197,14 @@ async def send_msg(
                     "GET", 
                     "/webhooks/{application_id}/{interaction_token}/messages/@original", 
                     application_id = goldy.application_data["id"], 
-                    interaction_token = object.data["token"]
+                    interaction_token = platter.data["token"]
                 ),
                 rate_limit_key = goldy.nc_authentication.rate_limit_key
             )
 
             message_data = await r.json()
 
-            object.logger.debug("Interaction callback message was sent.")
+            platter.logger.debug("Interaction callback message was sent.")
 
 
         # Follow up message.
@@ -214,7 +217,7 @@ async def send_msg(
                     "POST", 
                     "/webhooks/{application_id}/{interaction_token}", 
                     application_id = goldy.application_data["id"], 
-                    interaction_token = object.data["token"]
+                    interaction_token = platter.data["token"]
                 ),
                 rate_limit_key = goldy.nc_authentication.rate_limit_key,
                 json = payload
@@ -222,7 +225,7 @@ async def send_msg(
 
             message_data = await r.json()
 
-            object.logger.debug("Interaction follow up message was sent.")
+            platter.logger.debug("Interaction follow up message was sent.")
 
     else:
         # Perform normal message response.
@@ -230,9 +233,9 @@ async def send_msg(
 
         if reply:
             payload["message_reference"] = MessageReferenceData(
-                message_id = object.data["id"],
-                channel_id = object.data["channel_id"],
-                guild_id = object.data["guild_id"]
+                message_id = platter.data["id"],
+                channel_id = platter.data["channel_id"],
+                guild_id = platter.data["guild_id"]
             )
 
         form_data = FormData()
@@ -242,7 +245,7 @@ async def send_msg(
             Route(
                 "POST", 
                 "/channels/{channel_id}/messages", 
-                channel_id = object.data['channel_id']
+                channel_id = platter.data['channel_id']
             ),
             data = form_data,
             rate_limit_key = goldy.nc_authentication.rate_limit_key,
@@ -251,7 +254,7 @@ async def send_msg(
 
         message_data = await r.json()
 
-        object.logger.debug("Message was sent.")
+        platter.logger.debug("Message was sent.")
 
 
     message = objects.Message(message_data, goldy)
