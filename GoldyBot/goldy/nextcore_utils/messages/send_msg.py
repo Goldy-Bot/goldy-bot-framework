@@ -127,7 +127,6 @@ async def send_msg(
     **extra: MessageData | InteractionCallbackData
 ) -> objects.Message:
     
-    message_data:MessageData = None
     goldy = object.goldy
     
     payload: MessageBase | InteractionMessageCallbackData = {}
@@ -167,13 +166,15 @@ async def send_msg(
     # TODO: If object is instance of member convert it to a platter object.
     platter: objects.GoldPlatter = object
 
+    message_data: MessageData = None
+
     if platter.type.value == 1:
         # Perform interaction response.
         # ------------------------------
 
         # Callback message.
         # ------------------
-        if platter.__interaction_responded is False:
+        if platter._interaction_responded is False:
 
             await goldy.http_client.request(
                 Route(
@@ -189,7 +190,7 @@ async def send_msg(
                 }
             )
 
-            platter.__interaction_responded = True
+            platter._interaction_responded = True
 
             # Get and return message data of original interaction response. 
             r = await goldy.http_client.request(

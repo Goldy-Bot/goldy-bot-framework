@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import List
 from discord_typings import EmbedData, EmbedFieldData, EmbedImageData
 from ..colours import Colours
+from ... import utils
 
 class EmbedImage(dict):
     """A class used to add an image to a embed."""
@@ -38,7 +39,8 @@ class EmbedField(dict):
         data: EmbedFieldData = {}
 
         data["name"] = name
-        data["value"] = value
+        # TODO: Make this a goldy bot util function instead.
+        data["value"] = utils.line_fix(value)
 
         if inline is not None:
             data["inline"] = inline
@@ -92,7 +94,7 @@ class Embed(dict):
             data["title"] = title
 
         if description is not None:
-            data["description"] = description
+            data["description"] = utils.line_fix(description)
 
         if fields is not None:
             data["fields"] = []
