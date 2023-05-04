@@ -8,10 +8,10 @@ services:
         ports:
             - 27018:27017
         volumes:
-            - mongodb_data_container:/data/db
+            - goldybot_mongodb:/data/db
 
     goldybot:
-        image: devgoldy/goldybot
+        image: devgoldy/goldybot:latest
         environment:
             DISCORD_TOKEN: "${DISCORD_TOKEN}"
             MONGODB_URL: "mongodb://root:${MONGODB_PASSWORD:-1234}@mongodb:27017/"
@@ -22,4 +22,4 @@ services:
             - ${GOLDY_DIRECTORY}:/app/goldy
 
 volumes:
-    mongodb_data_container:
+    goldybot_mongodb:

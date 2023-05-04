@@ -12,3 +12,6 @@ __pycache__
 demo/*
 !demo/run.py
 !demo/cli_demo.py
+
+demo-docker/*
+!demo-docker/.gitkeep
