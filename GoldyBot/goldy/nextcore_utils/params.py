@@ -53,12 +53,6 @@ async def invoke_data_to_params(data: MessageData | InteractionData, platter: Go
         params = {}
         for option in data["data"].get("options", []):
             params[option["name"]] = option["value"]
-
-            # If the option is a channel make the value a Goldy Bot channel object.
-            if option["type"] == 7:
-                params[option["name"]] = await nextcore_utils.get_channel(option["value"], platter.goldy)
-
-            # TODO: Add more!
             
         return params
     
