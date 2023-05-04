@@ -35,13 +35,13 @@ async def delete_channel(channel: objects.Channel, reason: str = None) -> object
     if reason is not None:
         headers["X-Audit-Log-Reason"] = reason
 
-    await channel.goldy.http_client.request(
+    await goldy.http_client.request(
         Route(
             "DELETE",
             "/channels/{channel_id}",
             channel_id = channel.id
         ),
-        rate_limit_key = channel.goldy.nc_authentication.rate_limit_key,
+        rate_limit_key = goldy.nc_authentication.rate_limit_key,
         headers = headers,
     )
 

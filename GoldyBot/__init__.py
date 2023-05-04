@@ -19,9 +19,10 @@ from .goldy import nextcore_utils
 from .goldy.nextcore_utils import (
     Colours,
     Embed, EmbedField, EmbedImage,
-    SlashOption, SlashOptionChoice,
+    SlashOption, SlashOptionChoice, SlashOptionTypes,
     Recipe, Button, ButtonStyle,
-    send_msg, delete_msg
+    send_msg, delete_msg,
+    get_channel, get_channels, delete_channel
 )
 
 from .goldy import objects

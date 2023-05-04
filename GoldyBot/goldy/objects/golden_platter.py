@@ -2,13 +2,14 @@ from __future__ import annotations
 from enum import Enum
 
 from typing import TYPE_CHECKING, List
-from discord_typings import MessageData, InteractionData, EmbedData
+from discord_typings import MessageData, InteractionData
 
 if TYPE_CHECKING:
     from ...goldy import Goldy
     from .message import Message
     from ..guilds import Guild
     from ..nextcore_utils.components import Recipe
+    from ..nextcore_utils.embeds.embed import Embed
     from ..commands import Command
 
 class PlatterType(Enum):
@@ -52,7 +53,7 @@ class GoldPlatter():
     async def send_message(
         self, 
         text: str = None, 
-        embeds: List[EmbedData] = None, 
+        embeds: List[Embed] = None, 
         recipes: List[Recipe] = None, 
         reply: bool = False, 
         delete_after: float = None, 

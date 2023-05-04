@@ -5,7 +5,8 @@ from typing import List, TYPE_CHECKING, Dict
 from discord_typings import ApplicationCommandOptionData, MessageData, InteractionData
 
 from ... import errors
-from ..objects import PlatterType
+from .. import nextcore_utils
+from ..objects import PlatterType, GoldPlatter
 
 if TYPE_CHECKING:
     from ..commands import Command
@@ -42,17 +43,23 @@ def params_to_options(command: Command) -> List[ApplicationCommandOptionData]:
     return options
 
 
-def invoke_data_to_params(data: MessageData | InteractionData, platter_type: PlatterType) -> List[str] | Dict[str, str]:
+async def invoke_data_to_params(data: MessageData | InteractionData, platter: GoldPlatter) -> List[str] | Dict[str, str]:
     """A utility function that grabs command arguments from invoke data and converts it to appropriate params."""
 
-    if platter_type.value == PlatterType.PREFIX_CMD.value:
+    if platter.type.value == PlatterType.PREFIX_CMD.value:
         return data["content"].split(" ")[1:]
     
-    if platter_type.value == PlatterType.SLASH_CMD.value:
+    if platter.type.value == PlatterType.SLASH_CMD.value:
         params = {}
         for option in data["data"].get("options", []):
             params[option["name"]] = option["value"]
 
+            # If the option is a channel make the value a Goldy Bot channel object.
+            if option["type"] == 7:
+                params[option["name"]] = await nextcore_utils.get_channel(option["value"], platter.goldy)
+
+            # TODO: Add more!
+            
         return params
     
 
