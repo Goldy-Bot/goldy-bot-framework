@@ -137,7 +137,7 @@ class Command():
                     )
                 )
 
-                params = await nextcore_utils.invoke_data_to_params(data, gold_platter)
+                params = nextcore_utils.invoke_data_to_params(data, gold_platter)
 
                 # Run callback.
                 # --------------
@@ -175,7 +175,7 @@ class Command():
                     )
                 )
                 
-                params = await nextcore_utils.invoke_data_to_params(data, gold_platter)
+                params = nextcore_utils.invoke_data_to_params(data, gold_platter)
 
                 # Run callback.
                 # --------------

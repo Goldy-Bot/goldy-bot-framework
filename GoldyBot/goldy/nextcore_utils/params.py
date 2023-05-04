@@ -5,7 +5,6 @@ from typing import List, TYPE_CHECKING, Dict
 from discord_typings import ApplicationCommandOptionData, MessageData, InteractionData
 
 from ... import errors
-from .. import nextcore_utils
 from ..objects import PlatterType, GoldPlatter
 
 if TYPE_CHECKING:
@@ -43,17 +42,33 @@ def params_to_options(command: Command) -> List[ApplicationCommandOptionData]:
     return options
 
 
-async def invoke_data_to_params(data: MessageData | InteractionData, platter: GoldPlatter) -> List[str] | Dict[str, str]:
+def invoke_data_to_params(data: MessageData | InteractionData, platter: GoldPlatter) -> List[str] | Dict[str, str]: 
     """A utility function that grabs command arguments from invoke data and converts it to appropriate params."""
-
-    if platter.type.value == PlatterType.PREFIX_CMD.value:
-        return data["content"].split(" ")[1:]
     
+    # Where all the fucking magic happens.
+    if platter.type.value == PlatterType.PREFIX_CMD.value:
+        params = []
+        for arg in data["content"].split(" ")[1:]:
+            # If the argument is a user, a channel or a role strip the id from the mention.
+            if arg[:2] in ["<@", "<#"]:
+                params.append(arg[2:-1])
+
+        return params
+
     if platter.type.value == PlatterType.SLASH_CMD.value:
         params = {}
         for option in data["data"].get("options", []):
-            params[option["name"]] = option["value"]
-            
+            param_key_name = option["name"]
+
+            # If command is slash command make sure to set dictionary key to the true parameter name.
+            if platter.type.value == 1:
+                for slash_option in platter.command.slash_options:
+                    if platter.command.slash_options[slash_option]["name"] == option["name"]:
+                        param_key_name = slash_option
+                        break
+
+            params[param_key_name] = option["value"]
+
         return params
     
 
@@ -63,10 +78,8 @@ def get_function_parameters(command: Command) -> List[str]:
     # Get list of function params.
     func_params = list(command.func.__code__.co_varnames)
     
-    # Check if command is inside extension by checking if self is first parameter.
-    if func_params[0] == "self":
-        command.__in_extension = True
-        func_params.pop(0)
+    # Removes 'self' argument.
+    func_params.pop(0)
 
     # Removes 'platter' argument.
     func_params.pop(0)

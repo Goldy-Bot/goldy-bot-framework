@@ -20,15 +20,19 @@ class Channel(DictDataclass):
     data: ChannelData = field(repr=False)
     goldy: Goldy = field(repr=False)
 
-    id:str = field(init=False)
+    id: str = field(init=False)
     # TODO: Add more!
+
+    mention: str = field(init=False)
+    """This channel represented as a mention."""
 
     def __post_init__(self):
         super().__post_init__()
-        
+
         self.logger = logger
-        
+
         self.id = self.get("id")
+        self.mention = f"<#{self.id}>"
     
     async def send_message(
         self, 

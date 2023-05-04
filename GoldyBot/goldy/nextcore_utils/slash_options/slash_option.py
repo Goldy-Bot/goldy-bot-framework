@@ -7,6 +7,8 @@ from discord_typings.interactions.commands import StrCommandOptionChoiceData, In
 
 from GoldyBot.errors import GoldyBotError
 
+type_ = type
+
 class SlashOptionTypes(Enum):
     """An enum class containing some of the slash option types."""
     USER = 6
@@ -80,7 +82,7 @@ class SlashOption(dict):
         name: str = None, 
         description: str = None, 
         choices: List[SlashOptionChoice] = None, 
-        type_: SlashOptionTypes | Literal[6, 7, 8, 11] = None,
+        type: SlashOptionTypes | Literal[6, 7, 8, 11] = None,
         required: bool = True, 
         **extra: ApplicationCommandOptionData
     ) -> None:
@@ -96,19 +98,19 @@ class SlashOption(dict):
 
         # Check if all choices are same type.
         if choices is not None:
-            allowed_type = type(choices[0]["value"])
+            allowed_type = type_(choices[0]["value"])
 
             for choice in choices:
-                if not type(choice["value"]) == allowed_type:
+                if not type_(choice["value"]) == allowed_type:
                     raise GoldyBotError("All choices got to have the same value type!")
 
 
-        if type_ is not None:
+        if type is not None:
 
-            if isinstance(type_, SlashOptionTypes):
-                self.data["type"] = type_.value
+            if isinstance(type, SlashOptionTypes):
+                self.data["type"] = type.value
             else:
-                self.data["type"] = type_
+                self.data["type"] = type
                 
         else:
             self.data["type"] = 3
