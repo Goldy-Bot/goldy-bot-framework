@@ -10,7 +10,7 @@ if TYPE_CHECKING:
 
 logger = LoggerAdapter(goldy_bot_logger, prefix="delete_msg")
 
-async def delete_msg(message:Message, reason:str=None) -> Message:
+async def delete_msg(message: Message, reason: str=None) -> Message:
     """
     Allows you to delete a message that has been sent.
     

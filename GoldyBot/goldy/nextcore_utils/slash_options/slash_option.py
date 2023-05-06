@@ -1,14 +1,24 @@
 from __future__ import annotations
 
-from typing import List
+from enum import Enum
+from typing import List, Literal
 from discord_typings import ApplicationCommandOptionData
 from discord_typings.interactions.commands import StrCommandOptionChoiceData, IntCommandOptionChoiceData
 
 from GoldyBot.errors import GoldyBotError
 
+type_ = type
+
+class SlashOptionTypes(Enum):
+    """An enum class containing some of the slash option types."""
+    USER = 6
+    CHANNEL = 7
+    ROLE = 8
+    ATTACHMENT = 11
+
 class SlashOptionChoice(dict):
     """A class used to create slash option choice."""
-    def __init__(self, name:str, value: str|int, **extra):
+    def __init__(self, name: str, value: str | int, **extra):
         """
         Creates an slash option choice. 😋
         
@@ -67,7 +77,15 @@ class SlashOption(dict):
 
     """
 
-    def __init__(self, name:str=None, description:str=None, choices:List[SlashOptionChoice]=None, required=True, **extra: ApplicationCommandOptionData) -> None:
+    def __init__(
+        self, 
+        name: str = None, 
+        description: str = None, 
+        choices: List[SlashOptionChoice] = None, 
+        type: SlashOptionTypes | Literal[6, 7, 8, 11] = None,
+        required: bool = True, 
+        **extra: ApplicationCommandOptionData
+    ) -> None:
         """
         Creates a slash command option. 😋
         
@@ -80,14 +98,23 @@ class SlashOption(dict):
 
         # Check if all choices are same type.
         if choices is not None:
-            allowed_type = type(choices[0]["value"])
+            allowed_type = type_(choices[0]["value"])
 
             for choice in choices:
-                if not type(choice["value"]) == allowed_type:
+                if not type_(choice["value"]) == allowed_type:
                     raise GoldyBotError("All choices got to have the same value type!")
 
 
-        self.data["type"] = 3
+        if type is not None:
+
+            if isinstance(type, SlashOptionTypes):
+                self.data["type"] = type.value
+            else:
+                self.data["type"] = type
+                
+        else:
+            self.data["type"] = 3
+
 
         # If the choices are integer choices set the type of this slash option to 4.
         # This is because type 4 in the discord api means application options with integer choices and type 3 means application options with string choices, FUCK YOU DISCORD!
@@ -96,6 +123,9 @@ class SlashOption(dict):
 
             if isinstance(choices[0]["value"], int):
                 self.data["type"] = 4
+
+            elif isinstance(choices[0]["value"], bool):
+                self.data["type"] = 5
 
 
         self.data["name"] = name # If this is None it will get handled by the nextcore_utils.params_to_options() function respectively.
