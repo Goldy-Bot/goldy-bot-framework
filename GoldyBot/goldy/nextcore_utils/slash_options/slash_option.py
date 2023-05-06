@@ -14,6 +14,7 @@ class SlashOptionTypes(Enum):
     USER = 6
     CHANNEL = 7
     ROLE = 8
+    MENTIONABLE = 9
     ATTACHMENT = 11
 
 class SlashOptionChoice(dict):

@@ -102,7 +102,7 @@ class Command():
         return ApplicationCommandPayload(
             name = self.name,
             description = self.description,
-            options = nextcore_utils.params_to_options(self),
+            options = nextcore_utils.params_to_options(self), # TODO: Add subcommands to this.
             type = 1
         )
     
