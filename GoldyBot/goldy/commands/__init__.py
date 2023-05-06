@@ -97,7 +97,7 @@ class Command():
         return (lambda x: x[1] if x is not None else None)(utils.cache_lookup(self.extension_name, extensions_cache))
     
     @property
-    def slash_cmd_payload(self):
+    def slash_cmd_payload(self) -> ApplicationCommandPayload:
         """Returns the payload needed to create a slash command."""
         return ApplicationCommandPayload(
             name = self.name,
