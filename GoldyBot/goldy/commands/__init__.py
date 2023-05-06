@@ -138,6 +138,7 @@ class Command():
                 )
 
                 params = nextcore_utils.invoke_data_to_params(data, gold_platter)
+                self.logger.debug(f"Got args --> {params}")
 
                 # Run callback.
                 # --------------
@@ -176,6 +177,7 @@ class Command():
                 )
                 
                 params = nextcore_utils.invoke_data_to_params(data, gold_platter)
+                self.logger.debug(f"Got args --> {params}")
 
                 # Run callback.
                 # --------------

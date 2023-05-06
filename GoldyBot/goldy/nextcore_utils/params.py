@@ -3,12 +3,16 @@ from __future__ import annotations
 import regex
 from typing import List, TYPE_CHECKING, Dict
 from discord_typings import ApplicationCommandOptionData, MessageData, InteractionData
+from ... import LoggerAdapter, goldy_bot_logger
+from devgoldyutils import Colours
 
 from ... import errors
 from ..objects import PlatterType, GoldPlatter
 
 if TYPE_CHECKING:
     from ..commands import Command
+
+params_logger = LoggerAdapter(goldy_bot_logger, prefix=Colours.PINK_GREY.apply("Params Utils"))
 
 def params_to_options(command: Command) -> List[ApplicationCommandOptionData]:
     """A utility function that converts goldy command parameters to slash command options."""
@@ -44,14 +48,20 @@ def params_to_options(command: Command) -> List[ApplicationCommandOptionData]:
 
 def invoke_data_to_params(data: MessageData | InteractionData, platter: GoldPlatter) -> List[str] | Dict[str, str]: 
     """A utility function that grabs command arguments from invoke data and converts it to appropriate params."""
+    logger = LoggerAdapter(params_logger, prefix=Colours.GREY.apply(platter.command.name))
+    logger.debug(f"Attempting to convert command '{platter.command.name}' invoke data into parameters...")
     
     # Where all the fucking magic happens.
     if platter.type.value == PlatterType.PREFIX_CMD.value:
         params = []
         for arg in data["content"].split(" ")[1:]:
-            # If the argument is a user, a channel or a role strip the id from the mention.
+            # If the argument is a user, a channel or a role strip the id from the mention. (Yes this means normal args can't start with these)
             if arg[:2] in ["<@", "<#"]:
                 params.append(arg[2:-1])
+            else:
+                params.append(arg)
+
+            logger.debug(f"Found arg '{arg}'.")
 
         return params
 
@@ -68,6 +78,7 @@ def invoke_data_to_params(data: MessageData | InteractionData, platter: GoldPlat
                         break
 
             params[param_key_name] = option["value"]
+            logger.debug(f"Found arg '{params[param_key_name]}'.")
 
         return params
     
