@@ -64,14 +64,23 @@ class MissingArgument(FrontEndErrors):
 
 class TooManyArguments(FrontEndErrors):
     def __init__(self, platter: GoldPlatter, logger: log.Logger = None):
-        command_args_string = ""
+        command_args_string = " "
         for param in platter.command.params:
             command_args_string += f"{{{param}}} "
+
+        command_sub_cmds_string = " <"
+        for sub_cmd in platter.command.sub_commands:
+            command_sub_cmds_string += f"{sub_cmd[0]} | "
+
+        if len(command_sub_cmds_string) >= 3:
+            command_sub_cmds_string = command_sub_cmds_string[:-3] + ">  "
 
         super().__init__(
             title = ":heart: You gave me too many arguments.", 
             description = f"""
-            **Command Usage -> ``{platter.guild.prefix}{platter.command.name} {command_args_string[:-1]}``**
+            This command doesn't take that many arguments or it doesn't take any arguments at all.
+
+            **Command Usage -> ``{platter.guild.prefix}{platter.command.name}{command_args_string[:-1]}{command_sub_cmds_string[:-2]}``**
             """, 
             message = "The command author passed too many arguments.",
             platter = platter, 

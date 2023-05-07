@@ -55,6 +55,14 @@ def invoke_data_to_params(data: MessageData | InteractionData, platter: GoldPlat
     if platter.type.value == 0:
         params = []
         for arg in data["content"].split(" ")[1:]:
+            # Ignore sub commands.
+            if arg in [cmd_name[0] for cmd_name in platter.command.sub_commands]:
+                continue
+            
+            # A really weird check I know but I promise it's needed okay.
+            if arg == "" or arg[0] == " ":
+                continue
+
             # If the argument is a user, a channel or a role strip the id from the mention. (Yes this means normal args can't start with these)
             if arg[:2] in ["<@", "<#"]:
                 params.append(arg[2:-1])
@@ -69,6 +77,9 @@ def invoke_data_to_params(data: MessageData | InteractionData, platter: GoldPlat
         params = {}
         for option in data["data"].get("options", []):
             param_key_name = option["name"]
+
+            if option["type"] == 1 or option["type"] == 2: # Ignore sub commands and sub groups.
+                continue
 
             # If command is slash command make sure to set dictionary key to the true parameter name.
             if platter.type.value == 1:

@@ -85,7 +85,7 @@ class Command():
             self.parent_cmd.sub_commands.append(
                 (self.name, self)
             )
-            self.logger.debug(f"Added to '{self.parent_cmd.name}' as a sub command.")
+            self.logger.debug(f"Command '{self.name}' was added to the command '{self.parent_cmd.name}' as a sub command.")
         else:
             commands_cache.append(
                 (self.name, self)
@@ -121,12 +121,20 @@ class Command():
         return self.__loaded
 
     @property
-    def is_child(self):
+    def is_child(self) -> bool:
         """Returns if command is child or not. Basically is it a subcommand or not, essentially."""
         if self.parent_cmd is None:
             return False
-        else:
+
+        return True
+        
+    @property
+    def is_parent(self) -> bool:
+        """Returns if the command is a parent of a sub command or not."""
+        if len(self.sub_commands) >= 1:
             return True
+
+        return False
 
 
     def sub_command(
@@ -147,7 +155,7 @@ class Command():
 
             @GoldyBot.command()
             async def game(self, platter: GoldyBot.GoldPlatter):
-                if platter.member.id == "332592361307897856":
+                if platter.author.id == "332592361307897856":
                     return True
 
                 # You are able to perform checks with sub commands like this.
@@ -194,7 +202,7 @@ class Command():
             # Prefix/normal command.
             # ------------------------
             if gold_platter.type.value == PlatterType.PREFIX_CMD.value:
-                data:MessageData = gold_platter.data
+                data: MessageData = gold_platter.data
 
                 self.logger.info(
                     Colours.BLUE.apply(
@@ -202,14 +210,18 @@ class Command():
                     )
                 )
 
-                params = params_utils.invoke_data_to_params(data, gold_platter)
+                # Yep your right, parent commands of sub commands don't get any arguments. Ha, chew on that!
+                params = (lambda x: x if self.is_parent is False else [])(params_utils.invoke_data_to_params(data, gold_platter))
                 self.logger.debug(f"Got args --> {params}")
 
                 # Run callback.
                 # --------------
                 try:
+                    return_value = await self.func(self.extension, gold_platter, *params)
 
-                    await self.func(self.extension, gold_platter, *params)
+                    # Invoke sub command if there is one in invoke data.
+                    if return_value is not False:
+                        await self.__invoke_sub_cmd(data, gold_platter)
 
                 except TypeError as e:
                     # This could mean the args are missing or it could very well be a normal type error so let's check and handle it respectively.
@@ -220,8 +232,8 @@ class Command():
                             platter = gold_platter, 
                             logger = self.logger
                         )
-                    
-                    if f"{self.func.__name__}() takes from" in e.args[0]:
+
+                    if f"{self.func.__name__}() takes" in e.args[0] or f"{self.extension_name}.{self.func.__name__}() takes" in e.args[0]:
                         raise front_end_errors.TooManyArguments(
                             platter = gold_platter, 
                             logger = self.logger
@@ -233,7 +245,7 @@ class Command():
             # Slash command.
             # ----------------
             if gold_platter.type.value == PlatterType.SLASH_CMD.value:
-                data:InteractionData = gold_platter.data
+                data: InteractionData = gold_platter.data
 
                 self.logger.info(
                     Colours.CLAY.apply(
@@ -246,12 +258,52 @@ class Command():
 
                 # Run callback.
                 # --------------
-                await self.func(self.extension, gold_platter, **params)
+                return_value = await self.func(self.extension, gold_platter, **params)
+
+                # Invoke sub command if there is one in invoke data.
+                if return_value is not False:
+                    await self.__invoke_sub_cmd(data, gold_platter)
 
             return True
         
         # If member has no perms raise MissingPerms exception.
         raise front_end_errors.MissingPerms(gold_platter, self.logger)
+
+    async def __invoke_sub_cmd(self, invoke_data: InteractionData | MessageData, platter: GoldPlatter):
+        """Some goofy shit to invoke a sub command if it's in invoke data. Bio hazard inside, DO NOT LOOK!"""
+        sub_cmd_data = invoke_data.copy()
+        command: Tuple[str, Command] = None
+
+        if platter.type.value == 1:
+            for option in invoke_data["data"].get("options", []):
+                if option["type"] == 1:
+                    command = utils.cache_lookup(option["name"], self.sub_commands)
+
+                    if command is not None:
+                        sub_cmd_data["data"]["options"] = option["options"]
+                        break
+
+        else: # TODO: Now add this shit for prefix commands. 💀💀💀
+            for arg in invoke_data["content"].split(" ")[1:]:
+                command = utils.cache_lookup(arg, self.sub_commands)
+
+                if command is not None:
+                    sub_cmd_data["content"] = sub_cmd_data["content"].replace(arg, "")
+                    break
+
+
+        if command is not None:
+
+            sub_cmd_platter = GoldPlatter(
+                data = sub_cmd_data, 
+                type = platter.type, 
+                command = command[1],
+                goldy = self.goldy,
+            )
+
+            self.logger.debug(Colours.PINK_GREY.apply(f"Invoking sub command '{command[1].name}'."))
+
+            await command[1].invoke(sub_cmd_platter)
     
     async def __got_perms(self, platter: GoldPlatter) -> bool:
         """Internal method that checks if the command author has the perms to run this command."""
