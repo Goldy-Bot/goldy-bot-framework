@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from devgoldyutils import Colours
 from typing import List, Callable, Tuple, TYPE_CHECKING, Dict
-from discord_typings import ApplicationCommandData, MessageData, InteractionData, ApplicationCommandPayload, ApplicationCommandOptionData, GuildMemberData
+from discord_typings import MessageData, InteractionData, ApplicationCommandPayload, ApplicationCommandOptionData, GuildMemberData
 
 from nextcore.http import Route
 from nextcore.http.errors import BadRequestError
