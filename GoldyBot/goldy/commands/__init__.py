@@ -15,7 +15,7 @@ from ... import LoggerAdapter, goldy_bot_logger
 from ..extensions import Extension, extensions_cache
 
 if TYPE_CHECKING:
-    from ... import Goldy
+    from ... import Goldy, SlashOption
 
 commands_cache: List[Tuple[str, object]] = []
 """
@@ -37,7 +37,7 @@ class Command():
         parent_cmd: Command = None
     ):
         """A class representing a GoldyBot command."""
-        self.func:Callable = func
+        self.func: Callable = func
         """The command's callback function."""
         self.name = name
         """The command's code name."""
@@ -59,6 +59,8 @@ class Command():
             LoggerAdapter(goldy_bot_logger, prefix="Command"), 
             prefix = Colours.GREY.apply((lambda x: self.func.__name__ if x is None else x)(self.name))
         )
+        self.sub_commands: List[Tuple[str, Command]] = []
+        """A tuple list of this commands's child commands."""
 
         # If cmd_name is null, set it to function name.
         if self.name is None:
@@ -78,10 +80,16 @@ class Command():
 
         self.params = params_utils.get_function_parameters(self)
         """List of command function parameters."""
-
-        commands_cache.append(
-            (self.name, self)
-        )
+        
+        if self.parent_cmd is not None:
+            self.parent_cmd.sub_commands.append(
+                (self.name, self)
+            )
+            self.logger.debug(f"Added to '{self.parent_cmd.name}' as a sub command.")
+        else:
+            commands_cache.append(
+                (self.name, self)
+            )
 
         self.__loaded = False
 
@@ -103,7 +111,7 @@ class Command():
         return ApplicationCommandPayload(
             name = self.name,
             description = self.description,
-            options = params_utils.params_to_options(self), # TODO: Add subcommands to this.
+            options = params_utils.params_to_options(self) + [sub_command[1].slash_cmd_payload for sub_command in self.sub_commands], # TODO: Add subcommands to this.
             type = 1
         )
     
@@ -119,6 +127,62 @@ class Command():
             return False
         else:
             return True
+
+
+    def sub_command(
+        self,
+        name: str = None, 
+        description: str = None, 
+        required_roles: List[str]=None, 
+        slash_options: Dict[str, SlashOption] = None
+    ):
+        """
+        Create a sub command of this command with this decorator.
+        
+        ---------------
+        
+        ⭐ Example:
+        -------------
+        This is how you can create a sub command in GoldyBot::
+
+            @GoldyBot.command()
+            async def game(self, platter: GoldyBot.GoldPlatter):
+                if platter.member.id == "332592361307897856":
+                    return True
+
+                # You are able to perform checks with sub commands like this.
+                # Returning False will stop the execution of the sub command. 
+                # Returning True or nothing (None) will allow the sub command to execute.
+
+                await platter.send_message("You are not the game master! So you may not start the game.", reply=True)
+                return False
+
+            @game.sub_command()
+            async def start(self, platter: GoldyBot.GoldPlatter):
+                await platter.send_message("✅ Game has started!", reply=True)
+
+        .. note::
+
+            Read the code comments for more detail.
+        
+        """
+        def decorate(func):
+            def inner(func) -> Command:
+                return Command(
+                    goldy = self.goldy, 
+                    func = func, 
+                    name = name, 
+                    description = description, 
+                    required_roles = required_roles, 
+                    slash_options = slash_options,
+                    allow_prefix_cmd = self.allow_prefix_cmd, 
+                    allow_slash_cmd = self.allow_slash_cmd,
+                    parent_cmd = self
+                )
+            
+            return inner(func)
+
+        return decorate
 
 
     async def invoke(self, gold_platter: GoldPlatter) -> None:
