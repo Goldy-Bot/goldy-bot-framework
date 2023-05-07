@@ -191,7 +191,7 @@ class Command():
         """
         def decorate(func):
             def inner(func) -> Command:
-                return Command(
+                command = Command(
                     goldy = self.goldy, 
                     func = func, 
                     name = name, 
@@ -202,6 +202,10 @@ class Command():
                     allow_slash_cmd = self.allow_slash_cmd,
                     parent_cmd = self
                 )
+
+                command.logger = LoggerAdapter(self.logger, prefix=Colours.ORANGE.apply(command.name))
+
+                return command
             
             return inner(func)
 
