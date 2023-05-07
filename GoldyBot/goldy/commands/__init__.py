@@ -142,14 +142,14 @@ class Command():
         for param in self.params:
             command_args_string += f"{{{param}}} "
 
-        command_sub_cmds_string = " <"
+        command_sub_cmds_string = "<"
         for sub_cmd in self.sub_commands:
-            command_sub_cmds_string += f"{sub_cmd[0]} | "
+            command_sub_cmds_string += f"{sub_cmd[0]}|"
 
-        if len(command_sub_cmds_string) >= 3:
-            command_sub_cmds_string = command_sub_cmds_string[:-3] + ">  "
+        if len(command_sub_cmds_string) >= 2:
+            command_sub_cmds_string = command_sub_cmds_string[:-1] + "> "
 
-        return f"{self.parent_cmd.name + ' ' if self.is_child else ''}{self.name} {command_args_string[:-1]}{command_sub_cmds_string[:-2]}"
+        return f"{self.parent_cmd.name + ' ' if self.is_child else ''}{self.name} {command_args_string[:-1]}{command_sub_cmds_string[:-1]}"
 
 
     def sub_command(
