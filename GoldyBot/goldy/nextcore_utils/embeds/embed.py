@@ -74,8 +74,8 @@ class Embed(dict):
     """
     def __init__(
         self, 
-        title: str=None, 
-        description: str=None, 
+        title: str = None, 
+        description: str = None, 
         fields: List[EmbedField] = None, 
         color: Colours | int = None, 
         colour: Colours | int = None, 

@@ -2,7 +2,7 @@
 name = "GoldyBot"
 description = "Yet another another rewrite of Goldy Bot, a discord bot framework for my own bots."
 authors = [
-    {name = "Goldy", email = "goldy@devgoldy.me"},
+    {name = "Goldy", email = "goldy@devgoldy.xyz"},
 ]
 readme = {file = "README.md", content-type = "text/markdown"}
 requires-python = ">=3.8"

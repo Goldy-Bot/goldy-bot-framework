@@ -7,10 +7,10 @@ from ... import LoggerAdapter, goldy_bot_logger
 from devgoldyutils import Colours
 
 from ... import errors
-from ..objects import PlatterType, GoldPlatter
 
 if TYPE_CHECKING:
-    from ..commands import Command
+    from . import Command
+    from ..objects import GoldPlatter
 
 params_logger = LoggerAdapter(goldy_bot_logger, prefix=Colours.PINK_GREY.apply("Params Utils"))
 
@@ -49,12 +49,22 @@ def params_to_options(command: Command) -> List[ApplicationCommandOptionData]:
 def invoke_data_to_params(data: MessageData | InteractionData, platter: GoldPlatter) -> List[str] | Dict[str, str]: 
     """A utility function that grabs command arguments from invoke data and converts it to appropriate params."""
     logger = LoggerAdapter(params_logger, prefix=Colours.GREY.apply(platter.command.name))
-    logger.debug(f"Attempting to convert command '{platter.command.name}' invoke data into parameters...")
+    logger.debug(f"Attempting to phrase command '{platter.command.name}' invoke data into parameters...")
     
     # Where all the fucking magic happens.
-    if platter.type.value == PlatterType.PREFIX_CMD.value:
+    if platter.type.value == 0:
         params = []
         for arg in data["content"].split(" ")[1:]:
+            # Ignore sub commands.
+            if arg in [cmd_name[0] for cmd_name in platter.command.sub_commands]:
+                logger.debug(f"Not phrasing the argument '{arg}' as it is a sub command.")
+                continue
+            
+            # A really weird check I know but I promise it's needed okay.
+            if arg == "" or arg[0] == " ":
+                logger.debug(f"Not phrasing the argument '{arg}' as it is either blank or incorrect.")
+                continue
+
             # If the argument is a user, a channel or a role strip the id from the mention. (Yes this means normal args can't start with these)
             if arg[:2] in ["<@", "<#"]:
                 params.append(arg[2:-1])
@@ -65,10 +75,13 @@ def invoke_data_to_params(data: MessageData | InteractionData, platter: GoldPlat
 
         return params
 
-    if platter.type.value == PlatterType.SLASH_CMD.value:
+    if platter.type.value == 1:
         params = {}
         for option in data["data"].get("options", []):
             param_key_name = option["name"]
+
+            if option["type"] == 1 or option["type"] == 2: # Ignore sub commands and sub groups.
+                continue
 
             # If command is slash command make sure to set dictionary key to the true parameter name.
             if platter.type.value == 1:

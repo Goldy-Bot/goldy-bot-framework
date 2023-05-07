@@ -12,4 +12,3 @@ from .channels.get_channel import get_channel
 from .channels.delete_channel import delete_channel
 
 from .colours import Colours
-from .params import params_to_options, invoke_data_to_params, get_function_parameters

@@ -39,7 +39,7 @@ class Extension():
 
     More at our `docs`_.
 
-    .. _docs: https://goldybot.devgoldy.me/goldy.extensions.html#how-to-create-an-extension
+    .. _docs: https://goldybot.devgoldy.xyz/goldy.extensions.html#how-to-create-an-extension
     """
 
     def __init__(self):
