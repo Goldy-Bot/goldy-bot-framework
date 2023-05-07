@@ -34,7 +34,7 @@ def command(
 
         Do note that standalone commands are no longer a thing in goldy bot v5 so you WILL need to register this command inside an Extension. Visit `here`_ to find out how to create extensions.
 
-    .. _here: https://goldybot.devgoldy.me/goldy.extensions.html#how-to-create-an-extension
+    .. _here: https://goldybot.devgoldy.xyz/goldy.extensions.html#how-to-create-an-extension
     
     """
     def decorate(func):

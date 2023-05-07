@@ -122,7 +122,7 @@ class ExtensionLoader():
                     error_str = \
                         f"We encountered an error while trying to load the extension at '{path}'! " \
                         f"You likely forgot the 'load()' function. " \
-                        "Check out https://goldybot.devgoldy.me/goldy.extensions.html#how-to-create-an-extension" \
+                        "Check out https://goldybot.devgoldy.xyz/goldy.extensions.html#how-to-create-an-extension" \
                         f"\nERROR --> {e}"
                 else:
                     error_str = \

@@ -34,7 +34,7 @@ source_suffix = ['.rst', '.md']
 
 # Opengraph Settings
 # -------------------
-ogp_site_url = "https://goldybot.devgoldy.me"
+ogp_site_url = "https://goldybot.devgoldy.xyz"
 ogp_social_cards = {
     "line_color": "#bf5c00",
     "width": 500
