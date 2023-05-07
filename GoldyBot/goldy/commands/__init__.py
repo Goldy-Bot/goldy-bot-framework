@@ -7,7 +7,8 @@ from discord_typings import ApplicationCommandData, MessageData, InteractionData
 from nextcore.http import Route
 from nextcore.http.errors import BadRequestError
 
-from .. import utils, nextcore_utils
+from . import params_utils
+from .. import utils
 from ..nextcore_utils import front_end_errors
 from ..objects import GoldPlatter, PlatterType
 from ... import LoggerAdapter, goldy_bot_logger
@@ -75,7 +76,7 @@ class Command():
         if self.slash_options is None:
             self.slash_options = {}
 
-        self.params = nextcore_utils.get_function_parameters(self)
+        self.params = params_utils.get_function_parameters(self)
         """List of command function parameters."""
 
         commands_cache.append(
@@ -102,7 +103,7 @@ class Command():
         return ApplicationCommandPayload(
             name = self.name,
             description = self.description,
-            options = nextcore_utils.params_to_options(self), # TODO: Add subcommands to this.
+            options = params_utils.params_to_options(self), # TODO: Add subcommands to this.
             type = 1
         )
     
@@ -137,7 +138,7 @@ class Command():
                     )
                 )
 
-                params = nextcore_utils.invoke_data_to_params(data, gold_platter)
+                params = params_utils.invoke_data_to_params(data, gold_platter)
                 self.logger.debug(f"Got args --> {params}")
 
                 # Run callback.
@@ -176,7 +177,7 @@ class Command():
                     )
                 )
                 
-                params = nextcore_utils.invoke_data_to_params(data, gold_platter)
+                params = params_utils.invoke_data_to_params(data, gold_platter)
                 self.logger.debug(f"Got args --> {params}")
 
                 # Run callback.

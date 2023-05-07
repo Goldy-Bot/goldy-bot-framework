@@ -7,12 +7,12 @@ from ... import LoggerAdapter, goldy_bot_logger
 from devgoldyutils import Colours
 
 from ... import errors
-from ..objects import PlatterType, GoldPlatter
 
 if TYPE_CHECKING:
-    from ..commands import Command
+    from . import Command
+    from ..objects import GoldPlatter
 
-params_logger = LoggerAdapter(goldy_bot_logger, prefix=Colours.PINK_GREY.apply("Params Utils"))
+params_logger = LoggerAdapter(goldy_bot_logger, prefix=Colours.PINK_GREY.apply("Params"))
 
 def params_to_options(command: Command) -> List[ApplicationCommandOptionData]:
     """A utility function that converts goldy command parameters to slash command options."""
@@ -52,7 +52,7 @@ def invoke_data_to_params(data: MessageData | InteractionData, platter: GoldPlat
     logger.debug(f"Attempting to convert command '{platter.command.name}' invoke data into parameters...")
     
     # Where all the fucking magic happens.
-    if platter.type.value == PlatterType.PREFIX_CMD.value:
+    if platter.type.value == 0:
         params = []
         for arg in data["content"].split(" ")[1:]:
             # If the argument is a user, a channel or a role strip the id from the mention. (Yes this means normal args can't start with these)
@@ -65,7 +65,7 @@ def invoke_data_to_params(data: MessageData | InteractionData, platter: GoldPlat
 
         return params
 
-    if platter.type.value == PlatterType.SLASH_CMD.value:
+    if platter.type.value == 1:
         params = {}
         for option in data["data"].get("options", []):
             param_key_name = option["name"]
