@@ -135,6 +135,21 @@ class Command():
             return True
 
         return False
+    
+    @property
+    def command_usage(self) -> str:
+        command_args_string = " "
+        for param in self.params:
+            command_args_string += f"{{{param}}} "
+
+        command_sub_cmds_string = " <"
+        for sub_cmd in self.sub_commands:
+            command_sub_cmds_string += f"{sub_cmd[0]} | "
+
+        if len(command_sub_cmds_string) >= 3:
+            command_sub_cmds_string = command_sub_cmds_string[:-3] + ">  "
+
+        return f"{self.parent_cmd.name + ' ' if self.is_child else ''}{self.name} {command_args_string[:-1]}{command_sub_cmds_string[:-2]}"
 
 
     def sub_command(
@@ -220,7 +235,7 @@ class Command():
                     return_value = await self.func(self.extension, gold_platter, *params)
 
                     # Invoke sub command if there is one in invoke data.
-                    if return_value is not False:
+                    if return_value is not False and self.is_parent is True:
                         await self.__invoke_sub_cmd(data, gold_platter)
 
                 except TypeError as e:
@@ -261,7 +276,7 @@ class Command():
                 return_value = await self.func(self.extension, gold_platter, **params)
 
                 # Invoke sub command if there is one in invoke data.
-                if return_value is not False:
+                if return_value is not False and self.is_parent is True:
                     await self.__invoke_sub_cmd(data, gold_platter)
 
             return True
@@ -304,6 +319,10 @@ class Command():
             self.logger.debug(Colours.PINK_GREY.apply(f"Invoking sub command '{command[1].name}'."))
 
             await command[1].invoke(sub_cmd_platter)
+            return None
+
+        # Perhaps the user passed in the wrong sub command.
+        raise front_end_errors.MissingArgument(["<sub_command>"], platter)
     
     async def __got_perms(self, platter: GoldPlatter) -> bool:
         """Internal method that checks if the command author has the perms to run this command."""

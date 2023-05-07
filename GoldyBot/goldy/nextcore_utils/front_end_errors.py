@@ -41,10 +41,6 @@ class FrontEndErrors(errors.GoldyBotError):
 
 class MissingArgument(FrontEndErrors):
     def __init__(self, missing_args: list, platter: GoldPlatter, logger: log.Logger = None):
-        command_args_string = ""
-        for param in platter.command.params:
-            command_args_string += f"{{{param}}} "
-
         missing_args_string = ""
         for arg in missing_args:
             missing_args_string += f"{arg}, "
@@ -54,8 +50,8 @@ class MissingArgument(FrontEndErrors):
             description = f"""
             *You missed the argument(s): ``{missing_args_string[:-2]}``*
 
-            **Command Usage -> ``{platter.guild.prefix}{platter.command.name} {command_args_string[:-1]}``**
-            """, 
+            **Command Usage -> ``{platter.guild.prefix}{platter.command.command_usage}``**
+            """, # TODO: Add command usage string to command class.
             message = f"The command author missed the arguments -> '{missing_args_string[:-2]}'.",
             platter = platter, 
             logger = logger
@@ -64,23 +60,12 @@ class MissingArgument(FrontEndErrors):
 
 class TooManyArguments(FrontEndErrors):
     def __init__(self, platter: GoldPlatter, logger: log.Logger = None):
-        command_args_string = " "
-        for param in platter.command.params:
-            command_args_string += f"{{{param}}} "
-
-        command_sub_cmds_string = " <"
-        for sub_cmd in platter.command.sub_commands:
-            command_sub_cmds_string += f"{sub_cmd[0]} | "
-
-        if len(command_sub_cmds_string) >= 3:
-            command_sub_cmds_string = command_sub_cmds_string[:-3] + ">  "
-
         super().__init__(
             title = ":heart: You gave me too many arguments.", 
             description = f"""
             This command doesn't take that many arguments or it doesn't take any arguments at all.
 
-            **Command Usage -> ``{platter.guild.prefix}{platter.command.name}{command_args_string[:-1]}{command_sub_cmds_string[:-2]}``**
+            **Command Usage -> ``{platter.guild.prefix}{platter.command.command_usage}``**
             """, 
             message = "The command author passed too many arguments.",
             platter = platter, 
