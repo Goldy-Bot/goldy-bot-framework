@@ -5,6 +5,7 @@ from GoldyBot.goldy.database import DatabaseEnums
 
 if TYPE_CHECKING:
     from .. import Goldy
+    from ... import Extension
 
 class Guild():
     """A goldy bot guild."""
@@ -50,6 +51,20 @@ class Guild():
         """Returns the hidden extensions from this guild."""
         return self.config_dict["extensions"]["hidden"]
     
+    def is_extension_allowed(self, extension: Extension) -> bool:
+        """Returns True/False if this extension is allowed to function in this guild."""
+        disallowed_extensions = [ext.lower() for ext in self.disallowed_extensions]
+
+        if extension.name.lower() in disallowed_extensions:
+            return False
+        
+        if len(disallowed_extensions) >= 1:
+
+            if disallowed_extensions[0] == "." and extension.name.lower() not in [ext.lower() for ext in self.allowed_extensions]:
+                return False
+        
+        return True
+
     async def update(self) -> None:
         """Updates guild's data by fetching from database."""
         database = self.goldy.database.get_goldy_database(DatabaseEnums.GOLDY_MAIN)

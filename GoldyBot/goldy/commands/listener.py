@@ -26,10 +26,10 @@ class CommandListener():
         # Slash command listener.
         # ------------------------
         self.goldy.shard_manager.event_dispatcher.add_listener(
-            self.on_slash_cmd,
+            self.on_interaction,
             event_name="INTERACTION_CREATE"
         )
-        self.logger.info("Slash command listener set!")
+        self.logger.info("Interaction listener set!")
 
         # Prefix command listener.
         self.goldy.shard_manager.event_dispatcher.add_listener(
@@ -41,12 +41,11 @@ class CommandListener():
         return None
 
 
-    async def on_slash_cmd(self, interaction: InteractionCreateData) -> None:
-        # Only respond to slash command interactions.
-
+    async def on_interaction(self, interaction: InteractionCreateData) -> None:
         guild = self.goldy.guilds.get_guild(interaction["guild_id"])
 
         if guild is not None:
+            await guild.update()
 
             # Slash command.
             # ---------------
@@ -66,7 +65,7 @@ class CommandListener():
                         gold_platter
                     )
 
-            
+
             # Message components.
             # --------------------
             if interaction["type"] == 3:
@@ -97,6 +96,8 @@ class CommandListener():
             return
 
         if guild is not None:
+            await guild.update()
+            
             # Check if prefix is correct.
             if not guild.prefix == message["content"][0]:
                 return

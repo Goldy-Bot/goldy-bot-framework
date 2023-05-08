@@ -216,6 +216,9 @@ class Command():
         """Runs/triggers this command. This method is usually used internally."""
         self.logger.debug(f"Attempting to invoke '{gold_platter.type.name}'...")
 
+        if gold_platter.guild.is_extension_allowed(gold_platter.command.extension) is False:
+            raise front_end_errors.ExtensionNotAllowedInGuild(gold_platter, self.logger)
+
         if await self.__got_perms(gold_platter):
 
             # Prefix/normal command.
