@@ -17,7 +17,7 @@ class FrontEndErrors(errors.GoldyBotError):
             message: str,
             platter: GoldPlatter, 
             embed_colour = Colours.AKI_ORANGE,
-            delete_after = 6,
+            delete_after = 8,
             logger: log.Logger = None
         ):
 
@@ -31,8 +31,8 @@ class FrontEndErrors(errors.GoldyBotError):
                     )
                 ],
                 reply = True,
-                delete_after = (lambda: None if platter.type.value == PlatterType.SLASH_CMD.value else delete_after)(),
-                flags = (lambda: 1 << 6 if platter.type.value == PlatterType.SLASH_CMD.value else None)()
+                delete_after = None if platter.type.value == PlatterType.SLASH_CMD.value else delete_after,
+                flags = 1 << 6 if platter.type.value == PlatterType.SLASH_CMD.value else None
             )
         )
 
@@ -54,6 +54,7 @@ class MissingArgument(FrontEndErrors):
             """, # TODO: Add command usage string to command class.
             message = f"The command author missed the arguments -> '{missing_args_string[:-2]}'.",
             platter = platter, 
+            delete_after = 10,
             logger = logger
         )
 
@@ -70,6 +71,7 @@ class TooManyArguments(FrontEndErrors):
             message = "The command author passed too many arguments.",
             platter = platter, 
             embed_colour = Colours.RED,
+            delete_after = 10,
             logger = logger
         )
 
@@ -82,6 +84,18 @@ class MissingPerms(FrontEndErrors):
             message = f"The command author '{platter.author.username}#{platter.author.discriminator}' doesn't have the perms to run this command.",
             platter = platter, 
             embed_colour = Colours.RED,
+            logger = logger
+        )
+
+
+class ExtensionNotAllowedInGuild(FrontEndErrors):
+    def __init__(self, platter: GoldPlatter, logger: log.Logger = None):
+        super().__init__(
+            title = "🧡 Not Enabled In Guild!", 
+            description = "Sorry, the extension this command belongs to is not currently enabled in this guild (server).",
+            message = f"The command's extension is not allowed in the guild '{platter.guild.code_name}', check the guild's config on the database.",
+            platter = platter, 
+            embed_colour = Colours.AKI_ORANGE,
             logger = logger
         )
 
