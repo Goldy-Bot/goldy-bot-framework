@@ -158,7 +158,9 @@ class Goldy():
         await self.pre_setup()
         await self.setup()
 
-        if self.system.in_docker is False: # Live console is disabled when running a docker container.
+        if self.system.in_docker is True: # Live console is disabled when running a docker container.
+            self.logger.info(Colours.BLUE.apply("We detected that you are running Goldy Bot in 🐬docker. Live console will be disabled."))
+        else:
             self.live_console.start()
 
         # Raise a error and exit whenever a critical error occurs.
