@@ -17,13 +17,11 @@
 
 1. [Why Version 5?](#why-version-5)
    - [🏆 Goal](#-goal)
-   - [💛 Is goldy bot for you?](-is-goldy-bot-for-you)
-   - [⚡ Nextcore](-nextcore)
-2. [Install/Set Up](-installset-up---normal)
-   - [🛠 Normal](-installset-up---normal)
-   - [🐬 Docker](-installset-up---docker)
-
-<br>
+   - [💛 Is goldy bot for you?](#-is-goldy-bot-for-you)
+   - [⚡ Nextcore](#-nextcore)
+2. [Install/Set Up](#-installset-up---normal)
+   - [🛠 Normal](#-installset-up---normal)
+   - [🐬 Docker](#-installset-up---docker)
 
 <p align="right">
 
