@@ -9,7 +9,7 @@ Command Decorator
    :show-inheritance:
 
 Command
----------------
+--------
 .. automodule:: GoldyBot.goldy.commands
    :members:
    :undoc-members:
@@ -25,6 +25,13 @@ Command Listener
 Command Loader
 -------------------------------------
 .. automodule:: GoldyBot.goldy.commands.loader
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Params Utils
+---------------
+.. automodule:: GoldyBot.goldy.commands.params_utils
    :members:
    :undoc-members:
    :show-inheritance:
