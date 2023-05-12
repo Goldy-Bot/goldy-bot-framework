@@ -48,9 +48,6 @@ dev = [
     "pytest-cov",
     "ruff"
 ]
-api = [
-    "javascript"
-]
 
 [project.urls]
 GitHub = "https://github.com/Goldy-Bot/Goldy-Bot-V5"

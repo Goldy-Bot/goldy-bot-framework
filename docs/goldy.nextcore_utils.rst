@@ -25,10 +25,3 @@ Front End Errors
    :members:
    :undoc-members:
    :show-inheritance:
-
-Params
--------
-.. automodule:: GoldyBot.goldy.nextcore_utils.params
-   :members:
-   :undoc-members:
-   :show-inheritance:
