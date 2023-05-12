@@ -6,7 +6,7 @@
 
   [![Pypi Badge](https://img.shields.io/pypi/v/GoldyBot?style=flat)](https://pypi.org/project/GoldyBot/ "We're on pypi!")
   [![Python Badge](https://img.shields.io/pypi/pyversions/GoldyBot?style=flat)](https://pypi.org/project/GoldyBot/ "Supported python versions.")
-  [![Docs Badge](https://img.shields.io/static/v1?label=docs&message=Available&color=light-green)](https://goldybot.devgoldy.me/)
+  [![Docs Badge](https://img.shields.io/static/v1?label=docs&message=Available&color=light-green)](https://goldybot.devgoldy.xyz/)
   [![Docker Badge](https://img.shields.io/docker/v/devgoldy/goldybot?label=docker)](https://hub.docker.com/r/devgoldy/goldybot "We're on docker!")
   
 </div>
