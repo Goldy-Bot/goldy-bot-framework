@@ -13,10 +13,22 @@
 
 #### ⚠ *Warning: ``GoldyBot`` is in very deep development right now so some utils and code will be incomplete.*
 
+## Table of Contents
+
+1. [Why Version 5?](#why-version-5)
+   - [🏆 Goal](#-goal)
+   - [💛 Is goldy bot for you?](-is-goldy-bot-for-you)
+   - [⚡ Nextcore](-nextcore)
+2. [Install/Set Up](-installset-up---normal)
+   - [🛠 Normal](-installset-up---normal)
+   - [🐬 Docker](-installset-up---docker)
+
+<br>
+
 <p align="right">
 
 
-  <h2>Why Version 5?</h2>
+  ## Why Version 5?
 
   
   <img align="left" src="./assets/goldy_art/1.png" width="180"/>
