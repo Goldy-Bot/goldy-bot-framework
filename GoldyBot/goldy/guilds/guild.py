@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 from typing import List, TYPE_CHECKING
-from GoldyBot.goldy.database import DatabaseEnums
+from discord_typings import GuildData
+from ..database import DatabaseEnums
+from .. import nextcore_utils
 
 if TYPE_CHECKING:
     from .. import Goldy
@@ -64,6 +66,10 @@ class Guild():
                 return False
         
         return True
+    
+    async def get_guild_data(self) -> GuildData:
+        """Returns discord's guild data; the same as :py:meth:`~GoldyBot.goldy.nextcord_utils.get_guild()`."""
+        return await nextcore_utils.get_guild_data(self)
 
     async def update(self) -> None:
         """Updates guild's data by fetching from database."""

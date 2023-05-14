@@ -39,10 +39,10 @@ class LiveConsoleApp(cmd2.Cmd):
 
         # Rerun guilds setup...
         # ----------------------
-        self.goldy.guilds.guilds.clear()
+        self.goldy.guild_manager.guilds.clear()
 
         self.goldy.async_loop.create_task(
-            self.goldy.guilds.setup()
+            self.goldy.guild_manager.setup()
         )
 
 

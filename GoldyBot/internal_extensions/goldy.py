@@ -61,7 +61,7 @@ class Goldy(GoldyBot.Extension):
             ram = self.goldy.system.ram,
             disk = self.goldy.system.disk,
             up_time = f"<t:{int(self.goldy.start_up_time.timestamp())}:R>",
-            guild_count = "Soon™",
+            guild_count = len(self.goldy.guild_manager.guilds),
 
             heart = "🤍"
         )

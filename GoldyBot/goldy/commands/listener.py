@@ -42,7 +42,7 @@ class CommandListener():
 
 
     async def on_interaction(self, interaction: InteractionCreateData) -> None:
-        guild = self.goldy.guilds.get_guild(interaction["guild_id"])
+        guild = self.goldy.guild_manager.get_guild(interaction["guild_id"])
 
         if guild is not None:
             await guild.update()
@@ -89,7 +89,7 @@ class CommandListener():
 
 
     async def on_prefix_cmd(self, message: MessageData) -> None:
-        guild = self.goldy.guilds.get_guild(message["guild_id"])
+        guild = self.goldy.guild_manager.get_guild(message["guild_id"])
 
         # If user is bot return right away.
         if message["author"].get("bot", False):

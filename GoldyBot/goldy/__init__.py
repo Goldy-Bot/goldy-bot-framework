@@ -102,7 +102,7 @@ class Goldy():
         """Class that handles extension loading and reloading."""
         self.live_console = LiveConsole(self)
         """The goldy bot live console."""
-        self.guilds = Guilds(self)
+        self.guild_manager = GuildManager(self)
 
     @property
     def latency(self) -> float | None:
@@ -202,13 +202,13 @@ class Goldy():
 
     async def setup(self):
         """Method ran to set up goldy bot."""
-        await self.guilds.setup()
+        await self.guild_manager.setup()
         
         self.extension_loader.load()
         await self.command_loader.load()
         await self.command_listener.start_listening()
 
-    def stop(self, reason:str = "Unknown Reason"):
+    def stop(self, reason: str = "Unknown Reason"):
         """Shuts down goldy bot right away and safely incase anything sussy wussy is going on. 😳"""
         self.live_console.stop()
 
@@ -265,4 +265,4 @@ from .commands.loader import CommandLoader
 from .commands.listener import CommandListener
 from .live_console import LiveConsole
 from .objects import Member
-from .guilds import Guilds
+from .guilds import GuildManager

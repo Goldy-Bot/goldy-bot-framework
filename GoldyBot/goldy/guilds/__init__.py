@@ -8,7 +8,7 @@ from ...errors import GoldyBotError
 
 from .guild import Guild
 
-class Guilds():
+class GuildManager():
     def __init__(self, goldy: Goldy) -> None:
         self.goldy = goldy
         self.allowed_guilds = goldy.config.allowed_guilds
@@ -16,7 +16,7 @@ class Guilds():
         if self.allowed_guilds == []:
             raise AllowedGuildsNotSpecified()
         
-        self.guilds:List[Tuple[str|int, Guild]] = []
+        self.guilds: List[Tuple[str|int, Guild]] = []
 
     # TODO: In the future we might have to add some sort of way to reload the guild config of a guild from the database. (or just run setup again on that particular guild if that works well)
     # I can see this being needed if the v5 framework is going to be running public invite-able bots.

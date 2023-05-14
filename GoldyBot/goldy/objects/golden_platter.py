@@ -45,7 +45,7 @@ class GoldPlatter():
         else:
             self.author = Member(data["author"], goldy)
 
-        self.guild: Guild = self.goldy.guilds.get_guild(data["guild_id"])
+        self.guild: Guild = self.goldy.guild_manager.get_guild(data["guild_id"])
 
         self._interaction_responded = False
         """An internal property that is set by the :py:meth:`~GoldyBot.nextcore_utils.send_msg` method when a slash command is responded to."""

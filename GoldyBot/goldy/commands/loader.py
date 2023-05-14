@@ -57,7 +57,7 @@ class CommandLoader():
 
         # Create slash commands for each allowed guild.
         # ----------------------------------------------
-        for guild in self.goldy.guilds.allowed_guilds:
+        for guild in self.goldy.guild_manager.allowed_guilds:
 
             # TODO: Get the application objects from this response and save it in the guild. Also add a method in command object to retrieve it.
             await self.goldy.http_client.request(
