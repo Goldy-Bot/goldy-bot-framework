@@ -9,7 +9,7 @@ from datetime import datetime
 from nextcore.http.client import HTTPClient
 
 from nextcore.http import BotAuthentication, UnauthorizedError, Route
-from nextcore.gateway import ShardManager, GatewayOpcode
+from nextcore.gateway import ShardManager
 
 from typing import Dict, Any, TYPE_CHECKING
 from discord_typings import UpdatePresenceData, PartialActivityData, ApplicationData
@@ -197,7 +197,7 @@ class Goldy():
         )
 
         bot_user = await r.json()
-        self.bot_user = Member(bot_user, self)
+        self.bot_user = Member(bot_user, self, None)
         self.logger.debug("Bot's user object requested!")
 
     async def setup(self):

@@ -7,11 +7,11 @@ from devgoldyutils import Colours
 
 class GoldyDB():
     """A class representing a singular goldy bot database in mongoDB."""
-    def __init__(self, core_database, code_name:str) -> None:
+    def __init__(self, core_database, db_code_name: str) -> None:
         self.client = core_database.client
-        self.database = self.client[code_name]
+        self.database = self.client[db_code_name]
         
-        self.logger = LoggerAdapter(core_database.logger, Colours.PINK_GREY.apply_to_string(code_name))
+        self.logger = LoggerAdapter(core_database.logger, Colours.PINK_GREY.apply_to_string(db_code_name))
 
     async def insert(self, collection: str, data) -> bool:
         """Inserts the data provided into a collection in this database."""
