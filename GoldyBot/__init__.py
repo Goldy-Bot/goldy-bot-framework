@@ -5,7 +5,7 @@ Copyright (C) 2023 - Goldy
 """
 from .logging import LoggerAdapter, log, goldy_bot_logger, LOGGER_NAME
 
-from .info import VERSION, DISPLAY_NAME
+from .info import VERSION, DISPLAY_NAME, __version__
 from .paths import Paths
 
 from .goldy import Goldy, get_goldy_instance
