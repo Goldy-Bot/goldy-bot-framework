@@ -197,7 +197,7 @@ class Goldy():
         )
 
         bot_user = await r.json()
-        self.bot_user = Member(bot_user, self, None)
+        self.bot_user = Member(bot_user, None, self, [])
         self.logger.debug("Bot's user object requested!")
 
     async def setup(self):

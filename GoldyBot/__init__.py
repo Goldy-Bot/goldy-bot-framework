@@ -14,6 +14,7 @@ from .goldy.perms import Perms
 from .goldy.extensions import Extension
 from .goldy.commands.decorator import command
 from .goldy.utils import *
+from .goldy.database.wrapper import DatabaseWrapper
 
 from .goldy import nextcore_utils
 from .goldy.nextcore_utils import (

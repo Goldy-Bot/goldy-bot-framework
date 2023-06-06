@@ -29,7 +29,7 @@ class Message(DictDataclass):
         self.logger = logger
         
         self.id = self.get("id")
-        self.author = Member(self.get("author"), self.goldy)
+        self.author = Member(self.get("author"), self.goldy.guild_manager.get_guild(self.get("guild_id")), self.goldy)
     
     async def delete(self, reason:str=None) -> Message:
         return await nextcore_utils.delete_msg(self, reason)

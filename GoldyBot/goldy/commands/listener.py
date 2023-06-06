@@ -49,9 +49,9 @@ class CommandListener():
             await guild.update()
 
             member_data = await self.goldy.database.get_goldy_database(DatabaseEnums.GOLDY_MEMBER_DATA).find_all(
-                interaction["author"]["id"], max_to_find=201
+                interaction["member"]["user"]["id"], max_to_find=201
             )
-            author = objects.Member(interaction["author"]["user"], self.goldy, member_data)
+            author = objects.Member(interaction["member"]["user"], guild, self.goldy, member_data)
 
             # Slash command.
             # ---------------
@@ -123,7 +123,7 @@ class CommandListener():
                     gold_platter = GoldPlatter(
                         data = message, 
                         type = objects.PlatterType.PREFIX_CMD, 
-                        author = objects.Member(message["author"], self.goldy, member_data),
+                        author = objects.Member(message["author"], guild, self.goldy, member_data),
                         command = command[1],
                         goldy = self.goldy,
                     )
