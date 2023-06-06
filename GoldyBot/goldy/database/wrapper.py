@@ -19,6 +19,8 @@ class DatabaseWrapper(DictClass):
 
         super().__init__(logger)
 
+    # TODO: Generate member data collections if they don't exist for the member.
+
     async def update(self) -> None:
         if isinstance(self.object, objects.Member):
             database = self.goldy.database.get_goldy_database(DatabaseEnums.GOLDY_MEMBER_DATA)
