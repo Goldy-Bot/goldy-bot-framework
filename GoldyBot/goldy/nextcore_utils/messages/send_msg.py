@@ -276,8 +276,7 @@ async def send_msg(
 
         channel.logger.debug(f"Message was sent in channel '{channel.data['name']}'.")
 
-
-    message = objects.Message(message_data, goldy)
+    message = objects.Message(message_data, object.guild, goldy)
 
     if delete_after is not None:
         utils.delay(

@@ -48,10 +48,7 @@ class CommandListener():
         if guild is not None:
             await guild.update()
 
-            member_data = await self.goldy.database.get_goldy_database(DatabaseEnums.GOLDY_MEMBER_DATA).find_all(
-                interaction["member"]["user"]["id"], max_to_find=201
-            )
-            author = objects.Member(interaction["member"]["user"], guild, self.goldy, member_data)
+            author = objects.Member(interaction["member"]["user"], guild, self.goldy)
 
             # Slash command.
             # ---------------
@@ -113,17 +110,12 @@ class CommandListener():
             # i really hope this doesn't break
             command: Tuple[str, Command] = utils.cache_lookup(message["content"].split(" ")[0][1:], commands_cache)
 
-            member_data = await self.goldy.database.get_goldy_database(DatabaseEnums.GOLDY_MEMBER_DATA).find_all(
-                message["author"]["id"], max_to_find=201
-            )
-
             if command is not None:
-
                 if command[1].allow_prefix_cmd:
                     gold_platter = GoldPlatter(
                         data = message, 
                         type = objects.PlatterType.PREFIX_CMD, 
-                        author = objects.Member(message["author"], guild, self.goldy, member_data),
+                        author = objects.Member(message["author"], guild, self.goldy),
                         command = command[1],
                         goldy = self.goldy,
                     )

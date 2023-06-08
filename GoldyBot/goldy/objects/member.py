@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, List
 from discord_typings import UserData
-from devgoldyutils import DictClass
+from devgoldyutils import DictClass, Colours
 
 from ..database import DatabaseEnums
 from ... import goldy_bot_logger, LoggerAdapter
@@ -16,17 +16,14 @@ if TYPE_CHECKING:
 logger = LoggerAdapter(goldy_bot_logger, prefix="Member")
 
 class Member(DictClass):
-    def __init__(self, data: UserData, guild: Guild, goldy: Goldy, db_data: List[dict] = None) -> None:
+    def __init__(self, data: UserData, guild: Guild, goldy: Goldy) -> None:
         self.data = data
         self.guild = guild
         self.goldy = goldy
-        
-        if db_data is None:
-            db_data = []
 
-        self.db_data = db_data
+        super().__init__(LoggerAdapter(logger, prefix=Colours.GREY.apply(data['username'])))
 
-        super().__init__(LoggerAdapter(logger, prefix=data['username']))
+        self.db_wrapper = DatabaseWrapper(self)
 
     @property
     def id(self) -> str:
@@ -49,6 +46,9 @@ class Member(DictClass):
         return DISCORD_CDN + f"avatars/{self.id}/{self.get('avatar')}.png?size=4096"
 
     @property
-    def database(self) -> DatabaseWrapper:
-        """The member's database wrapper."""
-        return DatabaseWrapper(self, self.logger)
+    async def database(self) -> DatabaseWrapper:
+        """Get member's database wrapper."""
+        if self.db_wrapper.data == {}:
+            await self.db_wrapper.update()
+
+        return self.db_wrapper
