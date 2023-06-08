@@ -31,7 +31,9 @@ dependencies = [
     "cmd2",
     "pygame==2.3.0",
     "regex",
-    "psutil"
+    "psutil",
+    "dateparser",
+    "pytz"
 ]
 
 dynamic = ["version"]

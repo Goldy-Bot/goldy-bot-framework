@@ -73,7 +73,7 @@ class Button(Recipe):
     @overload
     def __init__(
         self, 
-        style: Literal[5], 
+        style: Literal[ButtonStyle.LINK, 5], 
         label: str, 
         url: str, 
         emoji: str = None, 
