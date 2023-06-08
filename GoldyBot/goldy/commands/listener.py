@@ -9,7 +9,6 @@ from ..nextcore_utils.components import Recipe, registered_recipes
 from .. import utils, objects
 from ... import LoggerAdapter, goldy_bot_logger
 from ..objects.golden_platter import GoldPlatter
-from ..database import DatabaseEnums
 
 if TYPE_CHECKING:
     from .. import Goldy

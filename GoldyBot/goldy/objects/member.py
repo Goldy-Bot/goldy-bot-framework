@@ -1,10 +1,9 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, List
+from typing import TYPE_CHECKING
 from discord_typings import UserData
 from devgoldyutils import DictClass, Colours
 
-from ..database import DatabaseEnums
 from ... import goldy_bot_logger, LoggerAdapter
 from ..nextcore_utils import DISCORD_CDN
 from ..database.wrapper import DatabaseWrapper
