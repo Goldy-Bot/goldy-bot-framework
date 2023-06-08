@@ -2,19 +2,22 @@ from __future__ import annotations
 
 from typing import List, Tuple
 
-from .. import Goldy, utils
+from .. import Goldy, utils, LoggerAdapter, goldy_bot_logger
 from ..database import DatabaseEnums
 from ...errors import GoldyBotError
 
 from .guild import Guild
 
+import logging
+
 class GuildManager():
     def __init__(self, goldy: Goldy) -> None:
         self.goldy = goldy
         self.allowed_guilds = goldy.config.allowed_guilds
+        self.logger = LoggerAdapter(goldy_bot_logger, prefix="GuildManager")
 
         if self.allowed_guilds == []:
-            raise AllowedGuildsNotSpecified()
+            raise AllowedGuildsNotSpecified(self.logger)
         
         self.guilds: List[Tuple[str|int, Guild]] = []
 
@@ -62,7 +65,7 @@ class GuildManager():
                 await database.insert("guild_configs", data = guild_config)
 
             else:
-                # Check if any keys are missing in the guild config, if it is update the config with that new item.
+                # Check if any keys are missing in the guild config, if any are update the config with the new item.
                 # ---------------------------------------------------------------------------------------------------
                 if not guild_config_template.keys() == guild_config.keys():
                     
@@ -71,6 +74,9 @@ class GuildManager():
 
                         if item not in guild_config:
                             guild_config[item] = guild_config_template[item]
+                            self.logger.debug(
+                                f"Added key '{item}' to {guild[1]}'s database config because it was missing."
+                            )
 
                     await database.edit("guild_configs", query = {"_id": guild[0]}, data = guild_config)
 
@@ -98,7 +104,8 @@ class GuildManager():
 # Exceptions
 # ------------
 class AllowedGuildsNotSpecified(GoldyBotError):
-    def __init__(self):
+    def __init__(self, logger: logging.Logger = None):
         super().__init__(
-            "Please add your guild id to the allowed_guilds in goldy.json"
+            "Please add your guild id to the allowed_guilds in goldy.json",
+            logger = logger
         )

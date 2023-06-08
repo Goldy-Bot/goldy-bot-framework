@@ -1,38 +1,54 @@
 from __future__ import annotations
-from dataclasses import dataclass, field
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, List
 from discord_typings import UserData
-from devgoldyutils import DictDataclass
+from devgoldyutils import DictClass, Colours
 
+from ..database import DatabaseEnums
 from ... import goldy_bot_logger, LoggerAdapter
 from ..nextcore_utils import DISCORD_CDN
+from ..database.wrapper import DatabaseWrapper
 
 if TYPE_CHECKING:
     from .. import Goldy
+    from ..guilds import Guild
 
 logger = LoggerAdapter(goldy_bot_logger, prefix="Member")
 
-@dataclass
-class Member(DictDataclass):
-    data:UserData = field(repr=False)
-    goldy:Goldy = field(repr=False)
+class Member(DictClass):
+    def __init__(self, data: UserData, guild: Guild, goldy: Goldy) -> None:
+        self.data = data
+        self.guild = guild
+        self.goldy = goldy
 
-    id:str = field(init=False)
-    """Member's id duhhhh."""
-    username:str = field(init=False)
-    """Members username. E.g. the ``The Golden Pro`` part of ``The Golden Pro#5675``."""
-    discriminator:str = field(init=False)
-    """Member's discriminator, their # tag. E.g the ``5675`` part of ``The Golden Pro#5675``."""
-    avatar_url:str = field(init=False, repr=False)
-    """The url to the member's profile picture."""
+        super().__init__(LoggerAdapter(logger, prefix=Colours.GREY.apply(data['username'])))
 
-    def __post_init__(self):
-        super().__post_init__()
+        self.db_wrapper = DatabaseWrapper(self)
 
-        self.logger = logger
+    @property
+    def id(self) -> str:
+        """Member's id duhhhh."""
+        return self.get("id")
 
-        self.id = self.get("id")
-        self.username = self.get("username")
-        self.discriminator = self.get("discriminator")
-        self.avatar_url = DISCORD_CDN + f"avatars/{self.id}/{self.get('avatar')}.png?size=4096"
+    @property
+    def username(self) -> str:
+        """Members username. E.g. the ``The Golden Pro`` part of ``The Golden Pro#5675``."""
+        return self.get("username")
+
+    @property
+    def discriminator(self) -> str:
+        """Member's discriminator, their # tag. E.g the ``5675`` part of ``The Golden Pro#5675``."""
+        return self.get("discriminator")
+
+    @property
+    def avatar_url(self) -> str:
+        """The url to the member's profile picture."""
+        return DISCORD_CDN + f"avatars/{self.id}/{self.get('avatar')}.png?size=4096"
+
+    @property
+    async def database(self) -> DatabaseWrapper:
+        """Get member's database wrapper."""
+        if self.db_wrapper.data == {}:
+            await self.db_wrapper.update()
+
+        return self.db_wrapper

@@ -9,6 +9,7 @@ from ..nextcore_utils.components import Recipe, registered_recipes
 from .. import utils, objects
 from ... import LoggerAdapter, goldy_bot_logger
 from ..objects.golden_platter import GoldPlatter
+from ..database import DatabaseEnums
 
 if TYPE_CHECKING:
     from .. import Goldy
@@ -47,6 +48,8 @@ class CommandListener():
         if guild is not None:
             await guild.update()
 
+            author = objects.Member(interaction["member"]["user"], guild, self.goldy)
+
             # Slash command.
             # ---------------
             if interaction["type"] == 2:
@@ -57,6 +60,7 @@ class CommandListener():
                     gold_platter = GoldPlatter(
                         data = interaction, 
                         type = objects.PlatterType.SLASH_CMD, 
+                        author = author,
                         command = command[1],
                         goldy = self.goldy,
                     )
@@ -75,6 +79,7 @@ class CommandListener():
                     gold_platter = GoldPlatter(
                         data = interaction, 
                         type = objects.PlatterType.SLASH_CMD, 
+                        author = author,
                         command = message_component[1],
                         goldy = self.goldy,
                     )
@@ -103,14 +108,14 @@ class CommandListener():
                 return
             
             # i really hope this doesn't break
-            command:Tuple[str, Command] = utils.cache_lookup(message["content"].split(" ")[0][1:], commands_cache)
+            command: Tuple[str, Command] = utils.cache_lookup(message["content"].split(" ")[0][1:], commands_cache)
 
             if command is not None:
-
                 if command[1].allow_prefix_cmd:
                     gold_platter = GoldPlatter(
                         data = message, 
                         type = objects.PlatterType.PREFIX_CMD, 
+                        author = objects.Member(message["author"], guild, self.goldy),
                         command = command[1],
                         goldy = self.goldy,
                     )
