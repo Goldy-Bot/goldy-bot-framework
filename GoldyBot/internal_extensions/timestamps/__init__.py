@@ -1,8 +1,12 @@
 from __future__ import annotations
 
 import GoldyBot
-from GoldyBot.goldy.utils.human_datetime import get_datetime, HumanDatetimeOptions
-from GoldyBot.goldy.nextcore_utils import front_end_errors
+from GoldyBot import ( 
+    get_datetime,
+    DatabaseEnums,
+    front_end_errors,
+    HumanDatetimeOptions 
+)
 
 import pytz
 from datetime import datetime
@@ -13,6 +17,7 @@ class Timestamps(GoldyBot.Extension):
         super().__init__()
 
         self.default_timezone = "Europe/London"
+        self.default_datetime_formats = ["%d/%m/%Y %H:%M", "%Y/%m/%d %H:%M", "%d.%m.%Y %H:%M", "%Y.%m.%d %H:%M"]
 
         self.failed_read_embed = GoldyBot.Embed(
             title = "❓ Did you enter it correctly?",
@@ -21,7 +26,7 @@ class Timestamps(GoldyBot.Extension):
         )
 
         self.unknown_timezone_embed = GoldyBot.Embed(
-            title = "❤ Unknown Time Zone!", 
+            title = "⏱️ Unknown Time Zone!", 
             description = """
             *This is how the ``timezone`` parameter should be used.*
 
@@ -34,14 +39,11 @@ class Timestamps(GoldyBot.Extension):
             colour = GoldyBot.Colours.RED
         )
 
-        self.unknown_error_embed = GoldyBot.Embed(
-            title = "❓ Did you enter it correctly?",
-            description = "I couldn't read either your time or date properly, please could you try again. Perhaps you mistyped something.",
-            colour = GoldyBot.Colours.RED
-        )
+    @GoldyBot.command()
+    async def timestamp(self, platter: GoldyBot.GoldPlatter):
+        ...
 
-
-    @GoldyBot.command(description = "Sends a discord timestamp of that time and date.", slash_options = {
+    @timestamp.sub_command(description = "Sends a discord timestamp of that time and date.", slash_options = {
         "date": GoldyBot.SlashOption(description="The date goes here like example, 13.08.2022 or even 2022/08/22.", required=True),
         "time": GoldyBot.SlashOption(description="The time goes here like example, 15:00.", required=True),
         "flag": GoldyBot.SlashOption(description="Choose a flag.", required=True, 
@@ -64,25 +66,28 @@ class Timestamps(GoldyBot.Extension):
             required = False
         )
     })
-    async def timestamp(self, platter: GoldyBot.GoldPlatter, date, time, flag, timezone: str = None, date_format: str = 0):
-        if date_format == 1:
-            dt_formats = ["%Y/%m/%d %H:%M", "%Y.%m.%d %H:%M"]
+    async def create(self, platter: GoldyBot.GoldPlatter, date, time, flag, timezone: str = None, date_format: str = None):
+        member_data = await platter.author.database
+
+        if date_format is None:
+            datetime_formats = (lambda x: x if x is not None else self.default_datetime_formats)(member_data.get("datetime_formats", optional=True))
         else:
-            dt_formats = ["%d/%m/%Y %H:%M", "%d.%m.%Y %H:%M"]
+            datetime_formats = ["%d/%m/%Y %H:%M", "%d.%m.%Y %H:%M"] if date_format == 0 else ["%Y/%m/%d %H:%M", "%Y.%m.%d %H:%M"]
 
-        # TODO: ^ Add this setting to the database.
+        datetime: datetime = get_datetime(f"{date} {time}", option = HumanDatetimeOptions.BOTH, datetime_formats = datetime_formats)
 
-        datetime: datetime = get_datetime(f"{date} {time}", option = HumanDatetimeOptions.BOTH, datetime_formats=dt_formats)
-
-        # TODO: Phrase the timezone.
+        # TODO: Phrase the timezone. (idk, maybe add some convenient aliases.)
 
         if timezone is None:
-            member_data = await platter.author.database
-            timezone = (lambda x: x if x is not None else self.default_timezone)(member_data.get("timezone"))
+            timezone = (lambda x: x if x is not None else self.default_timezone)(member_data.get("timezone", optional=True))
 
         if datetime is None:
-            await platter.send_message(embeds=[self.failed_read_embed], delete_after=30)
-            return False
+            raise front_end_errors.FrontEndErrors(
+                embed = self.failed_read_embed,
+                message = "Datetime failed to read the member's input.",
+                platter = platter,
+                delete_after = 30
+            )
 
         try:
             # Convert to chosen timezone.
@@ -106,47 +111,65 @@ class Timestamps(GoldyBot.Extension):
             raise front_end_errors.FrontEndErrors(
                 embed = self.unknown_timezone_embed,
                 message = f"The time zone the member entered is incorrect. Error --> {e}",
+                platter = platter,
                 delete_after = 30,
                 logger = self.logger
             )
 
         except Exception as e:
             raise front_end_errors.FrontEndErrors(
-                embed = self.unknown_error_embed,
+                embed = self.failed_read_embed,
                 message = f"We got an unknown exception when we tried to process and send the timestamp. Error --> {e}",
+                platter = platter,
                 delete_after = 30,
                 logger = self.logger
             )
 
-
-    """
-    @GoldyBot.command(help_des="Sets default timezone for /timestamp command.", slash_cmd_only=True, slash_options={
-        "timezone" : GoldyBot.nextcord.SlashOption(description="The time zone. Must be like this --> Europe/London, America/New_York, Europe/Stockholm", required=True)
+    @timestamp.sub_command(description = "Allows you to sets default timezone and date format for /timestamp command.", slash_options = {
+        "timezone" : GoldyBot.SlashOption(
+            description = "The time zone. Must be like this --> Europe/London, America/New_York, Europe/Stockholm", 
+            required = True
+        ),
+        "date_format": GoldyBot.SlashOption(
+            description = "The format we should read your date in. The order more specifically.", 
+            choices = [
+                GoldyBot.SlashOptionChoice("D/M/Y", 0),
+                GoldyBot.SlashOptionChoice("Y/M/D", 1)
+            ],
+            required = False
+        )
     })
-    async def timezone_set(self:Timestamps, ctx, timezone):
-        member = GoldyBot.Member(ctx)
-        member_data = await member.get_member_data()
+    async def set_defaults(self, platter: GoldyBot.GoldPlatter, timezone: str, date_format: int = None):
+        datetime_formats = None
+
+        if date_format is not None:
+            datetime_formats = ["%d/%m/%Y %H:%M", "%d.%m.%Y %H:%M"] if date_format == 0 else ["%Y/%m/%d %H:%M", "%Y.%m.%d %H:%M"]
+
+        timezone = timezone.lower()
+        member_data = await platter.author.database
 
         try:
-            pytz.timezone(timezone)
-            member_data[member.member_id]["timezone"] = timezone
-            await member.edit_member_data(member_data)
+            pytz.timezone(timezone) # Test timezone.
+            await member_data.push(DatabaseEnums.MEMBER_GLOBAL_DATA, {"timezone": timezone, "datetime_formats": datetime_formats})
 
-            message = await send(ctx, embed=GoldyBot.Embed(
-                title="💚 Time Zone Set!",
-                description="Your default timezone was set **UwU**!",
-                color=GoldyBot.Colours().GREEN
-            ))
+            embed = GoldyBot.Embed(
+                title = "⏱️ Timestamp Defaults Set!",
+                description = f"""
+                - Timezone: ``{timezone}``
+                - Date Format: ``{None if date_format is None else 'D/M/Y' if date_format == 0 else 'Y/M/D'}``
+                """,
+                color = GoldyBot.Colours.GREEN
+            )
 
-            await message.delete(delay=15)
+            await platter.send_message(embeds = [embed])
 
         except pytz.UnknownTimeZoneError as e:
-            GoldyBot.log("error", e)
-
-            message = await send(ctx, embed=self.unknown_timezone_embed)
-
-            await message.delete(delay=30)
-    """
+            raise front_end_errors.FrontEndErrors(
+                embed = self.unknown_timezone_embed,
+                message = f"Member supposedly entered false time zone. Error >> {e}",
+                platter = platter,
+                delete_after = 30
+            )
 
 
 def load():

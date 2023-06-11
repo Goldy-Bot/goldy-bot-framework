@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Literal
 from devgoldyutils import DictClass, LoggerAdapter, Colours
 from . import DatabaseEnums
 from .. import objects
@@ -14,14 +14,35 @@ class DatabaseWrapper(DictClass):
     def __init__(self, object: objects.Member | Guild) -> None:
         self.object = object
         self.goldy = object.goldy
+        self.guild = object.guild
 
         self.data = {}
 
         super().__init__(
             LoggerAdapter(object.logger, prefix=Colours.PINK_GREY.apply("Database Wrapper"))
         )
+    
+    async def push(
+        self, 
+        type: Literal[DatabaseEnums.MEMBER_GUILD_DATA, DatabaseEnums.MEMBER_GLOBAL_DATA] | str, 
+        data: dict
+    ) -> None:
+        """Push new data directly to the database."""
+        self.logger.info("Pushing data to the database...")
+        database = self.goldy.database.get_goldy_database(DatabaseEnums.GOLDY_MEMBER_DATA)
+
+        if isinstance(type, str):
+            type = DatabaseEnums(type)
+
+        doc_id = "1" # Global document.
+
+        if type == DatabaseEnums.MEMBER_GUILD_DATA:
+            doc_id = self.guild.id
+
+        await database.edit(self.object.id, {"_id": doc_id}, data)
 
     async def update(self) -> None:
+        """Update the wrapper with the greatest and latest data from the database."""
         self.logger.info("Pulling updated data from database...")
 
         if isinstance(self.object, objects.Member):

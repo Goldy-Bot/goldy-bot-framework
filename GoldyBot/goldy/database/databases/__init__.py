@@ -13,23 +13,23 @@ class GoldyDB():
         
         self.logger = LoggerAdapter(core_database.logger, Colours.PINK_GREY.apply_to_string(db_code_name))
 
-    async def insert(self, collection: str, data) -> bool:
-        """Inserts the data provided into a collection in this database."""
+    async def insert(self, collection: str, data) -> None:
+        """
+        Inserts the data provided into a collection in this database. 
+        Creates a whole new document. If you want to edit an existing document use .edit()
+        """
         await self.database[collection].insert_one(data)
         self.logger.debug(f"Inserted '{data}' into '{collection}.'")
-        return True
 
-    async def edit(self, collection: str, query, data: dict) -> bool:
+    async def edit(self, collection: str, query, data: dict) -> None:
         """Finds and edits a document in this database and collection with the data provided."""
         await self.database[collection].update_one(query, {"$set": data})
         self.logger.debug(f"Edited '{query}' into '{data}.'")
-        return True
 
-    async def remove(self, collection: str, data) -> bool:
+    async def remove(self, collection: str, data) -> None:
         """Finds and deletes a copy of this data from a collection in this database."""
         await self.database[collection].delete_one(data)
         self.logger.debug(f"Deleted '{data}' from '{collection}.'")
-        return True
 
     async def find(self, collection:  str, query, key: str, max_to_find=50) -> List[dict]:
         """Searches for and returns documents with that query in a collection in this database."""
@@ -70,19 +70,17 @@ class GoldyDB():
             self.logger.debug(f"'{query}' was not found in '{collection}.'")
             return None
 
-    async def create_collection(self, collection_name: str, data) -> bool:
+    async def create_collection(self, collection_name: str, data) -> None:
         await self.database[collection_name].insert_one(data)
         self.logger.debug(f"Database collection '{collection_name}' created.")
-        return True
 
     async def get_collection(self, collection: str):
         """Returns cursor of the following collection."""
         return self.database[collection]
 
-    async def delete_collection(self, collection_name: str) -> bool:
+    async def delete_collection(self, collection_name: str) -> None:
         await self.database[collection_name].drop()
         self.logger.debug(f"Database collection '{collection_name}' dropped.")
-        return True
 
     async def list_collection_names(self) -> List[str]:
         """Returns list of all collection name in this database."""

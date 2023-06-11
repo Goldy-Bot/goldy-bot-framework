@@ -13,9 +13,12 @@ from .. import Goldy, LoggerAdapter, goldy_bot_logger, GoldyBotError
 from .databases import GoldyDB
 
 class DatabaseEnums(Enum):
-    """Enum class that holds the code names for all goldy bot pymongo databases."""
+    """Enum class that holds the code names for all goldy bot pymongo databases and collection types."""
     GOLDY_MAIN = "goldy_main"
     GOLDY_MEMBER_DATA = "goldy_member_data"
+
+    MEMBER_GUILD_DATA = "member_guild_data"
+    MEMBER_GLOBAL_DATA = "member_global_data"
 
     def __init__(self, database_name: str):
         ...
