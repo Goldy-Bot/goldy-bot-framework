@@ -12,11 +12,9 @@ from ..objects.golden_platter import GoldPlatter, PlatterType
 class FrontEndErrors(errors.GoldyBotError):
     def __init__(
             self, 
-            title: str,
-            description: str,
+            embed: Embed,
             message: str,
             platter: GoldPlatter, 
-            embed_colour = Colours.AKI_ORANGE,
             delete_after = 8,
             logger: log.Logger = None
         ):
@@ -24,11 +22,7 @@ class FrontEndErrors(errors.GoldyBotError):
         platter.goldy.async_loop.create_task(
             platter.send_message(
                 embeds = [
-                    Embed(
-                        title = title,
-                        description = description,
-                        colour = embed_colour
-                    )
+                    embed
                 ],
                 reply = True,
                 delete_after = None if platter.type.value == PlatterType.SLASH_CMD.value else delete_after,
@@ -46,12 +40,15 @@ class MissingArgument(FrontEndErrors):
             missing_args_string += f"{arg}, "
 
         super().__init__(
-            title = "🧡 Oops, your missing an argument.", 
-            description = f"""
-            *You missed the argument(s): ``{missing_args_string[:-2]}``*
+            embed = Embed(
+                title = "🧡 Oops, you're missing an argument.", 
+                description = f"""
+                *You missed the argument(s): ``{missing_args_string[:-2]}``*
 
-            **Command Usage -> ``{platter.guild.prefix}{platter.command.command_usage}``**
-            """, # TODO: Add command usage string to command class.
+                **Command Usage -> ``{platter.guild.prefix}{platter.command.command_usage}``**
+                """, # TODO: Add command usage string to command class.
+                colour = Colours.AKI_ORANGE
+            ),
             message = f"The command author missed the arguments -> '{missing_args_string[:-2]}'.",
             platter = platter, 
             delete_after = 10,
@@ -62,15 +59,17 @@ class MissingArgument(FrontEndErrors):
 class TooManyArguments(FrontEndErrors):
     def __init__(self, platter: GoldPlatter, logger: log.Logger = None):
         super().__init__(
-            title = ":heart: You gave me too many arguments.", 
-            description = f"""
-            This command doesn't take that many arguments or it doesn't take any arguments at all.
+            embed = Embed(
+                title = ":heart: You gave me too many arguments.", 
+                description = f"""
+                This command doesn't take that many arguments or it doesn't take any arguments at all.
 
-            **Command Usage -> ``{platter.guild.prefix}{platter.command.command_usage}``**
-            """, 
+                **Command Usage -> ``{platter.guild.prefix}{platter.command.command_usage}``**
+                """,
+                colour = Colours.RED
+            ),
             message = "The command author passed too many arguments.",
             platter = platter, 
-            embed_colour = Colours.RED,
             delete_after = 10,
             logger = logger
         )
@@ -79,11 +78,13 @@ class TooManyArguments(FrontEndErrors):
 class MissingPerms(FrontEndErrors):
     def __init__(self, platter: GoldPlatter, logger: log.Logger = None):
         super().__init__(
-            title = ":heart: No Perms!", 
-            description = "Sorry, you don't have the perms to run this command.",
+            embed = Embed(
+                title = ":heart: No Perms!", 
+                description = "Sorry, you don't have the perms to run this command.",
+                colour = Colours.RED
+            ),
             message = f"The command author '{platter.author.username}#{platter.author.discriminator}' doesn't have the perms to run this command.",
             platter = platter, 
-            embed_colour = Colours.RED,
             logger = logger
         )
 
@@ -91,11 +92,13 @@ class MissingPerms(FrontEndErrors):
 class ExtensionNotAllowedInGuild(FrontEndErrors):
     def __init__(self, platter: GoldPlatter, logger: log.Logger = None):
         super().__init__(
-            title = "🧡 Not Enabled In Guild!", 
-            description = "Sorry, the extension this command belongs to is not currently enabled in this guild (server).",
+            embed = Embed(
+                title = "🧡 Not Enabled In Guild!", 
+                description = "Sorry, the extension this command belongs to is not currently enabled in this guild (server).",
+                colour = Colours.AKI_ORANGE
+            ),
             message = f"The command's extension is not allowed in the guild '{platter.guild.code_name}', check the guild's config on the database.",
             platter = platter, 
-            embed_colour = Colours.AKI_ORANGE,
             logger = logger
         )
 
@@ -103,10 +106,12 @@ class ExtensionNotAllowedInGuild(FrontEndErrors):
 class OnlyAuthorCanInvokeRecipe(FrontEndErrors):
     def __init__(self, platter: GoldPlatter, logger: log.Logger = None):
         super().__init__(
-            title = "🧡 Only Author Can Invoke", 
-            description = "Sorry, only the command author can invoke this.",
+            embed = Embed(
+                title = "🧡 Only Author Can Invoke", 
+                description = "Sorry, only the command author can invoke this.",
+                colour = Colours.AKI_ORANGE
+            ),
             message = f"'{platter.author.username}#{platter.author.discriminator}' tried to invoke an 'author only' recipe.",
             platter = platter, 
-            embed_colour = Colours.AKI_ORANGE,
             logger = logger
         )

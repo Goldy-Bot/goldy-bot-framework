@@ -11,47 +11,47 @@ if TYPE_CHECKING:
 
 class Guild():
     """A goldy bot guild."""
-    def __init__(self, config_dict: dict, goldy: Goldy) -> None:
+    def __init__(self, db_data: dict, goldy: Goldy) -> None:
         self.goldy = goldy
-        self.config_dict = config_dict
+        self.db_data = db_data
 
     @property
     def id(self) -> str:
         """The guild's discord id"""
-        return self.config_dict["_id"]
+        return self.db_data["_id"]
 
     @property
     def code_name(self) -> str:
         """The goldy bot code name of the guild."""
-        return self.config_dict["code_name"]
+        return self.db_data["code_name"]
 
     @property
     def prefix(self) -> str:
         """The prefix the guild uses."""
-        return self.config_dict["prefix"]
+        return self.db_data["prefix"]
     
     @property
     def roles(self):
-        return self.config_dict["roles"]
+        return self.db_data["roles"]
     
     @property
     def channels(self):
-        return self.config_dict["channels"]
+        return self.db_data["channels"]
     
     @property
     def allowed_extensions(self) -> List[str]:
         """Returns the allowed extensions from this guild."""
-        return self.config_dict["extensions"]["allowed"]
+        return self.db_data["extensions"]["allowed"]
     
     @property
     def disallowed_extensions(self) -> List[str]:
         """Returns the disallowed extensions from this guild."""
-        return self.config_dict["extensions"]["disallowed"]
+        return self.db_data["extensions"]["disallowed"]
     
     @property
     def hidden_extensions(self) -> List[str]:
         """Returns the hidden extensions from this guild."""
-        return self.config_dict["extensions"]["hidden"]
+        return self.db_data["extensions"]["hidden"]
     
     def is_extension_allowed(self, extension: Extension) -> bool:
         """Returns True/False if this extension is allowed to function in this guild."""
@@ -75,6 +75,6 @@ class Guild():
         """Updates guild's data by fetching from database."""
         database = self.goldy.database.get_goldy_database(DatabaseEnums.GOLDY_MAIN)
 
-        self.config_dict = await database.find_one("guild_configs", query = {"_id": self.id})
+        self.db_data = await database.find_one("guild_configs", query = {"_id": self.id})
 
         return None

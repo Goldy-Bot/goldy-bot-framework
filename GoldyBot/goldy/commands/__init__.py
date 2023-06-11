@@ -319,6 +319,7 @@ class Command():
             sub_cmd_platter = GoldPlatter(
                 data = sub_cmd_data, 
                 type = platter.type, 
+                author = platter.author,
                 command = command[1],
                 goldy = self.goldy,
             )

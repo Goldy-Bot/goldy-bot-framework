@@ -23,7 +23,7 @@ classifiers = [
 dependencies = [
     "requests",
     "importlib-metadata; python_version<'3.8'",
-    "devgoldyutils>=2.4.3",
+    "devgoldyutils>=2.5",
     "nextcore@git+https://github.com/nextsnake/nextcore",
     "click>=8.1.3",
     "python-decouple>=3.7",
@@ -31,7 +31,9 @@ dependencies = [
     "cmd2",
     "pygame==2.3.0",
     "regex",
-    "psutil"
+    "psutil",
+    "dateparser",
+    "pytz"
 ]
 
 dynamic = ["version"]

@@ -25,11 +25,13 @@ class GoldPlatter():
 
     ✨ Behold the golden platter. ✨😁
     """
-    def __init__(self, data: MessageData|InteractionData, type: PlatterType|int, command: Command | Recipe, goldy: Goldy) -> None:
+    def __init__(self, data: MessageData|InteractionData, type: PlatterType|int, author: Member, command: Command | Recipe, goldy: Goldy) -> None:
         # TODO: We got to somehow test this stuff with pytest because this being error prone is sort of a catastrophe.
 
         self.data = data
         """The raw data received right from discord that triggered this prefix or slash command."""
+        self.author = author
+        """The member who triggered this platter."""
         self.command = command
         """The command object."""
         self.goldy = goldy
@@ -39,11 +41,6 @@ class GoldPlatter():
 
         self.type: PlatterType = (lambda x: PlatterType(x) if isinstance(x, int) else x)(type)
         """The type of command this is."""
-
-        if self.type.value == PlatterType.SLASH_CMD.value:
-            self.author = Member(data["member"]["user"], goldy)
-        else:
-            self.author = Member(data["author"], goldy)
 
         self.guild: Guild = self.goldy.guild_manager.get_guild(data["guild_id"])
 
