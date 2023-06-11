@@ -55,7 +55,7 @@ class Extensions(GoldyBot.Extension):
     async def enable(self, platter: GoldyBot.GoldPlatter, extension: str):
         extension: GoldyBot.Extension = cache_lookup(extension, extensions_cache)[1]
 
-        if extension.is_loaded:
+        if extension.is_loaded: # TODO: is loaded is not working correctly. FIX
             await platter.send_message(embeds = [self.extension_already_enabled], delete_after = 5)
             return
 
@@ -73,7 +73,7 @@ class Extensions(GoldyBot.Extension):
     async def disable(self, platter: GoldyBot.GoldPlatter, extension: str):
         extension: GoldyBot.Extension = cache_lookup(extension, extensions_cache)[1]
 
-        if not extension.is_loaded:
+        if extension.is_loaded is False:
             await platter.send_message(embeds = [self.extension_already_disabled], delete_after = 5)
             return
 
