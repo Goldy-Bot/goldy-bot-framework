@@ -79,6 +79,16 @@ class Extension():
     def loaded_path(self) -> str:
         """The path where this extension was loaded."""
         return self.__loaded_path
+    
+    @property
+    def is_loaded(self) -> bool:
+        """Returns whether the extension is loaded."""
+        if all([command.is_loaded for command in self.commands]):
+            return True
+
+        # I hope this doesn't fuck with us in the future. :)
+
+        return False
 
     async def unload(self) -> None:
         """Unloads and deletes itself from cache and all the commands with it."""

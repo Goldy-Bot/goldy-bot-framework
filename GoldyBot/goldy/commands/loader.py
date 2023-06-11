@@ -28,7 +28,7 @@ class CommandLoader():
         """Loads each command in this list."""
         ...
 
-    async def load(self, commands:List[Command] = None) -> None:
+    async def load(self, commands: List[Command] = None) -> None:
         """Loads/creates all commands that have been initialized in goldy bot."""
         if commands is None:
             commands = [x[1] for x in commands_cache]

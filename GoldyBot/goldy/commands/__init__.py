@@ -34,6 +34,7 @@ class Command():
         slash_options: Dict[str, ApplicationCommandOptionData] = None,
         allow_prefix_cmd: bool = True, 
         allow_slash_cmd: bool = True, 
+        hidden: bool = False,
         parent_cmd: Command = None
     ):
         """A class representing a GoldyBot command."""
@@ -51,6 +52,8 @@ class Command():
         """If the creation of a prefix command is allowed."""
         self.allow_slash_cmd = allow_slash_cmd
         """If the creation of a slash command is allowed."""
+        self.hidden = hidden
+        """Should this command be hidden? For slash commands the command is just set to admins only."""
         self.parent_cmd = parent_cmd
         """Command object of the parent command if this command is a subcommand."""
 
@@ -104,7 +107,7 @@ class Command():
     def extension(self) -> Extension | None:
         """Finds and returns the object of the command's extension. Returns None if command's extension is not found."""
         return (lambda x: x[1] if x is not None else None)(utils.cache_lookup(self.extension_name, extensions_cache))
-    
+
     @property
     def slash_cmd_payload(self) -> ApplicationCommandPayload:
         """Returns the payload needed to create a slash command."""
@@ -112,9 +115,10 @@ class Command():
             name = self.name,
             description = self.description,
             options = params_utils.params_to_options(self) + [sub_command[1].slash_cmd_payload for sub_command in self.sub_commands], # TODO: Add subcommands to this.
+            default_member_permissions = str(1 << 3) if self.hidden else None,
             type = 1
         )
-    
+
     @property
     def is_loaded(self) -> bool:
         """Returns whether the command has been loaded by the command loader or not."""
@@ -127,7 +131,7 @@ class Command():
             return False
 
         return True
-        
+
     @property
     def is_parent(self) -> bool:
         """Returns if the command is a parent of a sub command or not."""
@@ -135,7 +139,7 @@ class Command():
             return True
 
         return False
-    
+
     @property
     def command_usage(self) -> str:
         command_args_string = " "
