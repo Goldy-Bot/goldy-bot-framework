@@ -82,7 +82,7 @@ class Extension():
     
     @property
     def is_loaded(self) -> bool:
-        """Returns whether the extension is loaded."""
+        """Returns whether the extension is loaded. An extension is considered loaded when all of it's commands are loaded."""
         if all([command.is_loaded for command in self.commands]):
             return True
 

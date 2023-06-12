@@ -94,7 +94,7 @@ class Command():
                 (self.name, self)
             )
 
-        self.__loaded = False
+        self.__loaded = True
 
         self.logger.debug("Command initialized!")
 
