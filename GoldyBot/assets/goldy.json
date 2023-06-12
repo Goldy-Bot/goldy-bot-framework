@@ -2,6 +2,7 @@
     "goldy" : {
         "extensions": {
             "ignored_extensions" : [],
+            "late_load_extensions": [],
 
             "raise_on_load_error" : true,
             "folder_location" : "./extensions"
