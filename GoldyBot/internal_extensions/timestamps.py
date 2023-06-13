@@ -9,7 +9,6 @@ from GoldyBot import (
 )
 
 import pytz
-from datetime import datetime
 
 class Timestamps(GoldyBot.Extension):
     """⏱️ Timestamps extension ported over from Goldy Bot V4 to V5. ⚡"""
@@ -74,7 +73,7 @@ class Timestamps(GoldyBot.Extension):
         else:
             datetime_formats = ["%d/%m/%Y %H:%M", "%d.%m.%Y %H:%M"] if date_format == 0 else ["%Y/%m/%d %H:%M", "%Y.%m.%d %H:%M"]
 
-        datetime: datetime = get_datetime(f"{date} {time}", option = HumanDatetimeOptions.BOTH, datetime_formats = datetime_formats)
+        datetime = get_datetime(f"{date} {time}", option = HumanDatetimeOptions.BOTH, datetime_formats = datetime_formats)
 
         # TODO: Phrase the timezone. (idk, maybe add some convenient aliases.)
 
