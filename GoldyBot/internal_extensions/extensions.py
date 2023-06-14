@@ -1,9 +1,7 @@
 from __future__ import annotations
 
-from typing import Tuple
-
 import GoldyBot
-from GoldyBot import cache_lookup, front_end_errors
+from GoldyBot import cache_lookup
 from GoldyBot.goldy.extensions import extensions_cache
 
 class Extensions(GoldyBot.Extension):

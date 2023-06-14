@@ -97,7 +97,7 @@ class CommandIsDisabled(FrontEndErrors):
                 description = "Sorry, the extension this command belongs to is currently disabled.",
                 colour = Colours.RED
             ),
-            message = f"The command's extension is disabled.",
+            message = "The command's extension is disabled.",
             platter = platter, 
             logger = logger
         )
