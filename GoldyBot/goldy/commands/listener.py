@@ -109,18 +109,17 @@ class CommandListener():
             # i really hope this doesn't break
             command: Tuple[str, Command] = utils.cache_lookup(message["content"].split(" ")[0][1:], commands_cache)
 
-            if command is not None:
-                if command[1].allow_prefix_cmd:
-                    gold_platter = GoldPlatter(
-                        data = message, 
-                        type = objects.PlatterType.PREFIX_CMD, 
-                        author = objects.Member(message["author"], guild, self.goldy),
-                        command = command[1],
-                        goldy = self.goldy,
-                    )
-                    
-                    await command[1].invoke(
-                        gold_platter
-                    )
+            if command is not None and command[1].allow_prefix_cmd: # TODO: move this to invoke method and add a front end exception.
+                gold_platter = GoldPlatter(
+                    data = message, 
+                    type = objects.PlatterType.PREFIX_CMD, 
+                    author = objects.Member(message["author"], guild, self.goldy),
+                    command = command[1],
+                    goldy = self.goldy,
+                )
+                
+                await command[1].invoke(
+                    gold_platter
+                )
         
         return None

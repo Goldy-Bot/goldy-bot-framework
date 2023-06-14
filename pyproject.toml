@@ -68,7 +68,7 @@ packages = ["GoldyBot"]
 
 [project.scripts]
 goldybot = "GoldyBot.cli.__main__:goldy_bot"
-
+goldy_bot = "GoldyBot.cli.__main__:goldy_bot"
 
 
 # Ruff

@@ -74,14 +74,45 @@ class Extension():
     def name(self) -> str:
         """Name of extension."""
         return self.__class__.__name__
-    
+
     @property
     def loaded_path(self) -> str:
         """The path where this extension was loaded."""
         return self.__loaded_path
 
+    @property
+    def is_disabled(self) -> bool:
+        """Returns true/false whether the extension is disabled. An extension is considered disabled when all of it's commands are also disabled."""
+        if all([command.is_disabled for command in self.commands]):
+            return True
+
+        # I hope this doesn't fuck with us in the future. :)
+
+        return False
+    
+    def disable(self) -> None:
+        """A method to disable this extension."""
+        self.logger.info("Disabling all commands in extension...")
+        for command in self.commands:
+            command.disable()
+            self.logger.debug(f"Disabled '{command.name}'.")
+
+        return None
+    
+    def enable(self) -> None:
+        """A method to enable this extension."""
+        self.logger.info("Enabling all commands in extension...")
+        for command in self.commands:
+            self.logger.debug(f"Enabled '{command.name}'.")
+            command.enable()
+
+        return None
+
     async def unload(self) -> None:
-        """Unloads and deletes itself from cache and all the commands with it."""
+        """
+        Unloads and deletes itself from cache and all the commands with it. 
+        You won't be able to load the extension again without the load path.
+        """
         for command in self.commands:
             await command.unload()
 

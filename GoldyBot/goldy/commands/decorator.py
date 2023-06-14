@@ -15,7 +15,8 @@ def command(
     required_roles: List[str]=None, 
     slash_options: Dict[str, SlashOption] = None,
     slash_cmd_only:bool = False, 
-    normal_cmd_only:bool = False
+    normal_cmd_only:bool = False,
+    hidden: bool = False
 ):
     """
     Add a command to Goldy Bot with this decorator.
@@ -54,7 +55,8 @@ def command(
                 required_roles = required_roles, 
                 slash_options = slash_options,
                 allow_prefix_cmd = create_normal, 
-                allow_slash_cmd = create_slash
+                allow_slash_cmd = create_slash,
+                hidden = hidden
             )
         
         return inner(func)

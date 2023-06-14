@@ -22,7 +22,12 @@ class GoldyConfig(Config):
     @property
     def ignored_extensions(self) -> List[str]:
         """Returns code name of all ignored extensions from ``goldy.json``."""
-        return self.get("goldy", "extensions", "ignored_extensions")
+        return self.get("goldy", "extensions", "ignored_extensions", default=[])
+    
+    @property
+    def late_load_extensions(self) -> List[str]:
+        """Returns code name of all late load extensions from ``goldy.json``."""
+        return self.get("goldy", "extensions", "late_load_extensions", default=[])
 
     @property
     def extension_folder_location(self) -> str:
@@ -42,7 +47,7 @@ class GoldyConfig(Config):
 
         if data is None:
             raise GoldyBotError(
-                "allowed_guilds was not specified in goldy.json. Please don't alter this json file."
+                "allowed_guilds was not specified in goldy.json. Please don't alter the json file like that."
             )
 
         # Removes template from dict if it exists.
