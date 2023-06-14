@@ -48,7 +48,7 @@ class CommandLoader():
             if command.allow_slash_cmd:
                 slash_command_payloads.append(command.slash_cmd_payload)
 
-            command.__loaded = True
+            command._loaded = True
 
             self.logger.debug(
                 f"Command '{command.name}' loaded and slash cmd payload grabbed."

@@ -1,9 +1,7 @@
 from __future__ import annotations
 
-from typing import Tuple
-
 import GoldyBot
-from GoldyBot import cache_lookup, front_end_errors
+from GoldyBot import cache_lookup
 from GoldyBot.goldy.extensions import extensions_cache
 
 class Extensions(GoldyBot.Extension):
@@ -55,11 +53,11 @@ class Extensions(GoldyBot.Extension):
     async def enable(self, platter: GoldyBot.GoldPlatter, extension: str):
         extension: GoldyBot.Extension = cache_lookup(extension, extensions_cache)[1]
 
-        if extension.is_loaded: # TODO: is loaded is not working correctly. FIX
+        if not extension.is_disabled:
             await platter.send_message(embeds = [self.extension_already_enabled], delete_after = 5)
             return
 
-        await self.goldy.extension_loader.load([extension.loaded_path])
+        extension.enable()
         await platter.send_message(embeds = [self.extension_enabled])
 
     @extensions.sub_command(
@@ -73,11 +71,11 @@ class Extensions(GoldyBot.Extension):
     async def disable(self, platter: GoldyBot.GoldPlatter, extension: str):
         extension: GoldyBot.Extension = cache_lookup(extension, extensions_cache)[1]
 
-        if extension.is_loaded is False:
+        if extension.is_disabled:
             await platter.send_message(embeds = [self.extension_already_disabled], delete_after = 5)
             return
 
-        await extension.unload()
+        extension.disable()
         await platter.send_message(embeds = [self.extension_disabled])
 
 def load():
