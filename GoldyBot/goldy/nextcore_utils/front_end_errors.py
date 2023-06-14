@@ -89,6 +89,20 @@ class MissingPerms(FrontEndErrors):
         )
 
 
+class CommandIsDisabled(FrontEndErrors):
+    def __init__(self, platter: GoldPlatter, logger: log.Logger = None):
+        super().__init__(
+            embed = Embed(
+                title = "❤️ This command is disabled!", 
+                description = "Sorry, the extension this command belongs to is currently disabled.",
+                colour = Colours.RED
+            ),
+            message = f"The command's extension is disabled.",
+            platter = platter, 
+            logger = logger
+        )
+
+
 class ExtensionNotAllowedInGuild(FrontEndErrors):
     def __init__(self, platter: GoldPlatter, logger: log.Logger = None):
         super().__init__(

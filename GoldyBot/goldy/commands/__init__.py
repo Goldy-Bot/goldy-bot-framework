@@ -94,7 +94,7 @@ class Command():
                 (self.name, self)
             )
 
-        self.__loaded = True
+        self.__is_disabled = False
 
         self.logger.debug("Command initialized!")
 
@@ -122,7 +122,12 @@ class Command():
     @property
     def is_loaded(self) -> bool:
         """Returns whether the command has been loaded by the command loader or not."""
-        return self.__loaded
+        return self._loaded
+
+    @property
+    def is_disabled(self) -> bool:
+        """Returns whether the command is disabled or not."""
+        return self.__is_disabled
 
     @property
     def is_child(self) -> bool:
@@ -223,6 +228,9 @@ class Command():
         if gold_platter.guild.is_extension_allowed(gold_platter.command.extension) is False:
             raise front_end_errors.ExtensionNotAllowedInGuild(gold_platter, self.logger)
 
+        if gold_platter.command.is_disabled:
+            raise front_end_errors.CommandIsDisabled(gold_platter, self.logger)
+
         if await self.__got_perms(gold_platter):
 
             # Prefix/normal command.
@@ -309,7 +317,7 @@ class Command():
                         sub_cmd_data["data"]["options"] = option["options"]
                         break
 
-        else: # TODO: Now add this shit for prefix commands. 💀💀💀
+        else:
             for arg in invoke_data["content"].split(" ")[1:]:
                 command = utils.cache_lookup(arg, self.sub_commands)
 
@@ -391,10 +399,18 @@ class Command():
         
         return True
 
+    def disable(self) -> None:
+        """A method to disable this command."""
+        self.__is_disabled = True
+
+    def enable(self) -> None:
+        """A method to enable this command."""
+        self.__is_disabled = False
+
     async def unload(self) -> None:
         """Unloads and removes the command from cache."""
 
-        self.__loaded = False
+        self._loaded = False
 
         commands_cache.remove(
             (self.name, self)
