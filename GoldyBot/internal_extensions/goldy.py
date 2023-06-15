@@ -46,7 +46,7 @@ class Goldy(GoldyBot.Extension):
             colour = Colours.YELLOW,
             thumbnail = GoldyBot.EmbedImage(self.goldy.bot_user.avatar_url)
         )
-    
+
     @GoldyBot.command(name="goldy", description="💛 Shows you stats about the current Goldy Bot framework instance.", required_roles=[GoldyBot.Perms.BOT_DEV])
     async def goldy_cmd(self, platter: GoldyBot.GoldPlatter):
         embed = self.goldy_embed.copy()

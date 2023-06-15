@@ -77,13 +77,22 @@ class TooManyArguments(FrontEndErrors):
 
 class MissingPerms(FrontEndErrors):
     def __init__(self, platter: GoldPlatter, logger: log.Logger = None):
+        # Don't raise front end error if the command is hidden and is a prefix command.
+        # This insures prefix commands are truly hidden.
+        # The git issue: https://github.com/Goldy-Bot/Goldy-Bot-V5/issues/54
+
+        message = f"The command author '{platter.author.username}#{platter.author.discriminator}' doesn't have the perms to run this command."
+
+        if platter.command.hidden and platter.type == PlatterType.PREFIX_CMD:
+            raise errors.GoldyBotError(message)
+
         super().__init__(
             embed = Embed(
                 title = ":heart: No Perms!", 
                 description = "Sorry, you don't have the perms to run this command.",
                 colour = Colours.RED
             ),
-            message = f"The command author '{platter.author.username}#{platter.author.discriminator}' doesn't have the perms to run this command.",
+            message = message,
             platter = platter, 
             logger = logger
         )
