@@ -60,7 +60,7 @@ class GoldyDB():
             return None
 
     async def find_one(self, collection: str, query: dict) -> (dict | None):
-        """Searches for and returns specific data from a collection in this database."""
+        """Searches for and returns specific data (document) from a collection in this database."""
         data = await self.database[collection].find_one(query)
 
         if data is not None:
