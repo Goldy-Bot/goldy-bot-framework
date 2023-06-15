@@ -14,8 +14,7 @@ def command(
     description: str = None, 
     required_roles: List[str]=None, 
     slash_options: Dict[str, SlashOption] = None,
-    slash_cmd_only:bool = False, 
-    normal_cmd_only:bool = False,
+    slash_cmd_only: bool = False, 
     hidden: bool = False
 ):
     """
@@ -42,11 +41,6 @@ def command(
         def inner(func) -> Command:
             goldy = get_goldy_instance()
 
-            create_slash = True; create_normal = True
-
-            if slash_cmd_only: create_normal = False
-            if normal_cmd_only: create_slash = False
-
             return Command(
                 goldy = goldy, 
                 func = func, 
@@ -54,8 +48,7 @@ def command(
                 description = description, 
                 required_roles = required_roles, 
                 slash_options = slash_options,
-                allow_prefix_cmd = create_normal, 
-                allow_slash_cmd = create_slash,
+                allow_prefix_cmd = False if slash_cmd_only else True, 
                 hidden = hidden
             )
         

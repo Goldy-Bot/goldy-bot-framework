@@ -44,9 +44,7 @@ class CommandLoader():
                 continue
 
             command.extension.commands.append(command)
-
-            if command.allow_slash_cmd:
-                slash_command_payloads.append(command.slash_cmd_payload)
+            slash_command_payloads.append(command.slash_cmd_payload)
 
             command._loaded = True
 

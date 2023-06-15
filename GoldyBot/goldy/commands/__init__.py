@@ -33,7 +33,6 @@ class Command():
         required_roles: List[str] = None, 
         slash_options: Dict[str, ApplicationCommandOptionData] = None,
         allow_prefix_cmd: bool = True, 
-        allow_slash_cmd: bool = True, 
         hidden: bool = False,
         parent_cmd: Command = None
     ):
@@ -49,9 +48,7 @@ class Command():
         self.slash_options = slash_options
         """Allows you to customize slash command arguments and make them beautiful 🥰."""
         self.allow_prefix_cmd = allow_prefix_cmd
-        """If the creation of a prefix command is allowed."""
-        self.allow_slash_cmd = allow_slash_cmd
-        """If the creation of a slash command is allowed."""
+        """If the creation of a prefix command is allowed. Slash commands are now ALWAYS created since v5.0dev5."""
         self.hidden = hidden
         """Should this command be hidden? For slash commands the command is just set to admins only."""
         self.parent_cmd = parent_cmd
@@ -208,7 +205,6 @@ class Command():
                     required_roles = required_roles, 
                     slash_options = slash_options,
                     allow_prefix_cmd = self.allow_prefix_cmd, 
-                    allow_slash_cmd = self.allow_slash_cmd,
                     parent_cmd = self
                 )
 
