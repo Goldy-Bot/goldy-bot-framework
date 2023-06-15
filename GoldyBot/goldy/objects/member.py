@@ -6,7 +6,7 @@ from devgoldyutils import DictClass, Colours
 
 from ... import goldy_bot_logger, LoggerAdapter
 from ..nextcore_utils import DISCORD_CDN
-from ..database.wrapper import DatabaseWrapper
+from ..database.wrappers.member import MemberDBWrapper
 
 if TYPE_CHECKING:
     from .. import Goldy
@@ -22,7 +22,7 @@ class Member(DictClass):
 
         super().__init__(LoggerAdapter(logger, prefix=Colours.GREY.apply(data['username'])))
 
-        self.db_wrapper = DatabaseWrapper(self)
+        self.db_wrapper = MemberDBWrapper(self)
 
     @property
     def id(self) -> str:
@@ -45,7 +45,7 @@ class Member(DictClass):
         return DISCORD_CDN + f"avatars/{self.id}/{self.get('avatar')}.png?size=4096"
 
     @property
-    async def database(self) -> DatabaseWrapper:
+    async def database(self) -> MemberDBWrapper:
         """Get member's database wrapper."""
         if self.db_wrapper.data == {}:
             await self.db_wrapper.update()

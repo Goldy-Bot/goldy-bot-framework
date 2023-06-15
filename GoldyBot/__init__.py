@@ -16,7 +16,7 @@ from .goldy.commands.decorator import command
 from .goldy.utils import *
 
 from .goldy.database import DatabaseEnums
-from .goldy.database.wrapper import DatabaseWrapper
+from .goldy.database.wrappers import DatabaseWrapper
 
 from .goldy import nextcore_utils
 from .goldy.nextcore_utils import (

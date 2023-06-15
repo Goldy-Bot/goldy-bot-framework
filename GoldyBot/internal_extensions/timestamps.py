@@ -9,6 +9,7 @@ from GoldyBot import (
 )
 
 import pytz
+import datetime as dt
 
 class Timestamps(GoldyBot.Extension):
     """⏱️ Timestamps extension ported over from Goldy Bot V4 to V5. ⚡"""
@@ -43,9 +44,17 @@ class Timestamps(GoldyBot.Extension):
         ...
 
     @timestamp.sub_command(description = "Sends a discord timestamp of that time and date.", slash_options = {
-        "date": GoldyBot.SlashOption(description="The date goes here like example, 13.08.2022 or even 2022/08/22.", required=True),
-        "time": GoldyBot.SlashOption(description="The time goes here like example, 15:00.", required=True),
-        "flag": GoldyBot.SlashOption(description="Choose a flag.", required=True, 
+        "date": GoldyBot.SlashOption(
+            description = "The date goes here like example, 13.08.2022 or even 2022/08/22.", 
+            required = True,
+        ),
+        "time": GoldyBot.SlashOption(
+            description = "The time goes here like example, 15:00.", 
+            required = True
+        ),
+        "flag": GoldyBot.SlashOption(
+            description = "Choose a flag.", 
+            required = True, 
             choices = [
                 GoldyBot.SlashOptionChoice("08/13/2022", "d"),
                 GoldyBot.SlashOptionChoice("August 13, 2022", "D"),
@@ -56,7 +65,8 @@ class Timestamps(GoldyBot.Extension):
                 GoldyBot.SlashOptionChoice("in 3 hours", "R")
             ]
         ),
-        "timezone": GoldyBot.SlashOption(description="The timezone to use. Goldy Bot defaults to Europe/London timezone.", required=False),
+        "timezone": GoldyBot.SlashOption(
+            description = "The timezone to use. Goldy Bot defaults to Europe/London timezone.", required=False),
         "date_format": GoldyBot.SlashOption(description="The format we should read your date in. The order more specifically.", 
             choices = [
                 GoldyBot.SlashOptionChoice("D/M/Y", 0),
@@ -72,6 +82,12 @@ class Timestamps(GoldyBot.Extension):
             datetime_formats = (lambda x: x if x is not None else self.default_datetime_formats)(member_data.get("datetime_formats", optional=True))
         else:
             datetime_formats = ["%d/%m/%Y %H:%M", "%d.%m.%Y %H:%M"] if date_format == 0 else ["%Y/%m/%d %H:%M", "%Y.%m.%d %H:%M"]
+
+        if date == "today":
+            date = dt.datetime.now().strftime(datetime_formats[0][:8])
+
+        if time == "now":
+            time = dt.datetime.now().strftime(datetime_formats[0][9:])
 
         datetime = get_datetime(f"{date} {time}", option = HumanDatetimeOptions.BOTH, datetime_formats = datetime_formats)
 
