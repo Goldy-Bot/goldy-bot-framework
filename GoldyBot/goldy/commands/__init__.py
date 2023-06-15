@@ -295,7 +295,7 @@ class Command():
                     await self.__invoke_sub_cmd(data, gold_platter)
 
             return True
-        
+
         # If member has no perms raise MissingPerms exception.
         raise front_end_errors.MissingPerms(gold_platter, self.logger)
 
