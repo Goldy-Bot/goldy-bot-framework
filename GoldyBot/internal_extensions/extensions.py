@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import GoldyBot
-from GoldyBot import cache_lookup
+from GoldyBot import cache_lookup, Perms
 from GoldyBot.goldy.extensions import extensions_cache
 
 class Extensions(GoldyBot.Extension):
@@ -38,7 +38,7 @@ class Extensions(GoldyBot.Extension):
             colour = GoldyBot.Colours.GREY # TODO: Replace this with brown.
         )
 
-    @GoldyBot.command(hidden = True)
+    @GoldyBot.command(hidden = True, required_roles = [Perms.BOT_DEV])
     async def extensions(self, platter: GoldyBot.GoldPlatter):
         ...
 

@@ -8,7 +8,7 @@ from nextcore.http import Route
 from nextcore.http.errors import BadRequestError
 
 from . import params_utils
-from .. import utils
+from .. import utils, perms
 from ..nextcore_utils import front_end_errors
 from ..objects import GoldPlatter, PlatterType
 from ... import LoggerAdapter, goldy_bot_logger
@@ -73,7 +73,7 @@ class Command():
             self.required_roles = []
         else:
             # This makes sure the GoldyBot.Perms enum objects are converted to their string values.
-            self.required_roles = [str(role) for role in self.required_roles]
+            self.required_roles = [role.value if isinstance(role, perms.Perms) else role for role in self.required_roles]
 
         if self.slash_options is None:
             self.slash_options = {}
