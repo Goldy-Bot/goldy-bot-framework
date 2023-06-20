@@ -5,6 +5,7 @@ from devgoldyutils import Colours
 from discord_typings import InteractionCreateData, MessageData
 
 from . import commands_cache, Command
+from ..nextcore_utils import Button
 from ..nextcore_utils.components import Recipe, registered_recipes
 from .. import utils, objects
 from ... import LoggerAdapter, goldy_bot_logger
@@ -71,8 +72,8 @@ class CommandListener():
 
             # Message components.
             # --------------------
-            if interaction["type"] == 3:
-                message_component: Tuple[str, Recipe] = utils.cache_lookup(interaction["data"]["custom_id"], registered_recipes)
+            elif interaction["type"] == 3:
+                message_component: Tuple[str, Button] = utils.cache_lookup(interaction["data"]["custom_id"], registered_recipes)
 
                 if message_component is not None:
                     gold_platter = GoldPlatter(
@@ -88,6 +89,25 @@ class CommandListener():
                         message_component[1].cmd_platter
                     )
 
+
+            # Command auto complete
+            # -----------------------
+            elif interaction["type"] == 4:
+                auto_complete_recipe: Tuple[str, Recipe] = utils.cache_lookup(interaction["data"]["id"], registered_recipes)
+
+                if auto_complete_recipe is not None:
+                    gold_platter = GoldPlatter(
+                        data = interaction, 
+                        type = objects.PlatterType.SLASH_CMD, 
+                        author = author,
+                        command = message_component[1],
+                        goldy = self.goldy,
+                    )
+
+                    await auto_complete_recipe[1].invoke(
+                        gold_platter,
+                        auto_complete_recipe[1].cmd_platter
+                    )
 
         return None
 

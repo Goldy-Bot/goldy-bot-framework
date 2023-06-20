@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from enum import Enum
-from typing import List, Literal
+from typing import List, Literal, overload
 from discord_typings import ApplicationCommandOptionData
 from discord_typings.interactions.commands import StrCommandOptionChoiceData, IntCommandOptionChoiceData
 
@@ -77,6 +77,30 @@ class SlashOption(dict):
         Each SlashOptionChoice MUST have the same value type or else you'll get an invalid form body error from discord :)
 
     """
+    @overload
+    def __init__(
+        self, 
+        name: str = None, 
+        description: str = None, 
+        choices: List[SlashOptionChoice] = None, 
+        type: SlashOptionTypes | Literal[6, 7, 8, 11] = None,
+        auto_complete: Literal[False] = False,
+        required: bool = True, 
+        **extra: ApplicationCommandOptionData
+    ) -> None:
+        ...
+
+    @overload
+    def __init__(
+        self, 
+        name: str = None, 
+        description: str = None, 
+        type: SlashOptionTypes | Literal[6, 7, 8, 11] = None,
+        auto_complete: Literal[True] = True,
+        required: bool = True, 
+        **extra: ApplicationCommandOptionData
+    ) -> None:
+        ...
 
     def __init__(
         self, 
@@ -102,10 +126,8 @@ class SlashOption(dict):
         if choices is not None:
             allowed_type = type_(choices[0]["value"])
 
-            for choice in choices:
-                if not type_(choice["value"]) == allowed_type:
-                    raise GoldyBotError("All choices got to have the same value type!")
-
+            if all([type_(choice["value"]) == allowed_type for choice in choices]):
+                raise GoldyBotError("All choices got to have the same value type!")
 
         if type is not None:
 
@@ -137,7 +159,8 @@ class SlashOption(dict):
             self.data["choices"] = choices
 
         if auto_complete is True:
-            # Enable listening of auto complete and then pass the choices there instead.
+            # TODO: Enable listening of auto complete and then pass the choices there instead.
+            # TODO: Add listening for auto complete.
             ...
 
         self.data["autocomplete"] = auto_complete
@@ -147,4 +170,3 @@ class SlashOption(dict):
         self.data.update(extra)
         
         super().__init__(self.data)
-

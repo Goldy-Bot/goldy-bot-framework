@@ -42,7 +42,7 @@ class Recipe(dict):
             
         super().__init__(data)
 
-    async def invoke(self, platter: objects.GoldPlatter, cmd_platter: objects.GoldPlatter) -> None:
+    async def invoke(self, platter: objects.GoldPlatter, cmd_platter: objects.GoldPlatter) -> Any:
         """Runs/triggers this recipe. This method is usually used internally."""
         self.logger.debug("Attempting to invoke RECIPE...")
 
@@ -51,10 +51,11 @@ class Recipe(dict):
                 raise front_end_errors.OnlyAuthorCanInvokeRecipe(platter, self.logger)
 
         try:
-            await self.callback(
+            value = await self.callback(
                 platter,
                 **self.callback_args
             )
+            return value
         
         except TypeError as e:
             if "object NoneType can't be used in 'await' expression" in e.args[0]:
