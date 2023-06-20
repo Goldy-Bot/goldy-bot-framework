@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import List
 from discord_typings import ApplicationCommandOptionData
 
-from GoldyBot.goldy.nextcore_utils.slash_options.slash_option import SlashOptionChoice, SlashOptionTypes
+from GoldyBot.goldy.nextcore_utils.slash_options.slash_option import SlashOptionChoice
 
 from .slash_option import SlashOption
 
