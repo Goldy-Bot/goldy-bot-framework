@@ -2,11 +2,12 @@ from __future__ import annotations
 
 from typing import Tuple, TYPE_CHECKING
 from devgoldyutils import Colours
-from discord_typings import InteractionCreateData, MessageData
+from discord_typings import InteractionCreateData, MessageData, ApplicationCommandOptionInteractionData
 
 from . import commands_cache, Command
 from ..nextcore_utils import Button
 from ..nextcore_utils.components import registered_recipes
+from ..nextcore_utils.slash_options.auto_complete.send import send_auto_complete
 from .. import utils, objects
 from ... import LoggerAdapter, goldy_bot_logger
 from ..objects.golden_platter import GoldPlatter
@@ -53,7 +54,6 @@ class CommandListener():
             # Slash command.
             # ---------------
             if interaction["type"] == 2:
-
                 command: Tuple[str, Command] = utils.cache_lookup(interaction["data"]["name"], commands_cache)
 
                 if command is not None:
@@ -93,20 +93,21 @@ class CommandListener():
             # Command auto complete
             # -----------------------
             elif interaction["type"] == 4:
-                auto_complete_recipe: Tuple[str, ] = utils.cache_lookup(interaction["data"]["id"], registered_recipes)
+                command: Tuple[str, Command] = utils.cache_lookup(interaction["data"]["name"], commands_cache)
 
-                if auto_complete_recipe is not None:
-                    gold_platter = GoldPlatter(
-                        data = interaction, 
-                        type = objects.PlatterType.SLASH_CMD, 
-                        author = author,
-                        command = message_component[1],
+                current_typing_option: ApplicationCommandOptionInteractionData = None
+
+                for option in interaction["data"]["options"]:
+                    if option.get("focused"):
+                        current_typing_option = option
+                        break
+
+                if command is not None:
+                    await send_auto_complete(
+                        data = interaction,
                         goldy = self.goldy,
-                    )
-
-                    await auto_complete_recipe[1].invoke(
-                        gold_platter,
-                        auto_complete_recipe[1].cmd_platter
+                        current_typing_option = current_typing_option,
+                        command = command[1]
                     )
 
         return None

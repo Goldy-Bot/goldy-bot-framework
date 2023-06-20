@@ -5,7 +5,7 @@ from discord_typings import ApplicationCommandOptionData
 
 from GoldyBot.goldy.nextcore_utils.slash_options.slash_option import SlashOptionChoice
 
-from .slash_option import SlashOption
+from ..slash_option import SlashOption
 
 class SlashOptionAutoComplete(SlashOption):
     def __init__(

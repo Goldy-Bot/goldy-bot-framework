@@ -103,7 +103,7 @@ class SlashOption(dict):
 
             allowed_type = type_(choices[0]["value"])
 
-            if all([type_(choice["value"]) == allowed_type for choice in choices]):
+            if not all([type_(choice["value"]) == allowed_type for choice in choices]):
                 raise GoldyBotError("All choices got to have the same value type!")
 
         if type is not None:

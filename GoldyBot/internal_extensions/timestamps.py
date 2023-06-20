@@ -146,14 +146,15 @@ class Timestamps(GoldyBot.Extension):
                 delete_after = 30,
                 logger = self.logger
             )
-        
+
+    """
     @create.auto_complete()
     async def create_custom_auto_complete(self, platter: GoldyBot.GoldPlatter):
         # TODO: This may be alright for custom auto completes but I REALLY don't want to do it this way.
         # I want a similar implementation as what I did with callback in buttons. 
         # So perhaps we should have another SlashOption class but for auto completion.
         ...
-
+    """
 
     @timestamp.sub_command(description = "Allows you to sets default timezone and date format for /timestamp command.", slash_options = {
         "timezone" : GoldyBot.SlashOption(
