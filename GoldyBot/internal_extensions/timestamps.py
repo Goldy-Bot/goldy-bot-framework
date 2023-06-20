@@ -44,12 +44,18 @@ class Timestamps(GoldyBot.Extension):
         ...
 
     @timestamp.sub_command(description = "Sends a discord timestamp of that time and date.", slash_options = {
-        "date": GoldyBot.SlashOption(
+        "date": GoldyBot.SlashOptionAutoComplete(
             description = "The date goes here like example, 13.08.2022 or even 2022/08/22.", 
+            recommendations = [
+                "today"
+            ],
             required = True,
         ),
-        "time": GoldyBot.SlashOption(
+        "time": GoldyBot.SlashOptionAutoComplete(
             description = "The time goes here like example, 15:00.", 
+            recommendations = [
+                "now"
+            ],
             required = True
         ),
         "flag": GoldyBot.SlashOption(
@@ -66,8 +72,9 @@ class Timestamps(GoldyBot.Extension):
             ]
         ),
         "timezone": GoldyBot.SlashOption(
-            description = "The timezone to use. Goldy Bot defaults to Europe/London timezone.", required=False),
-        "date_format": GoldyBot.SlashOption(description="The format we should read your date in. The order more specifically.", 
+            description = "The timezone to use. Goldy Bot defaults to Europe/London timezone.", required = False),
+        "date_format": GoldyBot.SlashOption(
+            description = "The format we should read your date in. The order more specifically.", 
             choices = [
                 GoldyBot.SlashOptionChoice("D/M/Y", 0),
                 GoldyBot.SlashOptionChoice("Y/M/D", 1)

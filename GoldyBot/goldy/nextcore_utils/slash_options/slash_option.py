@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from enum import Enum
-from typing import List, Literal, overload
+from typing import List, Literal
 from discord_typings import ApplicationCommandOptionData
 from discord_typings.interactions.commands import StrCommandOptionChoiceData, IntCommandOptionChoiceData
 
@@ -77,38 +77,12 @@ class SlashOption(dict):
         Each SlashOptionChoice MUST have the same value type or else you'll get an invalid form body error from discord :)
 
     """
-    @overload
     def __init__(
         self, 
         name: str = None, 
         description: str = None, 
-        choices: List[SlashOptionChoice] = None, 
+        choices: List[SlashOptionChoice | str] = None, 
         type: SlashOptionTypes | Literal[6, 7, 8, 11] = None,
-        auto_complete: Literal[False] = False,
-        required: bool = True, 
-        **extra: ApplicationCommandOptionData
-    ) -> None:
-        ...
-
-    @overload
-    def __init__(
-        self, 
-        name: str = None, 
-        description: str = None, 
-        type: SlashOptionTypes | Literal[6, 7, 8, 11] = None,
-        auto_complete: Literal[True] = True,
-        required: bool = True, 
-        **extra: ApplicationCommandOptionData
-    ) -> None:
-        ...
-
-    def __init__(
-        self, 
-        name: str = None, 
-        description: str = None, 
-        choices: List[SlashOptionChoice] = None, 
-        type: SlashOptionTypes | Literal[6, 7, 8, 11] = None,
-        auto_complete: bool = False,
         required: bool = True, 
         **extra: ApplicationCommandOptionData
     ) -> None:
@@ -124,6 +98,9 @@ class SlashOption(dict):
 
         # Check if all choices are same type.
         if choices is not None:
+            if isinstance(choices, str):
+                choices = [SlashOptionChoice(x, x) for x in choices]
+
             allowed_type = type_(choices[0]["value"])
 
             if all([type_(choice["value"]) == allowed_type for choice in choices]):
@@ -155,15 +132,8 @@ class SlashOption(dict):
         self.data["name"] = name # If this is None it will get handled by the nextcore_utils.params_to_options() function respectively.
         self.data["description"] = description
 
-        if choices is not None and auto_complete is False:
+        if choices is not None:
             self.data["choices"] = choices
-
-        if auto_complete is True:
-            # TODO: Enable listening of auto complete and then pass the choices there instead.
-            # TODO: Add listening for auto complete.
-            ...
-
-        self.data["autocomplete"] = auto_complete
 
         self.data["required"] = required
 

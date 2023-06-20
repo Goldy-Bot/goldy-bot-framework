@@ -6,7 +6,8 @@ from discord_typings import InteractionCreateData, MessageData
 
 from . import commands_cache, Command
 from ..nextcore_utils import Button
-from ..nextcore_utils.components import Recipe, registered_recipes
+from ..nextcore_utils.components import registered_recipes
+from ..nextcore_utils.slash_options.auto_complete import auto_complete_sessions
 from .. import utils, objects
 from ... import LoggerAdapter, goldy_bot_logger
 from ..objects.golden_platter import GoldPlatter
@@ -93,7 +94,7 @@ class CommandListener():
             # Command auto complete
             # -----------------------
             elif interaction["type"] == 4:
-                auto_complete_recipe: Tuple[str, Recipe] = utils.cache_lookup(interaction["data"]["id"], registered_recipes)
+                auto_complete_recipe: Tuple[str, ] = utils.cache_lookup(interaction["data"]["id"], registered_recipes)
 
                 if auto_complete_recipe is not None:
                     gold_platter = GoldPlatter(

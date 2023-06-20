@@ -23,6 +23,7 @@ from .goldy.nextcore_utils import (
     Colours,
     Embed, EmbedField, EmbedImage,
     SlashOption, SlashOptionChoice, SlashOptionTypes,
+    SlashOptionAutoComplete,
     Recipe, Button, ButtonStyle,
     send_msg, delete_msg,
     get_channel, get_channels, delete_channel,
