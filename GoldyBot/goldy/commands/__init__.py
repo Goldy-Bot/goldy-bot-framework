@@ -111,7 +111,7 @@ class Command():
         return ApplicationCommandPayload(
             name = self.name,
             description = self.description,
-            options = params_utils.params_to_options(self) + [sub_command[1].slash_cmd_payload for sub_command in self.sub_commands], # TODO: Add subcommands to this.
+            options = params_utils.params_to_options(self) + [sub_command[1].slash_cmd_payload for sub_command in self.sub_commands], # We're adding sub commands here if you're wondering.
             default_member_permissions = str(1 << 3) if self.hidden else None,
             type = 1
         )
@@ -274,7 +274,7 @@ class Command():
 
             # Slash command.
             # ----------------
-            if gold_platter.type.value == PlatterType.SLASH_CMD.value:
+            elif gold_platter.type.value == PlatterType.SLASH_CMD.value:
                 data: InteractionData = gold_platter.data
 
                 self.logger.info(
