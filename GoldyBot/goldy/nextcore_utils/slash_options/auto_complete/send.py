@@ -14,7 +14,8 @@ async def send_auto_complete(
     current_typing_option: ApplicationCommandOptionInteractionData, 
     command: commands.Command
 ) -> None:
-    
+    # TODO: Continue this later.
+
     payload = {}
 
     print("<<<", command.slash_options)
