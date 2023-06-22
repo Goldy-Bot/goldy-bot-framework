@@ -4,18 +4,13 @@ from typing import List, Callable, Any, Tuple
 from discord_typings import ComponentData
 from devgoldyutils import LoggerAdapter, Colours
 
-from GoldyBot import goldy_bot_logger
+from GoldyBot import goldy_bot_logger, get_goldy_instance
 from ... import objects
 from ...nextcore_utils import front_end_errors
 
 RECIPE_CALLBACK = Callable[[objects.GoldPlatter], Any]
 
-registered_recipes: List[Tuple[str, object]] = []
-"""
-This list contains all the recipes that have been registered and it's memory location to the class.
-"""
-
-class Recipe(dict):
+class Recipe(objects.Invokable):
     """A recipe is equivalent to an item or message component. This is inherited by all message components in Goldy Bot. This can be passed into a send_msg function."""
     def __init__(self, data: ComponentData, name: str, author_only: bool = True, callback: RECIPE_CALLBACK = None, **callback_args: dict) -> ComponentData:
         """
@@ -28,19 +23,16 @@ class Recipe(dict):
         self.callback_args = callback_args
 
         self.logger = LoggerAdapter(
-            logger = LoggerAdapter(goldy_bot_logger, prefix=self.__class__.__name__),
+            logger = LoggerAdapter(goldy_bot_logger, prefix = self.__class__.__name__),
             prefix = Colours.PINK_GREY.apply(name)
         )
-
-        # This is assigned by the send_msg nextcore util.
-        self.cmd_platter = None
-        """The platter object of the command this bowl was initialized from."""
-
-        if self.callback is not None:
-            registered_recipes.append((data["custom_id"], self))
-            self.logger.debug("I've been registered and added cache.")
             
-        super().__init__(data)
+        super().__init__(
+            name = name,
+            data = data,
+            goldy = get_goldy_instance(),
+            logger = self.logger 
+        )
 
     async def invoke(self, platter: objects.GoldPlatter, cmd_platter: objects.GoldPlatter) -> Any:
         """Runs/triggers this recipe. This method is usually used internally."""

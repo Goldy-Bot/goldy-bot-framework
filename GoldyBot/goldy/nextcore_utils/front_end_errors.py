@@ -7,7 +7,7 @@ import logging as log
 from ... import errors
 from .colours import Colours
 from .embeds.embed import Embed
-from ..objects.golden_platter import GoldPlatter, PlatterType
+from ..objects.platter.golden_platter import GoldPlatter, PlatterType
 
 class FrontEndErrors(errors.GoldyBotError):
     def __init__(

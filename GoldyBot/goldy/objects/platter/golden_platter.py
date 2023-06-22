@@ -1,22 +1,18 @@
 from __future__ import annotations
-from enum import Enum
 
 from typing import TYPE_CHECKING, List
 from discord_typings import MessageData, InteractionData
 
+from . import Platter
+
 if TYPE_CHECKING:
-    from ...goldy import Goldy
-    from .message import Message
-    from ..guilds import Guild
-    from ..nextcore_utils.components import Recipe
-    from ..nextcore_utils.embeds.embed import Embed
-    from ..commands import Command
+    from ..message import Message
+    from ...guilds import Guild
+    from ...nextcore_utils.components import Recipe
+    from ...nextcore_utils.embeds.embed import Embed
+    from ...commands import Command
 
-class PlatterType(Enum):
-    PREFIX_CMD = 0
-    SLASH_CMD = 1
-
-class GoldPlatter():
+class GoldPlatter(Platter):
     """
     🟡 The gold platter is equivalent to the context/ctx/interaction name your used to. You can use the alias context/ctx if your not a fan of the FUNNY name. 
     It's actually returned on both interactions and normal message/prefix commands. You can use this object to grab the command author, reply to the command, send a message in the command's channel and a lot more.
@@ -25,27 +21,28 @@ class GoldPlatter():
 
     ✨ Behold the golden platter. ✨😁
     """
-    def __init__(self, data: MessageData|InteractionData, type: PlatterType|int, author: Member, command: Command | Recipe, goldy: Goldy) -> None:
+    def __init__(self, data: MessageData|InteractionData, author: Member, command: Command) -> None:
         # TODO: We got to somehow test this stuff with pytest because this being error prone is sort of a catastrophe.
+        super().__init__(
+            data = data, 
+            invoker = author, 
+            invokable = command
+        )
 
-        self.data = data
-        """The raw data received right from discord that triggered this prefix or slash command."""
-        self.author = author
-        """The member who triggered this platter."""
-        self.command = command
-        """The command object."""
-        self.goldy = goldy
-        """An instance of the goldy class."""
-        self.logger = command.logger
-        """Logger passed by command executer."""
-
-        self.type: PlatterType = (lambda x: PlatterType(x) if isinstance(x, int) else x)(type)
-        """The type of command this is."""
-
-        self.guild: Guild = self.goldy.guild_manager.get_guild(data["guild_id"])
+        self.guild: Guild = self.goldy.guild_manager.get_guild(self.get("guild_id"))
 
         self._interaction_responded = False
         """An internal property that is set by the :py:meth:`~GoldyBot.nextcore_utils.send_msg` method when a slash command is responded to."""
+
+    @property
+    def author(self) -> Member:
+        """The member who triggered this command."""
+        return self.invoker
+
+    @property
+    def command(self) -> Command:
+        """The command object that was invoked."""
+        return self.invokable
 
     async def send_message(
         self, 
@@ -85,5 +82,5 @@ class GoldPlatter():
         return await nextcore_utils.send_msg(self, text, embeds, recipes, reply, delete_after, **extra)
 
 
-from .member import Member
-from .. import nextcore_utils
+from ..member import Member
+from ... import nextcore_utils

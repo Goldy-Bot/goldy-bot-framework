@@ -5,7 +5,6 @@ from typing import List, Callable, Tuple, TYPE_CHECKING, Dict
 from discord_typings import MessageData, InteractionData, ApplicationCommandPayload, ApplicationCommandOptionData, GuildMemberData
 
 from nextcore.http import Route
-from nextcore.http.errors import BadRequestError
 
 from . import params_utils
 from .. import utils

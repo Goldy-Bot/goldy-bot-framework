@@ -10,7 +10,7 @@ from ..nextcore_utils.components import registered_recipes
 from ..nextcore_utils.slash_options.auto_complete.send import send_auto_complete
 from .. import utils, objects
 from ... import LoggerAdapter, goldy_bot_logger
-from ..objects.golden_platter import GoldPlatter
+from ..objects.platter.golden_platter import GoldPlatter
 
 if TYPE_CHECKING:
     from .. import Goldy

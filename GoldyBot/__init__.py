@@ -32,7 +32,7 @@ from .goldy.nextcore_utils import (
 
 from .goldy import objects
 from .goldy.objects import (
-    GoldPlatter, Ctx, Context, PlatterType,
+    GoldPlatter, Ctx, Context,
     Channel,
     Message,
     Member

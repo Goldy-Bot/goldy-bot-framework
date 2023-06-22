@@ -11,7 +11,7 @@ from nextcore.http.client import HTTPClient
 from nextcore.http import BotAuthentication, UnauthorizedError, Route
 from nextcore.gateway import ShardManager
 
-from typing import Dict, Any, TYPE_CHECKING
+from typing import Dict, Any, TYPE_CHECKING, List
 from discord_typings import UpdatePresenceData, PartialActivityData, ApplicationData
 from devgoldyutils import Colours
 
@@ -24,6 +24,7 @@ from .token import Token
 
 if TYPE_CHECKING:
     from . import objects
+    from .objects.invokable import INVOKABLE_TYPES
 
 # Fixes this https://github.com/nextsnake/nextcore/issues/189.
 if sys.platform == "win32":
@@ -72,6 +73,9 @@ class Goldy():
 
         self.start_up_time: datetime | None = None
         """The datetime object of when the framework was booted up. Is None if the :py:meth:`~GoldyBot.Goldy.start` method isn't ran."""
+
+        self.invokable_list: List[INVOKABLE_TYPES] = []
+        """List of all commands, buttons and events registered."""
 
         self.bot_user: objects.Member = None
         """The bot's user/member object."""
