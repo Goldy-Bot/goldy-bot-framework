@@ -21,7 +21,7 @@ commands_cache: List[Tuple[str, object]] = []
 This cache contains all the commands that have been registered and it's memory location to the class.
 """
 
-class Command():
+class CommandOLD():
     """Class that represents all commands in goldy bot."""
     def __init__(
         self, 
@@ -416,3 +416,5 @@ class Command():
         )
 
         return None
+
+from .command import Command
