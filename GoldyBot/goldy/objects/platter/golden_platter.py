@@ -83,4 +83,4 @@ class GoldPlatter(Platter):
 
 
 from ..member import Member
-from ... import nextcore_utils
+from ...goldy import nextcore_utils

@@ -1,17 +1,17 @@
 from __future__ import annotations
+from abc import abstractmethod
 from typing import Callable, Any, List, Dict, TYPE_CHECKING
 from discord_typings import ApplicationCommandOptionData
 
-import logging
 from devgoldyutils import LoggerAdapter, Colours
 
-from GoldyBot.goldy.objects.invokable import InvokableType
 from ... import goldy_bot_logger
 
 from .. import objects
 
 if TYPE_CHECKING:
     from ... import Goldy
+    from .. import objects
 
 class Command(objects.Invokable):
     """Class that all commands in goldy bot inherit from."""
@@ -40,6 +40,7 @@ class Command(objects.Invokable):
                 "default_member_permissions": str(1 << 3) if hidden else None,
                 "type": 1
             }, 
+            func,
             goldy, 
             LoggerAdapter(LoggerAdapter(goldy_bot_logger, prefix=f"Command"), prefix=Colours.PINK_GREY.apply(name))
         )
@@ -78,3 +79,7 @@ class Command(objects.Invokable):
     def hidden(self):
         """Should this command be hidden? For slash commands the command is just set to admins only."""
         return self.__hidden
+    
+    @abstractmethod
+    async def invoke(self, platter: objects.GoldPlatter) -> None:
+        ...

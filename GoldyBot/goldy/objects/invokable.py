@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 from enum import Enum
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Union
+from typing import TYPE_CHECKING, Union, Callable, Any
 
 if TYPE_CHECKING:
     from .. import Goldy
@@ -25,27 +25,35 @@ class Invokable(ABC, dict):
         self,
         name: str,
         data: dict,
+        callback: Callable[[Platter], Any],
         goldy: Goldy,
         logger: logging.Logger
     ):
-        self.id: str | None = None
-        self.name = name
+        self.__id: str = None
+        self.__name = name
+
+        self.callback = callback
         self.goldy = goldy
         self.logger = logger
 
         super().__init__(data)
 
     @property
-    @abstractmethod
-    def type(self) -> InvokableType:
-        """The type of invokable."""
-        ...
+    def id(self) -> str:
+        """The id of the invokable. This is None when the invokable hasn't been invoked."""
+        return self.__id
+
+    @property
+    def name(self) -> str:
+        """The name of the invokable. This is used in log messages and more."""
+        return self.__name
 
     def register(self, id: str) -> None:
         """Method to register this as invokable in goldy bot."""
-        self.id = id
+        self.__id = id
         self.goldy.invokable_list.append((id, self))
         self.logger.debug(f"'{self.name}' has been registered!")
 
-    async def invoke(self, platter: Platter) -> None:
+    @abstractmethod
+    async def invoke(self, platter: Platter) -> Any:
         ...

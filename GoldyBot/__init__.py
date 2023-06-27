@@ -13,7 +13,7 @@ from .goldy.token import Token
 from .goldy.perms import Perms
 from .goldy.extensions import Extension
 from .goldy.commands.decorator import command
-from .goldy.utils import *
+from .utils import *
 
 from .goldy.database import DatabaseEnums
 from .goldy.database.wrappers import DatabaseWrapper

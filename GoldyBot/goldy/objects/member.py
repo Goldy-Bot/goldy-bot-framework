@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 from discord_typings import UserData
 from devgoldyutils import DictClass, Colours
 
-from ... import goldy_bot_logger, LoggerAdapter
+from .. import goldy_bot_logger, LoggerAdapter
 from ..nextcore_utils import DISCORD_CDN
 from ..database.wrappers.member import MemberDBWrapper
 

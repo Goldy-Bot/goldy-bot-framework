@@ -281,7 +281,7 @@ class CommandOLD():
                         f"Slash command invoked by '{data['member']['user']['username']}#{data['member']['user']['discriminator']}'."
                     )
                 )
-                
+
                 params = params_utils.invoke_data_to_params(data, gold_platter)
                 self.logger.debug(f"Got args --> {params}")
 

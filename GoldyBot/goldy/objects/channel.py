@@ -5,11 +5,11 @@ from typing import TYPE_CHECKING, List
 from discord_typings import ChannelData
 from devgoldyutils import DictDataclass
 
-from ... import goldy_bot_logger, LoggerAdapter
+from .. import goldy_bot_logger, LoggerAdapter
 
 if TYPE_CHECKING:
+    from . import Message
     from .. import Goldy
-    from .. import objects
     from ..nextcore_utils.embeds.embed import Embed
     from ..nextcore_utils.components import Recipe
 
@@ -42,7 +42,7 @@ class Channel(DictDataclass):
         reply: bool = False, 
         delete_after: float = None, 
         **extra
-    ) -> objects.Message:
+    ) -> Message:
         """
         Allows you to send a message to this channel.
         
