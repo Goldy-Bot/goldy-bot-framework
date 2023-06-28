@@ -8,12 +8,6 @@ class Extensions(GoldyBot.Extension):
     def __init__(self):
         super().__init__()
 
-        # Hack to force this extension to load last. This works because I made Goldy bot load extensions backwards (quite goofy I know 🤓).
-        #extensions_cache.remove((self.name, self))
-        #extensions_cache.insert(0, (self.name, self))
-
-        # TODO: FUCK we can't do that, we NEEEED to find a way to load this extension last.
-
         self.extension_enabled = GoldyBot.Embed(
             title = "💚 Enabled!",
             description = "Extension has been enabled. 👍",

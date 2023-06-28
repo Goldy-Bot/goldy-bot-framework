@@ -8,6 +8,7 @@ from devgoldyutils import LoggerAdapter, Colours
 from ... import goldy_bot_logger
 
 from .. import objects
+from ..nextcore_utils import front_end_errors
 
 if TYPE_CHECKING:
     from ... import Goldy
@@ -82,4 +83,16 @@ class Command(objects.Invokable):
     
     @abstractmethod
     async def invoke(self, platter: objects.GoldPlatter) -> None:
-        ...
+        self.logger.debug(f"Attempting to invoke slash command...")
+
+        if platter.guild.is_extension_allowed(platter.command.extension) is False:
+            raise front_end_errors.ExtensionNotAllowedInGuild(platter, self.logger)
+
+        if platter.command.is_disabled:
+            raise front_end_errors.CommandIsDisabled(platter, self.logger)
+        
+        if await self.__got_perms(platter):
+            ...
+
+        # If member has no perms raise MissingPerms exception.
+        raise front_end_errors.MissingPerms(platter, self.logger)
