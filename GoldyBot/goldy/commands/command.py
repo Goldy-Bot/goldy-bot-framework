@@ -5,13 +5,15 @@ from discord_typings import ApplicationCommandOptionData
 
 from devgoldyutils import LoggerAdapter, Colours
 
-from ... import goldy_bot_logger
+from ..extensions import extensions_cache
+from ... import goldy_bot_logger, utils
 
+import params_utils
 from .. import objects
 from ..nextcore_utils import front_end_errors
 
 if TYPE_CHECKING:
-    from ... import Goldy
+    from ... import Goldy, Extension
     from .. import objects
 
 class Command(objects.Invokable):
@@ -19,19 +21,22 @@ class Command(objects.Invokable):
     def __init__(
         self, 
         goldy: Goldy, 
-        func: Callable[[objects.GoldPlatter], Any], 
+        func: Callable[[Extension, objects.GoldPlatter], Any], 
         name: str, 
         description: str, 
         required_roles: List[str], 
         slash_options: Dict[str, ApplicationCommandOptionData], 
-        allow_prefix_cmd: bool, 
         hidden: bool, 
     ):
         self.__func = func
         self.__required_roles = required_roles
         self.__slash_options = slash_options
-        self.__allow_prefix_cmd = allow_prefix_cmd
         self.__hidden = hidden
+
+        self.__params = params_utils.get_function_parameters(self)
+
+        self._is_loaded = False
+        self.__is_disabled = False
 
         super().__init__(
             name, 
@@ -47,15 +52,15 @@ class Command(objects.Invokable):
         )
 
     @property
-    def func(self) -> Callable[[objects.GoldPlatter], Any]:
+    def func(self) -> Callable[[Extension, objects.GoldPlatter], Any]:
         """The command's callback function."""
         return self.__func
-    
+
     @property
     def name(self) -> str:
         """The command's code name."""
         return self.get("name")
-    
+
     @property
     def description(self) -> str:
         """The command's set description. None if there is no description set."""
@@ -65,34 +70,67 @@ class Command(objects.Invokable):
     def required_roles(self):
         """The code names for the roles needed to access this command."""
         return self.__required_roles
-    
+
     @property
     def slash_options(self):
         """Allows you to customize slash command arguments and make them beautiful 🥰."""
         return self.__slash_options
-    
-    @property
-    def allow_prefix_cmd(self):
-        """If the creation of a prefix command is allowed. Slash commands are now ALWAYS created since v5.0dev5."""
-        return self.__allow_prefix_cmd
-    
+
     @property
     def hidden(self):
         """Should this command be hidden? For slash commands the command is just set to admins only."""
         return self.__hidden
     
-    @abstractmethod
-    async def invoke(self, platter: objects.GoldPlatter) -> None:
-        self.logger.debug(f"Attempting to invoke slash command...")
+    @property
+    def params(self) -> List[str]:
+        """List of command function parameters."""
+        return self.__params
 
-        if platter.guild.is_extension_allowed(platter.command.extension) is False:
+    @property
+    def extension_name(self) -> str:
+        """Returns extension's code name."""
+        return str(self.func).split(" ")[1].split(".")[0]
+
+    @property
+    def extension(self) -> Extension | None:
+        """Finds and returns the object of the command's extension. Returns None if the extension doesn't exits. (failed to load)"""
+        return (lambda x: x[1] if x is not None else None)(
+            utils.cache_lookup(self.extension_name, extensions_cache)
+        )
+
+    @property
+    def is_loaded(self) -> bool:
+        """Returns whether the command has been loaded by the command loader or not."""
+        return self._is_loaded
+
+    @property
+    def is_disabled(self) -> bool:
+        """Returns whether the command is disabled or not."""
+        return self.__is_disabled
+
+    def disable(self) -> None:
+        """A method to disable this command."""
+        self.__is_disabled = True
+        self.logger.debug(Colours.GREY.apply("Command has been disabled!"))
+
+    def enable(self) -> None:
+        """A method to enable this command."""
+        self.__is_disabled = False
+        self.logger.debug(Colours.GREEN.apply("Command has been enabled!"))
+
+    @abstractmethod
+    async def invoke(self, platter: objects.GoldPlatter, async_lambda: Callable) -> None:
+        self.logger.debug(f"Attempting to invoke command...")
+
+        if platter.guild.is_extension_allowed(self.extension) is False:
             raise front_end_errors.ExtensionNotAllowedInGuild(platter, self.logger)
 
-        if platter.command.is_disabled:
+        if self.is_disabled:
             raise front_end_errors.CommandIsDisabled(platter, self.logger)
-        
-        if await self.__got_perms(platter):
-            ...
+
+        if await self.goldy.permission_system.got_perms(platter):
+            await async_lambda()
+            return None
 
         # If member has no perms raise MissingPerms exception.
         raise front_end_errors.MissingPerms(platter, self.logger)

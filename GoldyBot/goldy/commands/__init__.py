@@ -16,11 +16,6 @@ from ..extensions import Extension, extensions_cache
 if TYPE_CHECKING:
     from ... import Goldy, SlashOption
 
-commands_cache: List[Tuple[str, object]] = []
-"""
-This cache contains all the commands that have been registered and it's memory location to the class.
-"""
-
 class CommandOLD():
     """Class that represents all commands in goldy bot."""
     def __init__(
@@ -141,7 +136,7 @@ class CommandOLD():
 
         return False
 
-    @property
+    @property # TODO: Only add to prefix commands.
     def command_usage(self) -> str:
         command_args_string = " "
         for param in self.params:

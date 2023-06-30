@@ -6,6 +6,8 @@ from discord_typings import ApplicationCommandOptionData, MessageData, Interacti
 from ... import LoggerAdapter, goldy_bot_logger
 from devgoldyutils import Colours
 
+from slash_command import SlashCommand
+from prefix_command import PrefixCommand
 from ... import errors
 
 if TYPE_CHECKING:
@@ -52,7 +54,7 @@ def invoke_data_to_params(data: MessageData | InteractionData, platter: GoldPlat
     logger.debug(f"Attempting to phrase command '{platter.command.name}' invoke data into parameters...")
     
     # Where all the fucking magic happens.
-    if platter.type.value == 0:
+    if isinstance(platter.command, PrefixCommand):
         params = []
         for arg in data["content"].split(" ")[1:]:
             # Ignore sub commands.
@@ -75,7 +77,7 @@ def invoke_data_to_params(data: MessageData | InteractionData, platter: GoldPlat
 
         return params
 
-    if platter.type.value == 1:
+    elif isinstance(platter.command, SlashCommand):
         params = {}
         for option in data["data"].get("options", []):
             param_key_name = option["name"]
@@ -83,12 +85,11 @@ def invoke_data_to_params(data: MessageData | InteractionData, platter: GoldPlat
             if option["type"] == 1 or option["type"] == 2: # Ignore sub commands and sub groups.
                 continue
 
-            # If command is slash command make sure to set dictionary key to the true parameter name.
-            if platter.type.value == 1:
-                for slash_option in platter.command.slash_options:
-                    if platter.command.slash_options[slash_option]["name"] == option["name"]:
-                        param_key_name = slash_option
-                        break
+            # Make sure to set dictionary key to the true parameter name.
+            for slash_option in platter.command.slash_options:
+                if platter.command.slash_options[slash_option]["name"] == option["name"]:
+                    param_key_name = slash_option
+                    break
 
             params[param_key_name] = option["value"]
             logger.debug(f"Found arg '{params[param_key_name]}'.")

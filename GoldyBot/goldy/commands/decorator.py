@@ -2,7 +2,8 @@ from __future__ import annotations
 
 from typing import List, Dict, TYPE_CHECKING
 
-from . import Command
+from .slash_command import SlashCommand
+from .prefix_command import PrefixCommand
 from ... import get_goldy_instance
 
 if TYPE_CHECKING:
@@ -12,7 +13,7 @@ if TYPE_CHECKING:
 def command(
     name: str = None, 
     description: str = None, 
-    required_roles: List[str]=None, 
+    required_roles: List[str] = None, 
     slash_options: Dict[str, SlashOption] = None,
     slash_cmd_only: bool = False, 
     hidden: bool = False
@@ -38,20 +39,29 @@ def command(
     
     """
     def decorate(func):
-        def inner(func) -> Command:
+        def inner(func) -> None:
             goldy = get_goldy_instance()
 
-            return Command(
+            SlashCommand(
                 goldy = goldy, 
                 func = func, 
                 name = name, 
                 description = description, 
                 required_roles = required_roles, 
                 slash_options = slash_options,
-                allow_prefix_cmd = False if slash_cmd_only else True, 
                 hidden = hidden
             )
-        
+
+            if not slash_cmd_only:
+                PrefixCommand(
+                    goldy = goldy,
+                    func = func,
+                    name = name,
+                    description = description,
+                    required_roles = required_roles,
+                    hidden = hidden
+                )
+
         return inner(func)
 
     return decorate

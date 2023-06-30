@@ -18,9 +18,8 @@ class InvokableType(Enum):
     SLASH_CMD = 1
     BUTTON = 2
 
-# TODO: Make it a dict.
 class Invokable(ABC, dict):
-    """A hybrid abstract class that is inherited from every goldy bot object that can be invoked, like a command, a button or on-message event."""
+    """A hybrid abstract class that is inherited from every goldy bot object that can be invoked from discord, like a command, a button or on-message event."""
     def __init__(
         self,
         name: str,
@@ -40,7 +39,7 @@ class Invokable(ABC, dict):
 
     @property
     def id(self) -> str:
-        """The id of the invokable. This is None when the invokable hasn't been invoked."""
+        """The id of the invokable. This is None when the invokable hasn't been registered."""
         return self.__id
 
     @property
@@ -51,7 +50,7 @@ class Invokable(ABC, dict):
     def register(self, id: str) -> None:
         """Method to register this as invokable in goldy bot."""
         self.__id = id
-        self.goldy.invokable_list.append((id, self))
+        self.goldy.invokables.add((id, self))
         self.logger.debug(f"'{self.name}' has been registered!")
 
     @abstractmethod

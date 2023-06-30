@@ -28,6 +28,11 @@ class Member(DictClass):
     def id(self) -> str:
         """Member's id duhhhh."""
         return self.get("id")
+    
+    @property
+    def name(self) -> str:
+        """Aliases of username."""
+        return self.username
 
     @property
     def username(self) -> str:

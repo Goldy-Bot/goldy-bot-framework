@@ -11,7 +11,7 @@ from nextcore.http.client import HTTPClient
 from nextcore.http import BotAuthentication, UnauthorizedError, Route
 from nextcore.gateway import ShardManager
 
-from typing import Dict, Any, TYPE_CHECKING, List
+from typing import Dict, Any, TYPE_CHECKING, Tuple, Set
 from discord_typings import UpdatePresenceData, PartialActivityData, ApplicationData
 from devgoldyutils import Colours
 
@@ -74,7 +74,7 @@ class Goldy():
         self.start_up_time: datetime | None = None
         """The datetime object of when the framework was booted up. Is None if the :py:meth:`~GoldyBot.Goldy.start` method isn't ran."""
 
-        self.invokable_list: List[INVOKABLE_TYPES] = []
+        self.invokables: Set[Tuple[str, INVOKABLE_TYPES, Set[INVOKABLE_TYPES]]] = set()
         """List of all commands, buttons and events registered."""
 
         self.bot_user: objects.Member = None
@@ -107,6 +107,8 @@ class Goldy():
         self.live_console = LiveConsole(self)
         """The goldy bot live console."""
         self.guild_manager = GuildManager(self)
+        self.permission_system = PermissionSystem(self)
+        """A goldy bot class that contains methods to handle member/command permissions."""
 
     @property
     def latency(self) -> float | None:
@@ -270,3 +272,4 @@ from .commands.listener import CommandListener
 from .live_console import LiveConsole
 from .objects import Member
 from .guilds import GuildManager
+from .permission_system import PermissionSystem

@@ -5,8 +5,8 @@ from discord_typings import ApplicationCommandPayload
 from nextcore.http import Route
 
 from .. import Goldy
+from .slash_command import SlashCommand
 from ... import goldy_bot_logger, LoggerAdapter
-from . import commands_cache
 
 if TYPE_CHECKING:
     from . import Command
@@ -31,7 +31,7 @@ class CommandLoader():
     async def load(self, commands: List[Command] = None) -> None:
         """Loads/creates all commands that have been initialized in goldy bot."""
         if commands is None:
-            commands = [x[1] for x in commands_cache]
+            commands = [x[1] for x in self.goldy.invokables if isinstance(x, Command)]
 
         slash_command_payloads: List[ApplicationCommandPayload] = []
 
@@ -44,12 +44,15 @@ class CommandLoader():
                 continue
 
             command.extension.commands.append(command)
-            slash_command_payloads.append(command.slash_cmd_payload)
 
-            command._loaded = True
+            if isinstance(command, SlashCommand):
+                slash_command_payloads.append(dict(command))
+                self.logger.debug(f"Slash command '{command.name}' payload grabbed.")
+
+            command._is_loaded = True
 
             self.logger.debug(
-                f"Command '{command.name}' loaded and slash cmd payload grabbed."
+                f"Command '{command.name}' loaded."
             )
 
 
@@ -57,7 +60,6 @@ class CommandLoader():
         # ----------------------------------------------
         for guild in self.goldy.guild_manager.allowed_guilds:
 
-            # TODO: Get the application objects from this response and save it in the guild. Also add a method in command object to retrieve it.
             await self.goldy.http_client.request(
                 Route(
                     "PUT",
