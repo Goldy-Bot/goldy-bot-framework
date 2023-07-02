@@ -8,29 +8,42 @@ from devgoldyutils import LoggerAdapter, Colours
 from ..extensions import extensions_cache
 from ... import goldy_bot_logger, utils
 
-import params_utils
-from .. import objects
+from . import params_utils
 from ..nextcore_utils import front_end_errors
+from ..objects import Invokable
 
 if TYPE_CHECKING:
     from ... import Goldy, Extension
     from .. import objects
 
-class Command(objects.Invokable):
+class Command(Invokable):
     """Class that all commands in goldy bot inherit from."""
     def __init__(
         self, 
         goldy: Goldy, 
         func: Callable[[Extension, objects.GoldPlatter], Any], 
-        name: str, 
-        description: str, 
-        required_roles: List[str], 
-        slash_options: Dict[str, ApplicationCommandOptionData], 
-        hidden: bool, 
+        name: str = None, 
+        description: str = None, 
+        required_roles: List[str] = None, 
+        slash_options: Dict[str, ApplicationCommandOptionData] = None, 
+        hidden: bool = False, 
     ):
         self.__func = func
-        self.__required_roles = required_roles
-        self.__slash_options = slash_options
+
+        if name is None:
+            name = func.__name__
+
+        if description is None:
+            description = "Oops daisy, looks like no description was set for this command."
+
+        if required_roles is None:
+            self.__required_roles = []
+        else:
+            self.__required_roles = [str(role) for role in required_roles]
+
+        if slash_options is None:
+            self.__slash_options = {}
+
         self.__hidden = hidden
 
         self.__params = params_utils.get_function_parameters(self)
@@ -48,7 +61,7 @@ class Command(objects.Invokable):
             }, 
             func,
             goldy, 
-            LoggerAdapter(LoggerAdapter(goldy_bot_logger, prefix=f"Command"), prefix=Colours.PINK_GREY.apply(name))
+            LoggerAdapter(LoggerAdapter(goldy_bot_logger, prefix="Command"), prefix=Colours.PINK_GREY.apply(name))
         )
 
     @property
@@ -119,7 +132,7 @@ class Command(objects.Invokable):
         self.logger.debug(Colours.GREEN.apply("Command has been enabled!"))
 
     @abstractmethod
-    async def invoke(self, platter: objects.GoldPlatter, async_lambda: Callable) -> None:
+    async def invoke(self, platter: objects.GoldPlatter, lambda_func: Callable) -> None:
         self.logger.debug(f"Attempting to invoke command...")
 
         if platter.guild.is_extension_allowed(self.extension) is False:
@@ -129,7 +142,7 @@ class Command(objects.Invokable):
             raise front_end_errors.CommandIsDisabled(platter, self.logger)
 
         if await self.goldy.permission_system.got_perms(platter):
-            await async_lambda()
+            await lambda_func()
             return None
 
         # If member has no perms raise MissingPerms exception.

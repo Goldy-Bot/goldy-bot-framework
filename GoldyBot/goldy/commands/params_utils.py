@@ -6,12 +6,12 @@ from discord_typings import ApplicationCommandOptionData, MessageData, Interacti
 from ... import LoggerAdapter, goldy_bot_logger
 from devgoldyutils import Colours
 
-from slash_command import SlashCommand
-from prefix_command import PrefixCommand
+from . import slash_command
+from . import prefix_command
 from ... import errors
 
 if TYPE_CHECKING:
-    from . import Command
+    from .command import Command
     from ..objects import GoldPlatter
 
 params_logger = LoggerAdapter(goldy_bot_logger, prefix=Colours.PINK_GREY.apply("Params Utils"))
@@ -52,9 +52,9 @@ def invoke_data_to_params(data: MessageData | InteractionData, platter: GoldPlat
     """A utility function that grabs command arguments from invoke data and converts it to appropriate params."""
     logger = LoggerAdapter(params_logger, prefix=Colours.GREY.apply(platter.command.name))
     logger.debug(f"Attempting to phrase command '{platter.command.name}' invoke data into parameters...")
-    
+
     # Where all the fucking magic happens.
-    if isinstance(platter.command, PrefixCommand):
+    if isinstance(platter.command, prefix_command.PrefixCommand):
         params = []
         for arg in data["content"].split(" ")[1:]:
             # Ignore sub commands.
@@ -77,7 +77,7 @@ def invoke_data_to_params(data: MessageData | InteractionData, platter: GoldPlat
 
         return params
 
-    elif isinstance(platter.command, SlashCommand):
+    elif isinstance(platter.command, slash_command.SlashCommand):
         params = {}
         for option in data["data"].get("options", []):
             param_key_name = option["name"]

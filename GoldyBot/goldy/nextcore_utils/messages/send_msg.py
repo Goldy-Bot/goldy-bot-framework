@@ -7,10 +7,12 @@ from aiohttp import FormData
 from nextcore.http import Route
 from nextcore.common import json_dumps
 
-from ... import objects, utils
+from ... import objects
+from .... import utils
+from ...commands import slash_command
 
 if TYPE_CHECKING:
-    from ..components import Recipe
+    from ...components import Recipe
     from ..embeds.embed import Embed
 
 # TODO: Add more options to allow using channel instead of platter.
@@ -164,7 +166,7 @@ async def send_msg(
     if isinstance(object, objects.GoldPlatter):
         platter: objects.GoldPlatter = object
 
-        if platter.type.value == 1:
+        if isinstance(platter.command, slash_command.SlashCommand):
             # Perform interaction response.
             # ------------------------------
 

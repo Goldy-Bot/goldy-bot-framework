@@ -1,18 +1,21 @@
 from __future__ import annotations
 
-from typing import List, Callable, Any, Tuple
+from typing import Callable, Any, TYPE_CHECKING
 from discord_typings import ComponentData
 from devgoldyutils import LoggerAdapter, Colours
 
-from GoldyBot import goldy_bot_logger, get_goldy_instance
-from ... import objects
-from ...nextcore_utils import front_end_errors
+from ... import goldy_bot_logger
+from ..objects import Invokable, GoldPlatter
+from ..nextcore_utils import front_end_errors
 
-RECIPE_CALLBACK = Callable[[objects.GoldPlatter], Any]
+if TYPE_CHECKING:
+    from ... import Goldy, objects
 
-class Recipe(objects.Invokable):
+RECIPE_CALLBACK = Callable[[GoldPlatter], Any]
+
+class Recipe(Invokable):
     """A recipe is equivalent to an item or message component. This is inherited by all message components in Goldy Bot. This can be passed into a send_msg function."""
-    def __init__(self, data: ComponentData, name: str, author_only: bool = True, callback: RECIPE_CALLBACK = None, **callback_args: dict) -> ComponentData:
+    def __init__(self, data: ComponentData, name: str, callback: RECIPE_CALLBACK, goldy: Goldy, author_only: bool = True, **callback_args: dict) -> ComponentData:
         """
         Creates an component in discord to use in action rows. 😋
         """
@@ -26,11 +29,12 @@ class Recipe(objects.Invokable):
             logger = LoggerAdapter(goldy_bot_logger, prefix = self.__class__.__name__),
             prefix = Colours.PINK_GREY.apply(name)
         )
-            
+
         super().__init__(
             name = name,
             data = data,
-            goldy = get_goldy_instance(),
+            callback = callback,
+            goldy = goldy,
             logger = self.logger 
         )
 

@@ -3,8 +3,7 @@ from __future__ import annotations
 import cmd2
 from typing import TYPE_CHECKING, Tuple
 
-from .. import utils
-from ... import log
+from ... import log, utils
 from ..extensions import extensions_cache, Extension
 
 if TYPE_CHECKING:

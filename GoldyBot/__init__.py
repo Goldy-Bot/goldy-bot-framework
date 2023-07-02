@@ -13,6 +13,8 @@ from .goldy.token import Token
 from .goldy.perms import Perms
 from .goldy.extensions import Extension
 from .goldy.commands.decorator import command
+from .goldy.components import Recipe
+from .goldy.components.buttons.button import Button, ButtonStyle
 from .utils import *
 
 from .goldy.database import DatabaseEnums
@@ -24,7 +26,6 @@ from .goldy.nextcore_utils import (
     Embed, EmbedField, EmbedImage,
     SlashOption, SlashOptionChoice, SlashOptionTypes,
     SlashOptionAutoComplete,
-    Recipe, Button, ButtonStyle,
     send_msg, delete_msg,
     get_channel, get_channels, delete_channel,
     front_end_errors

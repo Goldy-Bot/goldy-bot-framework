@@ -4,7 +4,6 @@ import os
 from enum import Enum
 from typing import overload, Literal
 from discord_typings import ButtonComponentData
-from .... import objects
 
 from .. import Recipe, RECIPE_CALLBACK
 
@@ -125,6 +124,3 @@ class Button(Recipe):
             self.register(custom_id)
 
         super().__init__(data, custom_id, data["label"], author_only, callback, **callback_args)
-
-    def type(self) -> objects.InvokableType:
-        return objects.InvokableType.BUTTON

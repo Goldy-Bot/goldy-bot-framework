@@ -5,7 +5,6 @@ from discord_typings import UserData
 from devgoldyutils import DictClass, Colours
 
 from .. import goldy_bot_logger, LoggerAdapter
-from ..nextcore_utils import DISCORD_CDN
 from ..database.wrappers.member import MemberDBWrapper
 
 if TYPE_CHECKING:
@@ -47,7 +46,8 @@ class Member(DictClass):
     @property
     def avatar_url(self) -> str:
         """The url to the member's profile picture."""
-        return DISCORD_CDN + f"avatars/{self.id}/{self.get('avatar')}.png?size=4096"
+        from .. import nextcore_utils # Avoiding circular import until I find a better way.
+        return nextcore_utils.DISCORD_CDN + f"avatars/{self.id}/{self.get('avatar')}.png?size=4096"
 
     @property
     async def database(self) -> MemberDBWrapper:

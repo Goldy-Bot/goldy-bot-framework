@@ -4,13 +4,11 @@ from discord_typings import ApplicationCommandOptionData, InteractionData
 
 from devgoldyutils import Colours
 
-from .. import objects
-
 if TYPE_CHECKING:
     from .. import Goldy, objects
     from ... import Extension
 
-import params_utils
+from . import params_utils
 from .command import Command
 
 class SlashCommand(Command):
@@ -18,11 +16,11 @@ class SlashCommand(Command):
         self, 
         goldy: Goldy, 
         func: Callable[[Extension, objects.GoldPlatter], Any], 
-        name: str, 
-        description: str, 
-        required_roles: List[str], 
-        slash_options: Dict[str, ApplicationCommandOptionData], 
-        hidden: bool
+        name: str = None, 
+        description: str = None, 
+        required_roles: List[str] = None, 
+        slash_options: Dict[str, ApplicationCommandOptionData] = None, 
+        hidden: bool = False
     ):
         super().__init__(
             goldy, 
@@ -33,6 +31,8 @@ class SlashCommand(Command):
             slash_options, 
             hidden
         )
+
+        self.logger.debug("Slash command has been initialized!")
 
     async def invoke(self, platter: objects.GoldPlatter) -> None:
         """Runs and triggers a slash command. This method is usually ran internally."""
@@ -45,10 +45,10 @@ class SlashCommand(Command):
         )
 
         params = params_utils.invoke_data_to_params(data, platter)
-        if not params == []: self.logger.debug(f"Got args --> {params}")
+        if not params == {}: self.logger.debug(f"Got args --> {params}")
 
-        super().invoke(
-            platter, lambda: await self.func(platter.command.extension, platter, **params)
+        await super().invoke(
+            platter, lambda: self.func(platter.command.extension, platter, **params)
         )
 
         # TODO: When exceptions raise in commands wrap them in a goldy bot command exception.

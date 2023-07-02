@@ -2,9 +2,9 @@ from __future__ import annotations
 
 from typing import List, Tuple
 
-from .. import Goldy, utils, LoggerAdapter, goldy_bot_logger
+from .. import Goldy, LoggerAdapter, goldy_bot_logger
+from ... import utils, errors
 from ..database import DatabaseEnums
-from ...errors import GoldyBotError
 
 from .guild import Guild
 
@@ -103,7 +103,7 @@ class GuildManager():
 
 # Exceptions
 # ------------
-class AllowedGuildsNotSpecified(GoldyBotError):
+class AllowedGuildsNotSpecified(errors.GoldyBotError):
     def __init__(self, logger: logging.Logger = None):
         super().__init__(
             "Please add your guild id to the allowed_guilds in goldy.json",

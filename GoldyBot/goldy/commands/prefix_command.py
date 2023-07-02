@@ -1,6 +1,6 @@
 from __future__ import annotations
-from typing import Any, Callable, Dict, List, TYPE_CHECKING
-from discord_typings import ApplicationCommandOptionData, InteractionData
+from typing import Any, Callable, List, TYPE_CHECKING
+from discord_typings import InteractionData
 
 from devgoldyutils import Colours
 
@@ -11,7 +11,7 @@ if TYPE_CHECKING:
     from .. import Goldy, objects
     from ... import Extension
 
-import params_utils
+from . import params_utils
 from .command import Command
 
 class PrefixCommand(Command):
@@ -19,10 +19,10 @@ class PrefixCommand(Command):
         self, 
         goldy: Goldy, 
         func: Callable[[Extension, objects.GoldPlatter], Any], 
-        name: str, 
-        description: str, 
-        required_roles: List[str], 
-        hidden: bool
+        name: str = None, 
+        description: str = None, 
+        required_roles: List[str] = None, 
+        hidden: bool = False
     ):
         super().__init__(
             goldy, 
@@ -30,9 +30,10 @@ class PrefixCommand(Command):
             name, 
             description, 
             required_roles, 
-            [],
-            hidden
+            hidden = hidden
         )
+
+        self.logger.debug("Prefix command has been initialized!")
 
     @property
     def command_usage(self) -> str:
@@ -63,8 +64,8 @@ class PrefixCommand(Command):
         if not params == []: self.logger.debug(f"Got args --> {params}")
 
         try:
-            super().invoke(
-                platter, lambda: await self.func(platter.command.extension, platter, **params)
+            await super().invoke(
+                platter, lambda: self.func(platter.command.extension, platter, *params)
             )
 
         except TypeError as e:

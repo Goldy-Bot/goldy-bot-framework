@@ -4,14 +4,15 @@ import logging
 from enum import Enum
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Union, Callable, Any
+from ctypes import cast, py_object
 
 if TYPE_CHECKING:
     from .. import Goldy
     from .platter import Platter
-    from ..commands import Command
-    from ..nextcore_utils.components.buttons.button import Button
+    from ..commands.command import Command
+    from ..components.buttons.button import Button
 
-INVOKABLE_TYPES = Union[Command, Button]
+    INVOKABLE_TYPES = Union[Command, Button]
 
 class InvokableType(Enum):
     PREFIX_CMD = 0
@@ -35,6 +36,10 @@ class Invokable(ABC, dict):
         self.goldy = goldy
         self.logger = logger
 
+        # Preregistering invokables.
+        self.goldy.pre_invokables.append(self)
+        self.logger.debug(f"Command has been PRE-registered.")
+
         super().__init__(data)
 
     @property
@@ -50,8 +55,8 @@ class Invokable(ABC, dict):
     def register(self, id: str) -> None:
         """Method to register this as invokable in goldy bot."""
         self.__id = id
-        self.goldy.invokables.add((id, self))
-        self.logger.debug(f"'{self.name}' has been registered!")
+        self.goldy.invokables.append((id, self))
+        self.logger.debug(f"'{self.name}' has been registered with id '{id}'!")
 
     @abstractmethod
     async def invoke(self, platter: Platter) -> Any:

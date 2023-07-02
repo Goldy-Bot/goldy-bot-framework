@@ -6,11 +6,12 @@ from discord_typings import MessageData, InteractionData
 from . import Platter
 
 if TYPE_CHECKING:
+    from ..member import Member
     from ..message import Message
     from ...guilds import Guild
     from ...nextcore_utils.components import Recipe
     from ...nextcore_utils.embeds.embed import Embed
-    from ...commands import Command
+    from ...commands.command import Command
 
 class GoldPlatter(Platter):
     """
@@ -80,7 +81,5 @@ class GoldPlatter(Platter):
         
         """
         return await nextcore_utils.send_msg(self, text, embeds, recipes, reply, delete_after, **extra)
-
-
-from ..member import Member
-from ... import nextcore_utils
+    
+from ... import nextcore_utils # This must be here to avoid circular import.
