@@ -21,4 +21,4 @@ build-docs:
 	cd docs && make html
 
 update-pip:
-	"./env/bin/python3.8" -m pip install --upgrade pip
+	python -m pip install --upgrade pip
