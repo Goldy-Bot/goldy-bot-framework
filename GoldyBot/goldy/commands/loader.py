@@ -57,11 +57,6 @@ class CommandLoader():
                 f"Command '{command.name}' loaded."
             )
 
-        # Refresh invokable list.
-        for x in self.goldy.invokables:
-            if isinstance(x[1], Command):
-                self.goldy.invokables.remove(x)
-
         # Create slash commands for each allowed guild.
         # ----------------------------------------------
         for guild in self.goldy.guild_manager.allowed_guilds:
