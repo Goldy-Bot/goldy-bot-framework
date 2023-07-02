@@ -8,7 +8,7 @@ from .. import objects
 from ..nextcore_utils import front_end_errors
 
 if TYPE_CHECKING:
-    from .. import Goldy, objects
+    from .. import Goldy
     from ... import Extension
 
 from . import params_utils

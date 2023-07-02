@@ -133,7 +133,7 @@ class Command(Invokable):
 
     @abstractmethod
     async def invoke(self, platter: objects.GoldPlatter, lambda_func: Callable) -> None:
-        self.logger.debug(f"Attempting to invoke command...")
+        self.logger.debug("Attempting to invoke command...")
 
         if platter.guild.is_extension_allowed(self.extension) is False:
             raise front_end_errors.ExtensionNotAllowedInGuild(platter, self.logger)

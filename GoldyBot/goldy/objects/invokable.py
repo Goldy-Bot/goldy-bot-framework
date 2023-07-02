@@ -4,7 +4,6 @@ import logging
 from enum import Enum
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Union, Callable, Any
-from ctypes import cast, py_object
 
 if TYPE_CHECKING:
     from .. import Goldy
@@ -38,7 +37,7 @@ class Invokable(ABC, dict):
 
         # Preregistering invokables.
         self.goldy.pre_invokables.append(self)
-        self.logger.debug(f"Command has been PRE-registered.")
+        self.logger.debug("Command has been PRE-registered.")
 
         super().__init__(data)
 

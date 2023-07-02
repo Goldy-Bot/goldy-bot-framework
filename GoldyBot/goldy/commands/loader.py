@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import List, overload, TYPE_CHECKING
+from typing import List, overload
 from discord_typings import ApplicationCommandPayload
 
 from nextcore.http import Route
@@ -47,7 +47,6 @@ class CommandLoader():
             if isinstance(command, slash_command.SlashCommand):
                 slash_command_payloads.append(dict(command))
                 self.logger.debug(f"Slash command '{command.name}' payload grabbed.")
-
             else:
                 command.register(command.name) # Registering prefix commands with their command name.
 
@@ -75,6 +74,7 @@ class CommandLoader():
 
             registered_interactions = await r.json()
 
+            # Registering slash commands with the id given by discord.
             for interaction in registered_interactions:
 
                 for command in self.goldy.pre_invokables:
@@ -82,8 +82,6 @@ class CommandLoader():
                     if command.name == interaction["name"]:
                         command.register(interaction["id"])
                         break
-
-            # TODO: Register slash command invokables here with the id given by discord.
 
             self.logger.debug(f"Created slash cmds for guild '{guild[1]}'.")
 
