@@ -128,13 +128,13 @@ class ExtensionLoader():
             except Exception as e:
                 if isinstance(e, AttributeError):
                     error_str = \
-                        f"We encountered an error while trying to load the extension at '{path}'! " \
-                        f"You likely forgot the 'load()' function. " \
+                        f"We encountered an error while trying to load the extension at '{pathlib.Path(path).name}'! " \
+                        f"\nYou likely forgot the 'load()' function. " \
                         "Check out https://goldybot.devgoldy.xyz/goldy.extensions.html#how-to-create-an-extension" \
                         f"\nERROR --> {e}"
                 else:
                     error_str = \
-                        f"We encountered an error while trying to load the extension at '{path}'! " \
+                        f"We encountered an error while trying to load the extension at '{pathlib.Path(path).name}'! " \
                         f"\nERROR --> {e}"
                 
                 if self.raise_on_load_error:
