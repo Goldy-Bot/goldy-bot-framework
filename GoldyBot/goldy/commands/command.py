@@ -28,7 +28,8 @@ class Command(Invokable):
         slash_options: Dict[str, ApplicationCommandOptionData] = None, 
         hidden: bool = False, 
     ):
-        self.__func = func
+        self.func = func
+        """The command's callback function."""
 
         if name is None:
             name = func.__name__
@@ -56,6 +57,7 @@ class Command(Invokable):
             {
                 "name": name,
                 "description": description,
+                "options": params_utils.params_to_options(self),
                 "default_member_permissions": str(1 << 3) if hidden else None,
                 "type": 1
             }, 
@@ -63,11 +65,6 @@ class Command(Invokable):
             goldy, 
             LoggerAdapter(LoggerAdapter(goldy_bot_logger, prefix="Command"), prefix=Colours.PINK_GREY.apply(name))
         )
-
-    @property
-    def func(self) -> Callable[[Extension, objects.GoldPlatter], Any]:
-        """The command's callback function."""
-        return self.__func
 
     @property
     def name(self) -> str:

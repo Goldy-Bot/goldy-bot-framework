@@ -7,7 +7,7 @@ from discord_typings import InteractionCreateData, MessageData, ApplicationComma
 from .command import Command
 from .slash_command import SlashCommand
 from .prefix_command import PrefixCommand
-from ..components.buttons.button import Button
+from ..recipes.buttons.button import Button
 from ..nextcore_utils.slash_options.auto_complete.send import send_auto_complete
 from .. import objects
 from ... import LoggerAdapter, goldy_bot_logger, utils
