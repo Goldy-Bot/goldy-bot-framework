@@ -2,8 +2,6 @@ from __future__ import annotations
 from typing import Any, Callable, List, TYPE_CHECKING
 from discord_typings import InteractionData
 
-from devgoldyutils import Colours
-
 from .. import objects
 from ..nextcore_utils import front_end_errors
 
@@ -22,15 +20,17 @@ class PrefixCommand(Command):
         name: str = None, 
         description: str = None, 
         required_roles: List[str] = None, 
-        hidden: bool = False
+        hidden: bool = False,
+        pre_register: bool = True
     ):
         super().__init__(
-            goldy, 
-            func, 
-            name, 
-            description, 
-            required_roles, 
-            hidden = hidden
+            goldy = goldy, 
+            func = func, 
+            name = name, 
+            description = description, 
+            required_roles = required_roles, 
+            hidden = hidden,
+            pre_register = pre_register
         )
 
         self.logger.debug("Prefix command has been initialized!")
@@ -50,15 +50,14 @@ class PrefixCommand(Command):
 
         return f"{self.parent_cmd.name + ' ' if self.is_child else ''}{self.name} {command_args_string[:-1]}{command_sub_cmds_string[:-1]}"
 
+    def register_sub_command(self, command: Command) -> None:
+        """Method that registers prefix sub command."""
+        # TODO: add sub command registering for prefix command.
+        ...
+
     async def invoke(self, platter: objects.GoldPlatter) -> None:
         """Runs and triggers a slash command. This method is usually ran internally."""
         data: InteractionData = platter.data
-
-        self.logger.info(
-            Colours.BLUE.apply(
-                f"Prefix command invoked by '{platter.author.username}#{platter.author.discriminator}'."
-            )
-        )
 
         params = params_utils.invoke_data_to_params(data, platter)
         if not params == []: self.logger.debug(f"Got args --> {params}")

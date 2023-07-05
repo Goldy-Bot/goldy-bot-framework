@@ -90,7 +90,7 @@ class CommandListener():
             # Command auto complete
             # -----------------------
             elif interaction["type"] == 4:
-                command: Tuple[str, Command] = utils.cache_lookup(interaction["data"]["name"], commands_cache)
+                command: Tuple[str, Command] = utils.cache_lookup(interaction["data"]["name"], self.goldy.invokables)
 
                 current_typing_option: ApplicationCommandOptionInteractionData = None
 

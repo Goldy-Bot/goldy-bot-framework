@@ -20,7 +20,7 @@ class PermissionSystem():
 
     async def got_perms(self, platter: GoldPlatter) -> bool: # TODO: I might rename this method.
         """Method that checks if the command author has the perms to run this command."""
-
+        
         if not platter.command.required_roles == []:
             self.logger.debug("Checking if member has perms to run command...")
 
@@ -28,6 +28,7 @@ class PermissionSystem():
             # --------------------------------------------------------------------------------------------------------------
             if "bot_dev" in platter.command.required_roles:
                 if platter.author.id == self.goldy.config.bot_dev:
+                    self.logger.debug("Member is a bot developer :)")
                     return True
 
             # Check if member has any of the required roles.
@@ -62,12 +63,14 @@ class PermissionSystem():
                     # Loop through each role of the member and check if the role id is equal to that required.
                     for member_role_id in member_data["roles"]:
                         if str(member_role_id) == role_id_uwu:
-                            self.logger.debug(f"The author has the required role '{role_code_name}'.")
+                            self.logger.debug(f"The author has the required role '{role_code_name}' :)")
                             return True
                     
 
                     # TODO: Might be better to create a Role() object and add a .has_role() method to Member object.
 
+            self.logger.info("The author has no perms to run this command.")
             return False
-        
+
+        self.logger.debug("This command has no required perms. Your free! 🔓")
         return True

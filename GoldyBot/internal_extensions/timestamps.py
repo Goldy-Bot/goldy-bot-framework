@@ -39,9 +39,7 @@ class Timestamps(GoldyBot.Extension):
             colour = GoldyBot.Colours.RED
         )
 
-    @GoldyBot.command()
-    async def timestamp(self, platter: GoldyBot.GoldPlatter):
-        ...
+    timestamp = GoldyBot.GroupCommand("timestamp")
 
     @timestamp.sub_command(description = "Sends a discord timestamp of that time and date.", slash_options = {
         "date": GoldyBot.SlashOptionAutoComplete(

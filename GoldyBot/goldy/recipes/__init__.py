@@ -15,7 +15,7 @@ RECIPE_CALLBACK = Callable[[GoldPlatter], Any]
 
 class Recipe(Invokable):
     """A recipe is equivalent to an item or message component. This is inherited by all message components in Goldy Bot. This can be passed into a send_msg function."""
-    def __init__(self, data: ComponentData, name: str, callback: RECIPE_CALLBACK, goldy: Goldy, author_only: bool = True, **callback_args: dict) -> ComponentData:
+    def __init__(self, data: ComponentData, name: str, callback: RECIPE_CALLBACK, author_only: bool = True, **callback_args: dict) -> ComponentData:
         """
         Creates an component in discord to use in action rows. 😋
         """
@@ -30,11 +30,13 @@ class Recipe(Invokable):
             prefix = Colours.PINK_GREY.apply(name)
         )
 
+        from ... import get_goldy_instance
+
         super().__init__(
             name = name,
             data = data,
             callback = callback,
-            goldy = goldy,
+            goldy = get_goldy_instance(),
             logger = self.logger 
         )
 
