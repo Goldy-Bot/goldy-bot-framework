@@ -130,6 +130,10 @@ class Command(Invokable):
         self.__is_disabled = False
         self.logger.debug(Colours.GREEN.apply("Command has been enabled!"))
 
+    def delete(self):
+        """Method to remove/delete command."""
+        self.unregister()
+
     @abstractmethod
     def register_sub_command(self, command: Command) -> None:
         """

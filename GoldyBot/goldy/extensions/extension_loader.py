@@ -151,7 +151,7 @@ class ExtensionLoader():
     async def reload(self) -> None:
         """Reloads all extensions loaded in goldy bot."""
         ...
-    
+
     @overload
     async def reload(self, extensions: List[Extension]) -> None:
         """Reloads each extension in the list."""
@@ -168,7 +168,7 @@ class ExtensionLoader():
 
         for extension in extensions:
             # Unload all commands in extension.
-            await extension.unload()
+            extension.unload()
 
             # Get the full path the extension was loaded from so we can load it again with ExtensionLoader().
             if extension.loaded_path not in loaded_paths:

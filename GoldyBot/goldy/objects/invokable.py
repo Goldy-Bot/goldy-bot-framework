@@ -48,10 +48,23 @@ class Invokable(ABC, dict):
         return self.__name
 
     def register(self, id: str) -> None:
-        """Method to register this as invokable in goldy bot."""
+        """Method to register this as an invokable."""
         self.__id = id
         self.goldy.invokables.append((id, self))
+        self.goldy.pre_invokables.remove(self)
         self.logger.debug(f"'{self.name}' has been registered with id '{id}'!")
+
+    def unregister(self) -> None:
+        """Deletes and removes this invokable from the registration list, making it no longer invokable."""
+        self.goldy.invokables.remove(
+            (self.id, self)
+        )
+
+        self.logger.debug(
+            f"Invokable '{self.name}' has been unregistered!"
+        )
+
+        return None
 
     @abstractmethod
     async def invoke(self, platter: Platter) -> Any:
