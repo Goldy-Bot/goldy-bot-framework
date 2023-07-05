@@ -16,6 +16,8 @@ if TYPE_CHECKING:
 
 params_logger = LoggerAdapter(goldy_bot_logger, prefix=Colours.PINK_GREY.apply("Params Utils"))
 
+# TODO: We might move these utils into the command objects themselves in the future, so yeah this might be gone later.
+
 def params_to_options(command: Command) -> List[ApplicationCommandOptionData]:
     """A utility function that converts goldy command parameters to slash command options."""
     options: List[ApplicationCommandOptionData] = []

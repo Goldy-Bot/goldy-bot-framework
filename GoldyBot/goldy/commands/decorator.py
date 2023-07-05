@@ -1,7 +1,8 @@
 from __future__ import annotations
 
-from typing import List, Dict, TYPE_CHECKING
+from typing import List, Dict, TYPE_CHECKING, overload, Callable, Literal
 
+from .group_command import GroupCommand
 from .slash_command import SlashCommand
 from .prefix_command import PrefixCommand
 from ... import get_goldy_instance
@@ -9,6 +10,29 @@ from ... import get_goldy_instance
 if TYPE_CHECKING:
     from GoldyBot import SlashOption
 
+@overload
+def command(
+    name: str = None, 
+    description: str = None, 
+    required_roles: List[str] = None, 
+    slash_options: Dict[str, SlashOption] = None,
+    slash_cmd_only: bool = False, 
+    hidden: bool = False,
+    group: Literal[False] = False
+) -> Callable[..., None]:
+    ...
+
+@overload
+def command(
+    name: str = None, 
+    description: str = None, 
+    required_roles: List[str] = None, 
+    slash_options: Dict[str, SlashOption] = None,
+    slash_cmd_only: bool = False, 
+    hidden: bool = False,
+    group: Literal[True] = False
+) -> Callable[..., GroupCommand]:
+    ...
 
 def command(
     name: str = None, 
@@ -16,7 +40,8 @@ def command(
     required_roles: List[str] = None, 
     slash_options: Dict[str, SlashOption] = None,
     slash_cmd_only: bool = False, 
-    hidden: bool = False
+    hidden: bool = False,
+    group: bool = False
 ):
     """
     Add a command to Goldy Bot with this decorator.
@@ -39,20 +64,19 @@ def command(
     
     """
     def decorate(func):
-        def inner(func) -> None:
+        def inner(func):
             goldy = get_goldy_instance()
 
-            SlashCommand(
-                goldy = goldy, 
-                func = func, 
-                name = name, 
-                description = description, 
-                required_roles = required_roles, 
-                slash_options = slash_options,
-                hidden = hidden
-            )
-
-            if not slash_cmd_only:
+            commands = (
+                SlashCommand(
+                    goldy = goldy, 
+                    func = func, 
+                    name = name, 
+                    description = description, 
+                    required_roles = required_roles, 
+                    slash_options = slash_options,
+                    hidden = hidden
+                ),
                 PrefixCommand(
                     goldy = goldy,
                     func = func,
@@ -60,7 +84,10 @@ def command(
                     description = description,
                     required_roles = required_roles,
                     hidden = hidden
-                )
+                ) if slash_cmd_only is False else None
+            )
+
+            return GroupCommand(base_commands = commands) if group else None
 
         return inner(func)
 

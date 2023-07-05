@@ -13,13 +13,21 @@ from .goldy.token import Token
 from .goldy.perms import Perms
 from .goldy.extensions import Extension
 from .goldy.commands.decorator import command
-from .goldy.components import Recipe
-from .goldy.components.buttons.button import Button, ButtonStyle
+from .goldy.commands.group_command import GroupCommand
 from .utils import *
 
+# Recipes
+# --------
+from .goldy.recipes import Recipe
+from .goldy.recipes.buttons.button import Button, ButtonStyle
+
+# Database
+# ----------
 from .goldy.database import DatabaseEnums
 from .goldy.database.wrappers import DatabaseWrapper
 
+# Nextcore utils and api wrappers.
+# ----------------------------------
 from .goldy import nextcore_utils
 from .goldy.nextcore_utils import (
     Colours,
@@ -31,6 +39,8 @@ from .goldy.nextcore_utils import (
     front_end_errors
 )
 
+# Objects
+# ---------
 from .goldy import objects
 from .goldy.objects import (
     GoldPlatter, Ctx, Context,

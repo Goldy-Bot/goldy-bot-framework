@@ -7,7 +7,7 @@ from discord_typings import InteractionCreateData, MessageData, ApplicationComma
 from .command import Command
 from .slash_command import SlashCommand
 from .prefix_command import PrefixCommand
-from ..components.buttons.button import Button
+from ..recipes.buttons.button import Button
 from ..nextcore_utils.slash_options.auto_complete.send import send_auto_complete
 from .. import objects
 from ... import LoggerAdapter, goldy_bot_logger, utils
@@ -90,7 +90,7 @@ class CommandListener():
             # Command auto complete
             # -----------------------
             elif interaction["type"] == 4:
-                command: Tuple[str, Command] = utils.cache_lookup(interaction["data"]["name"], commands_cache)
+                command: Tuple[str, Command] = utils.cache_lookup(interaction["data"]["name"], self.goldy.invokables)
 
                 current_typing_option: ApplicationCommandOptionInteractionData = None
 

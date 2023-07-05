@@ -32,9 +32,7 @@ class Extensions(GoldyBot.Extension):
             colour = GoldyBot.Colours.GREY # TODO: Replace this with brown.
         )
 
-    @GoldyBot.command(hidden = True)
-    async def extensions(self, platter: GoldyBot.GoldPlatter):
-        ...
+    extensions = GoldyBot.GroupCommand("extensions", hidden=True)
 
     @extensions.sub_command(
         description = "A command for enabling a Goldy Bot extension that is disabled.",

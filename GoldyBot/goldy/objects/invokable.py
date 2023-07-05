@@ -1,22 +1,16 @@
 from __future__ import annotations
 
 import logging
-from enum import Enum
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Union, Callable, Any
 
 if TYPE_CHECKING:
     from .. import Goldy
     from .platter import Platter
+    from ..recipes import Recipe
     from ..commands.command import Command
-    from ..components.buttons.button import Button
 
-    INVOKABLE_TYPES = Union[Command, Button]
-
-class InvokableType(Enum):
-    PREFIX_CMD = 0
-    SLASH_CMD = 1
-    BUTTON = 2
+    INVOKABLE_TYPES = Union[Command, Recipe]
 
 class Invokable(ABC, dict):
     """A hybrid abstract class that is inherited from every goldy bot object that can be invoked from discord, like a command, a button or on-message event."""
@@ -26,7 +20,8 @@ class Invokable(ABC, dict):
         data: dict,
         callback: Callable[[Platter], Any],
         goldy: Goldy,
-        logger: logging.Logger
+        logger: logging.Logger,
+        pre_register: bool = True
     ):
         self.__id: str = None
         self.__name = name
@@ -36,13 +31,14 @@ class Invokable(ABC, dict):
         self.logger = logger
 
         # Preregistering invokables.
-        self.goldy.pre_invokables.append(self)
-        self.logger.debug("Command has been PRE-registered.")
+        if pre_register:
+            self.goldy.pre_invokables.append(self)
+            self.logger.debug("Invokable has been PRE-registered.")
 
         super().__init__(data)
 
     @property
-    def id(self) -> str:
+    def id(self) -> str | None:
         """The id of the invokable. This is None when the invokable hasn't been registered."""
         return self.__id
 
