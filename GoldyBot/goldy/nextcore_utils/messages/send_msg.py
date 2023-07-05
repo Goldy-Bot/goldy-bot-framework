@@ -12,7 +12,7 @@ from .... import utils
 from ...commands import slash_command
 
 if TYPE_CHECKING:
-    from ...components import Recipe
+    from ...recipes import Recipe
     from ..embeds.embed import Embed
 
 # TODO: Add more options to allow using channel instead of platter.
@@ -146,14 +146,14 @@ async def send_msg(
         component_count = 0
         for recipe in recipes:
             # Recipes need the command platter object for when checking if it was the author who invoked a recipe.
-            recipe.cmd_platter = object 
+            recipe.command_platter = object 
 
             if count / 5 == 0:
                 component_count += 1
                 components[component_count] = ActionRowData(type=1, components=[])
 
             components[component_count]["components"].append(recipe)
-            
+
             count += 1
 
         payload["components"] = [components[component] for component in components]

@@ -12,6 +12,7 @@ from ..nextcore_utils.slash_options.auto_complete.send import send_auto_complete
 from .. import objects
 from ... import LoggerAdapter, goldy_bot_logger, utils
 from ..objects.platter.golden_platter import GoldPlatter
+from ..objects.platter.silver_platter import SilverPlatter
 
 if TYPE_CHECKING:
     from .. import Goldy
@@ -75,15 +76,14 @@ class CommandListener():
                 message_component: Tuple[str, Button] = utils.cache_lookup(interaction["data"]["custom_id"], self.goldy.invokables)
 
                 if message_component is not None:
-                    gold_platter = GoldPlatter( # TODO: Create new platter for message components. (SilverPlatter)
+                    silver_platter = SilverPlatter(
                         data = interaction, 
                         author = author,
-                        command = message_component[1],
+                        recipe = message_component[1]
                     )
 
                     await message_component[1].invoke(
-                        gold_platter,
-                        message_component[1].cmd_platter # TODO: Fix this.
+                        silver_platter
                     )
 
 

@@ -28,6 +28,8 @@ class Message(DictDataclass):
     def __post_init__(self):
         super().__post_init__()
 
+        print(">>", self.data)
+
         self.logger = logger
         
         self.id = self.get("id")

@@ -30,6 +30,9 @@ class Recipe(Invokable):
             prefix = Colours.PINK_GREY.apply(name)
         )
 
+        self.command_platter: objects.GoldPlatter | None = None
+        """The platter object from the command that sent this recipe."""
+
         from ... import get_goldy_instance
 
         super().__init__(
@@ -40,12 +43,12 @@ class Recipe(Invokable):
             logger = self.logger 
         )
 
-    async def invoke(self, platter: objects.GoldPlatter, cmd_platter: objects.GoldPlatter) -> Any:
+    async def invoke(self, platter: objects.SilverPlatter) -> Any:
         """Runs/triggers this recipe. This method is usually used internally."""
-        self.logger.debug("Attempting to invoke RECIPE...")
+        self.logger.debug(f"Attempting to invoke '{self.__class__.__name__}'...")
 
         if self.author_only:
-            if not platter.author.id == cmd_platter.author.id:
+            if not platter.author.id == platter.recipe.command_platter.author.id:
                 raise front_end_errors.OnlyAuthorCanInvokeRecipe(platter, self.logger)
 
         try:
