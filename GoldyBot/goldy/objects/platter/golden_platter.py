@@ -19,7 +19,7 @@ class GoldPlatter(Platter):
 
     ✨ Behold the golden platter. ✨😁
     """
-    def __init__(self, data: MessageData|InteractionData, author: Member, command: Command) -> None:
+    def __init__(self, data: MessageData | InteractionData, author: Member, command: Command) -> None:
         # TODO: We got to somehow test this stuff with pytest because this being error prone is sort of a catastrophe.
         super().__init__(
             data = data, 

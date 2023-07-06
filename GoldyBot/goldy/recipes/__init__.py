@@ -5,13 +5,14 @@ from discord_typings import ComponentData
 from devgoldyutils import LoggerAdapter, Colours
 
 from ... import goldy_bot_logger
-from ..objects import Invokable, GoldPlatter
+from ..objects.invokable import Invokable
+from ..objects.platter.silver_platter import SilverPlatter
 from ..nextcore_utils import front_end_errors
 
 if TYPE_CHECKING:
-    from ... import Goldy, objects
+    from ... import objects
 
-RECIPE_CALLBACK = Callable[[GoldPlatter], Any]
+RECIPE_CALLBACK = Callable[[SilverPlatter], Any]
 
 class Recipe(Invokable):
     """A recipe is equivalent to an item or message component. This is inherited by all message components in Goldy Bot. This can be passed into a send_msg function."""

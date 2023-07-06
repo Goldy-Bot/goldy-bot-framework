@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Tuple, TYPE_CHECKING
 from devgoldyutils import Colours
-from discord_typings import InteractionCreateData, MessageData, ApplicationCommandOptionInteractionData
+from discord_typings import InteractionCreateData, MessageData, ApplicationCommandOptionInteractionData, ComponentInteractionData
 
 from .command import Command
 from .slash_command import SlashCommand
@@ -73,6 +73,7 @@ class CommandListener():
             # Message components.
             # --------------------
             elif interaction["type"] == 3:
+                interaction: ComponentInteractionData
                 message_component: Tuple[str, Button] = utils.cache_lookup(interaction["data"]["custom_id"], self.goldy.invokables)
 
                 if message_component is not None:
@@ -118,7 +119,8 @@ class CommandListener():
             return
 
         if guild is not None:
-            await guild.update()
+            #await guild.update() # Since v5.0dev5 the guild database data is no longer updated automatically on message event.
+            # This means if you manually change the command prefix in the database you have to also manually run "reload_config" in live console.
             
             # Check if prefix is correct.
             if not guild.prefix == message["content"][0]:

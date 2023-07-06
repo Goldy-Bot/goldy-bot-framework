@@ -10,9 +10,9 @@ from nextcore.common import json_dumps
 from ... import objects
 from .... import utils
 from ...commands import slash_command
+from ...recipes import Recipe
 
 if TYPE_CHECKING:
-    from ...recipes import Recipe
     from ..embeds.embed import Embed
 
 # TODO: Add more options to allow using channel instead of platter.
@@ -120,7 +120,7 @@ async def send_msg(
     ...
 
 async def send_msg(
-    object: objects.GoldPlatter | objects.Member | objects.Channel, 
+    object: objects.Platter | objects.Member | objects.Channel, 
     text: str = None, 
     embeds: List[Embed] = None, 
     recipes: List[Recipe] = None, 
@@ -163,10 +163,10 @@ async def send_msg(
 
     message_data: MessageData = None
 
-    if isinstance(object, objects.GoldPlatter):
-        platter: objects.GoldPlatter = object
+    if isinstance(object, objects.Platter):
+        platter: objects.Platter = object
 
-        if isinstance(platter.command, slash_command.SlashCommand):
+        if isinstance(platter.invokable, (slash_command.SlashCommand, Recipe)):
             # Perform interaction response.
             # ------------------------------
 
