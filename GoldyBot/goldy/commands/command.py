@@ -3,14 +3,14 @@ from abc import abstractmethod
 from typing import Callable, Any, List, Dict, TYPE_CHECKING
 from discord_typings import ApplicationCommandOptionData
 
+import regex
 from devgoldyutils import LoggerAdapter, Colours
 
 from ..extensions import extensions_cache
 from ... import goldy_bot_logger, utils
-
-from . import params_utils
-from ..nextcore_utils import front_end_errors
 from ..objects import Invokable
+from ... import errors
+from ..nextcore_utils import front_end_errors
 
 if TYPE_CHECKING:
     from ... import Goldy, Extension
@@ -53,7 +53,7 @@ class Command(Invokable):
 
         self.__hidden = hidden
 
-        self.__params = params_utils.get_function_parameters(self)
+        self.__params = self.__get_function_parameters()
 
         self._is_loaded = False
         self.__is_disabled = False
@@ -63,7 +63,7 @@ class Command(Invokable):
             {
                 "name": name,
                 "description": description,
-                "options": params_utils.params_to_options(self),
+                "options": self.params_to_options(),
                 "default_member_permissions": str(1 << 3) if hidden else None,
                 "type": 1
             }, 
@@ -165,3 +165,52 @@ class Command(Invokable):
 
         # If member has no perms raise MissingPerms exception.
         raise front_end_errors.MissingPerms(platter, self.logger)
+
+
+    def __get_function_parameters(self) -> List[str]:
+        """Returns the function parameters of a command respectively."""
+        
+        # Get list of function params.
+        func_params = list(self.func.__code__.co_varnames)
+        
+        # Removes 'self' argument.
+        func_params.pop(0)
+
+        # Removes 'platter' argument.
+        func_params.pop(0)
+
+        # Filters out other variables resulting in just function parameters. It's weird I know.
+        params = func_params[:self.func.__code__.co_argcount - 2]
+
+        return params
+    
+    def params_to_options(self) -> List[ApplicationCommandOptionData]:
+        """A function that converts slash command parameters to slash command options."""
+        options: List[ApplicationCommandOptionData] = []
+
+        # Discord chat input regex as of https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-naming
+        chat_input_patten = regex.compile(r"^[-_\p{L}\p{N}\p{sc=Deva}\p{sc=Thai}]{1,32}$", regex.UNICODE)
+
+        for param in self.params:
+            if param.isupper() or bool(chat_input_patten.match(param)) is False: # Uppercase parameters are not allowed in the discord API.
+                raise errors.InvalidParameter(self, param)
+
+            if param in self.slash_options:
+                option_data = self.slash_options[param]
+                
+                if option_data.get("name") is None:
+                    option_data["name"] = param
+
+                options.append(
+                    option_data
+                )
+            
+            else:
+                options.append({
+                    "name": param,
+                    "description": "This option has no description. Sorry about that.",
+                    "type": 3,
+                    "required": True,
+                })
+
+        return options

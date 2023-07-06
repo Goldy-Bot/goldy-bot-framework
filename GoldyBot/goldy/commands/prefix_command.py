@@ -1,6 +1,6 @@
 from __future__ import annotations
 from typing import Any, Callable, List, TYPE_CHECKING
-from discord_typings import InteractionData
+from discord_typings import MessageData
 
 from .. import objects
 from ..nextcore_utils import front_end_errors
@@ -9,7 +9,6 @@ if TYPE_CHECKING:
     from .. import Goldy
     from ... import Extension
 
-from . import params_utils
 from .command import Command
 
 class PrefixCommand(Command):
@@ -57,9 +56,9 @@ class PrefixCommand(Command):
 
     async def invoke(self, platter: objects.GoldPlatter) -> None:
         """Runs and triggers a slash command. This method is usually ran internally."""
-        data: InteractionData = platter.data
+        data: MessageData = platter.data
 
-        params = params_utils.invoke_data_to_params(data, platter)
+        params = self.__invoke_data_to_params(data)
         if not params == []: self.logger.debug(f"Got args --> {params}")
 
         try:
@@ -86,3 +85,30 @@ class PrefixCommand(Command):
             
             # TODO: When exceptions raise in commands wrap them in a goldy bot command exception.
             raise e
+
+    def __invoke_data_to_params(self, data: MessageData) -> List[str]: 
+        """A function that grabs prefix command arguments from invoke data and converts it to appropriate params."""
+        self.logger.debug("Attempting to phrase invoke data into parameters...")
+
+        # Where all the fucking magic happens.
+        params = []
+        for arg in data["content"].split(" ")[1:]:
+            # Ignore sub commands.
+            if arg in [cmd_name[0] for cmd_name in self.sub_commands]:
+                self.logger.debug(f"Not phrasing the argument '{arg}' as it is a sub command.")
+                continue
+            
+            # A really weird check I know but I promise it's needed okay.
+            if arg == "" or arg[0] == " ":
+                self.logger.debug(f"Not phrasing the argument '{arg}' as it is either blank or incorrect.")
+                continue
+
+            # If the argument is a user, a channel or a role strip the id from the mention. (Yes this means normal args can't start with these)
+            if arg[:2] in ["<@", "<#"]:
+                params.append(arg[2:-1])
+            else:
+                params.append(arg)
+
+            self.logger.debug(f"Found arg '{arg}'.")
+
+        return params

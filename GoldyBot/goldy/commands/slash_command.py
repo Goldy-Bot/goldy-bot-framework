@@ -6,7 +6,6 @@ if TYPE_CHECKING:
     from .. import Goldy, objects
     from ... import Extension
 
-from . import params_utils
 from .command import Command
 from ..objects import GoldPlatter
 
@@ -45,7 +44,7 @@ class SlashCommand(Command):
             {
                 "name": command.name,
                 "description": command.description,
-                "options": params_utils.params_to_options(command),
+                "options": command.params_to_options(),
                 "default_member_permissions": str(1 << 3) if command.hidden else None,
                 "type": 1
             }
@@ -57,7 +56,7 @@ class SlashCommand(Command):
         """Runs and triggers a slash command. This method is usually ran internally."""
         data: InteractionData = platter.data
 
-        params = params_utils.invoke_data_to_params(data, platter)
+        params = self.__invoke_data_to_params(data)
         if not params == {}: self.logger.debug(f"Got args --> {params}")
 
         return_value = await super().invoke(
@@ -72,13 +71,11 @@ class SlashCommand(Command):
 
         # TODO: When exceptions raise in commands wrap them in a goldy bot command exception.
 
+
     async def __invoke_sub_command(self, data: InteractionData, platter: objects.GoldPlatter) -> None:
         for option in data["data"].get("options", []):
-
             if option["type"] == 1:
-
                 for command in self.__sub_commands:
-
                     if command.name == option["name"]:
                         self.logger.debug("Calling sub command...")
 
@@ -96,3 +93,25 @@ class SlashCommand(Command):
 
                         await command.invoke(platter)
                         break
+
+    def __invoke_data_to_params(self, data: InteractionData) -> Dict[str, str]:
+        """A method that grabs slash command arguments from invoke data and converts it to appropriate params."""
+        self.logger.debug("Attempting to phrase invoke data into parameters...")
+
+        params = {}
+        for option in data["data"].get("options", []):
+            param_key_name = option["name"]
+
+            if option["type"] == 1 or option["type"] == 2: # Ignore sub commands and sub groups.
+                continue
+
+            # Make sure to set dictionary key to the true parameter name.
+            for slash_option in self.slash_options:
+                if self.slash_options[slash_option]["name"] == option["name"]:
+                    param_key_name = slash_option
+                    break
+
+            params[param_key_name] = option["value"]
+            self.logger.debug(f"Found arg '{params[param_key_name]}'.")
+
+        return params
