@@ -10,7 +10,6 @@ import logging as log
 from ... import errors
 from .colours import Colours
 from .embeds.embed import Embed
-from  ..commands import slash_command, prefix_command
 
 if TYPE_CHECKING:
     from .. import objects
@@ -24,6 +23,7 @@ class FrontEndErrors(errors.GoldyBotError):
             delete_after = 8,
             logger: log.Logger = None
         ):
+        from  ..commands import slash_command
 
         platter.goldy.async_loop.create_task(
             platter.send_message(
@@ -86,6 +86,7 @@ class MissingPerms(FrontEndErrors):
         # Don't raise front end error if the command is hidden and is a prefix command.
         # This insures prefix commands are truly hidden.
         # The git issue: https://github.com/Goldy-Bot/Goldy-Bot-V5/issues/54
+        from  ..commands import prefix_command
 
         message = f"The command author '{platter.author.username}#{platter.author.discriminator}' doesn't have the perms to run this command."
 
