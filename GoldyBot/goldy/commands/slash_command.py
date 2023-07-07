@@ -36,8 +36,9 @@ class SlashCommand(Command):
 
         self.logger.debug("Slash command has been initialized!")
 
-    def register_sub_command(self, command: Command) -> None:
+    def register_sub_command(self, command: SlashCommand) -> None:
         """Method to register slash sub command."""
+        command._parent_command = self
         self.__sub_commands.append(command)
 
         dict(self)["options"].append(
@@ -51,6 +52,7 @@ class SlashCommand(Command):
         )
 
         self.logger.info(f"Registered '{command.name}' -> '{self.name}' as sub command.")
+
 
     async def invoke(self, platter: objects.GoldPlatter) -> None:
         """Runs and triggers a slash command. This method is usually ran internally."""
@@ -71,28 +73,30 @@ class SlashCommand(Command):
 
         # TODO: When exceptions raise in commands wrap them in a goldy bot command exception.
 
-
     async def __invoke_sub_command(self, data: InteractionData, platter: objects.GoldPlatter) -> None:
         for option in data["data"].get("options", []):
-            if option["type"] == 1:
-                for command in self.__sub_commands:
-                    if command.name == option["name"]:
-                        self.logger.debug("Calling sub command...")
+            if not option["type"] == 1:
+                continue
 
-                        interaction_responded = platter._interaction_responded
+            for command in self.__sub_commands:
+                if command.name == option["name"]:
+                    self.logger.debug("Calling sub command...")
 
-                        # Migrating some things from sub command.
-                        data["data"]["options"] = option["options"]
+                    interaction_responded = platter._interaction_responded
 
-                        platter = GoldPlatter(
-                            data = data, 
-                            author = platter.author,
-                            command = command,
-                        )
-                        platter._interaction_responded = interaction_responded
+                    # Migrating some things from sub command.
+                    data["data"]["options"] = option["options"]
 
-                        await command.invoke(platter)
-                        break
+                    platter = GoldPlatter(
+                        data = data, 
+                        author = platter.author,
+                        command = command,
+                    )
+                    platter._interaction_responded = interaction_responded
+
+                    await command.invoke(platter)
+                    break
+
 
     def __invoke_data_to_params(self, data: InteractionData) -> Dict[str, str]:
         """A method that grabs slash command arguments from invoke data and converts it to appropriate params."""

@@ -27,7 +27,6 @@ def command(
     name: str = None, 
     description: str = None, 
     required_roles: List[str] = None, 
-    slash_options: Dict[str, SlashOption] = None,
     slash_cmd_only: bool = False, 
     hidden: bool = False,
     group: Literal[True] = False

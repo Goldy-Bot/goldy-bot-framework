@@ -39,7 +39,7 @@ class Command(Invokable):
             name = func.__name__
 
         if description is None:
-            description = "Oops daisy, looks like no description was set for this command."
+            description = "🪹 Oops daisy, looks like no description was set for this command."
 
         if required_roles is None:
             self.__required_roles = []
@@ -55,6 +55,7 @@ class Command(Invokable):
 
         self.__params = self.__get_function_parameters()
 
+        self._parent_command = None
         self._is_loaded = False
         self.__is_disabled = False
 
@@ -119,6 +120,19 @@ class Command(Invokable):
     def is_disabled(self) -> bool:
         """Returns whether the command is disabled or not."""
         return self.__is_disabled
+
+    @property
+    def parent_command(self) -> Command | None:
+        """Command object of the parent command if this command is a subcommand."""
+        return self._parent_command
+
+    @property
+    def is_child(self) -> bool:
+        """Returns if command is child or not. Basically is it a subcommand or not, in other words."""
+        if self.parent_command is None:
+            return False
+
+        return True
 
     def disable(self) -> None:
         """A method to disable this command."""

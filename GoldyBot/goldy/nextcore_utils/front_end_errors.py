@@ -62,21 +62,28 @@ class MissingArgument(FrontEndErrors):
         )
 
 
-class TooManyArguments(FrontEndErrors):
+class InvalidArguments(FrontEndErrors):
     def __init__(self, platter: objects.GoldPlatter, logger: log.Logger = None):
         super().__init__(
             embed = Embed(
-                title = ":heart: You gave me too many arguments.", 
+                title = "⚠️ Invalid Arguments!", 
                 description = f"""
-                This command doesn't take that many arguments or it doesn't take any arguments at all.
+                The arguments you entered for this command are invalid.
 
-                **Command Usage -> ``{platter.guild.prefix}{platter.command.command_usage}``**
+                One of these could be the cause:
+                - This command takes a sub command and you mistyped it.
+                - This command doesn't take that many arguments.
+                - It doesn't take any arguments at all.
+
+                ```
+                Command Usage -> {platter.guild.prefix}{platter.command.command_usage}
+                ```
                 """,
-                colour = Colours.RED
+                colour = Colours.YELLOW
             ),
             message = "The command author passed too many arguments.",
             platter = platter, 
-            delete_after = 10,
+            delete_after = 30,
             logger = logger
         )
 
