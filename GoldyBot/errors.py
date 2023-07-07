@@ -6,7 +6,7 @@ from devgoldyutils import Colours
 from . import goldy_bot_logger, log
 
 if TYPE_CHECKING:
-    from .goldy.commands import Command
+    from .goldy.commands.command import Command
 
 class GoldyBotError(Exception):
     """Raises whenever there's a known error in goldy bot."""

@@ -14,7 +14,7 @@ logger = LoggerAdapter(goldy_bot_logger, prefix="delete_channel")
 async def get_channel(channel_id: str | int, goldy: Goldy) -> objects.Channel:
     """
     Allows you to get a channel by id.
-    
+
     ------------------
 
     Parameters
@@ -43,4 +43,4 @@ async def get_channel(channel_id: str | int, goldy: Goldy) -> objects.Channel:
 
     logger.debug(f"We got the channel '{data['name']}'.")
 
-    return objects.Channel(data, goldy)
+    return objects.Channel(data, goldy.guild_manager.get_guild(data["guild_id"]), goldy)

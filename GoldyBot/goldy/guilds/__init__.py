@@ -2,9 +2,11 @@ from __future__ import annotations
 
 from typing import List, Tuple
 
-from .. import Goldy, utils, LoggerAdapter, goldy_bot_logger
+from devgoldyutils import Colours
+
+from .. import Goldy, LoggerAdapter, goldy_bot_logger
+from ... import utils, errors
 from ..database import DatabaseEnums
-from ...errors import GoldyBotError
 
 from .guild import Guild
 
@@ -14,7 +16,7 @@ class GuildManager():
     def __init__(self, goldy: Goldy) -> None:
         self.goldy = goldy
         self.allowed_guilds = goldy.config.allowed_guilds
-        self.logger = LoggerAdapter(goldy_bot_logger, prefix="GuildManager")
+        self.logger = LoggerAdapter(goldy_bot_logger, prefix=Colours.ORANGE.apply("GuildManager"))
 
         if self.allowed_guilds == []:
             raise AllowedGuildsNotSpecified(self.logger)
@@ -29,6 +31,7 @@ class GuildManager():
         """Adds guilds specified in goldy.json to the database if not already added."""
         # TODO: Find better way to organize this code, it's too long and complex for my liking.
         # 08/04/2023: idk is it really that complex... i'll come back to it later...
+        self.logger.info("Setting up guilds...")
 
         database = self.goldy.database.get_goldy_database(DatabaseEnums.GOLDY_MAIN)
 
@@ -87,6 +90,8 @@ class GuildManager():
                 (guild[0], Guild(guild_config, self.goldy))
             )
 
+            self.logger.info("Done setting up guilds.")
+
 
     def get_guild(self, guild_id: str | int) -> Guild | None:
         """Finds and returns goldy bot guild by id."""
@@ -103,7 +108,7 @@ class GuildManager():
 
 # Exceptions
 # ------------
-class AllowedGuildsNotSpecified(GoldyBotError):
+class AllowedGuildsNotSpecified(errors.GoldyBotError):
     def __init__(self, logger: logging.Logger = None):
         super().__init__(
             "Please add your guild id to the allowed_guilds in goldy.json",

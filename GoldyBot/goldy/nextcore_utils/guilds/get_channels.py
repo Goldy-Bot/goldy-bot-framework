@@ -4,15 +4,14 @@ from discord_typings import ChannelData
 
 from nextcore.http import Route
 
-from ...objects import Channel
-from ... import LoggerAdapter, goldy_bot_logger
+from ... import LoggerAdapter, goldy_bot_logger, objects
 
 if TYPE_CHECKING:
     from ...guilds import Guild
 
 logger = LoggerAdapter(goldy_bot_logger, prefix="get_channels")
 
-async def get_channels(guild: Guild) -> List[Channel]:
+async def get_channels(guild: Guild) -> List[objects.Channel]:
     """
     Returns a list of channels in that guild.
 
@@ -46,4 +45,4 @@ async def get_channels(guild: Guild) -> List[Channel]:
 
     logger.debug(f"Grabbed all channels from the guild '{guild.code_name}'.")
 
-    return [Channel(channel_data, goldy) for channel_data in guild_channels]
+    return [objects.Channel(channel_data, guild, goldy) for channel_data in guild_channels]

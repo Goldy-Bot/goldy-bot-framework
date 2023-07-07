@@ -20,12 +20,12 @@ def cache_lookup(key: str, cache: list, cap_sensitive = True) -> Tuple[str, ...]
     ...
 
 
-def cache_lookup(key: str|int, cache: dict|list, cap_sensitive = True) -> Tuple[str, ...] | Any | None:
+def cache_lookup(key: str|int, cache: dict|list|set, cap_sensitive = True) -> Tuple[str, ...] | Any | None:
     """Finds and returns object using key from any goldy bot cache object."""
     if cap_sensitive is False:
         key = key.lower()
 
-    if isinstance(cache, list):
+    if isinstance(cache, (list, set)):
         for obj in cache:
             
             if isinstance(obj, tuple):

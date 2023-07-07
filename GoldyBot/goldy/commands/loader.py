@@ -1,15 +1,13 @@
 from __future__ import annotations
-from typing import List, overload, TYPE_CHECKING
+from typing import List, overload
 from discord_typings import ApplicationCommandPayload
 
 from nextcore.http import Route
 
 from .. import Goldy
+from . import slash_command
+from .command import Command
 from ... import goldy_bot_logger, LoggerAdapter
-from . import commands_cache
-
-if TYPE_CHECKING:
-    from . import Command
 
 class CommandLoader():
     """Class that handles command loading."""
@@ -30,8 +28,9 @@ class CommandLoader():
 
     async def load(self, commands: List[Command] = None) -> None:
         """Loads/creates all commands that have been initialized in goldy bot."""
+        self.logger.info("Loading and registering commands...")
         if commands is None:
-            commands = [x[1] for x in commands_cache]
+            commands = [x for x in self.goldy.pre_invokables if isinstance(x, Command)]
 
         slash_command_payloads: List[ApplicationCommandPayload] = []
 
@@ -44,21 +43,22 @@ class CommandLoader():
                 continue
 
             command.extension.commands.append(command)
-            slash_command_payloads.append(command.slash_cmd_payload)
 
-            command._loaded = True
+            if isinstance(command, slash_command.SlashCommand):
+                slash_command_payloads.append(dict(command))
+                self.logger.debug(f"Slash command '{command.name}' payload grabbed.")
+            else:
+                command.register(command.name) # Registering prefix commands with their command name.
 
-            self.logger.debug(
-                f"Command '{command.name}' loaded and slash cmd payload grabbed."
-            )
+            command._is_loaded = True
 
+            command.logger.debug("Command loaded.")
 
         # Create slash commands for each allowed guild.
         # ----------------------------------------------
         for guild in self.goldy.guild_manager.allowed_guilds:
 
-            # TODO: Get the application objects from this response and save it in the guild. Also add a method in command object to retrieve it.
-            await self.goldy.http_client.request(
+            r = await self.goldy.http_client.request(
                 Route(
                     "PUT",
                     "/applications/{application_id}/guilds/{guild_id}/commands",
@@ -69,6 +69,20 @@ class CommandLoader():
                 headers = self.goldy.nc_authentication.headers,
                 json = slash_command_payloads
             )
+
+            registered_interactions = await r.json()
+
+            # Registering slash commands with the id given by discord.
+            for interaction in registered_interactions:
+
+                for command in self.goldy.pre_invokables:
+
+                    if not isinstance(command, slash_command.SlashCommand):
+                        continue
+
+                    if command.name == interaction["name"]:
+                        command.register(interaction["id"])
+                        break
 
             self.logger.debug(f"Created slash cmds for guild '{guild[1]}'.")
 
