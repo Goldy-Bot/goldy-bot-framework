@@ -54,7 +54,6 @@ class GroupCommand():
         name: str, 
         description: str = None, 
         required_roles: List[str] = None, 
-        slash_options: Dict[str, ApplicationCommandOptionData] = None, 
         slash_cmd_only: bool = False, 
         hidden: bool = False,
     ):
@@ -78,8 +77,6 @@ class GroupCommand():
     ):
         self.goldy = get_goldy_instance()
         self.logger = LoggerAdapter(goldy_bot_logger, prefix="GroupCommand")
-
-        self.__extension_name: str = None
 
         self.commands: Tuple[SlashCommand, PrefixCommand] = None
 
