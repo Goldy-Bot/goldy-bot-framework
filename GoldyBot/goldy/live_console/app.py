@@ -48,6 +48,15 @@ class LiveConsoleApp(cmd2.Cmd):
             self.goldy.guild_manager.setup()
         )
 
+    def do_reload_configs(self, _: cmd2.Statement):
+        self.goldy.config.__init__()
+
+        self.goldy.guild_manager.guilds.clear()
+
+        self.logger.warning("Wait, we're reloading guilds... (This may halt the discord for a while!)")
+        self.goldy.async_loop.create_task(
+            self.goldy.guild_manager.setup()
+        )
 
     def do_quit(self, _: cmd2.Statement):
         self.logger.info("Exiting...")

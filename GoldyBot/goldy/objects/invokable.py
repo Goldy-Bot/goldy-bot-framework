@@ -37,6 +37,9 @@ class Invokable(ABC, dict):
 
         super().__init__(data)
 
+    # Little trick to make all invokables hashable for set classes.
+    def __hash__(self): return id(self)
+
     @property
     def id(self) -> str | None:
         """The id of the invokable. This is None when the invokable hasn't been registered."""

@@ -73,8 +73,6 @@ class Command(Invokable):
             pre_register
         )
 
-    def __hash__(self): return id(self)
-
     @property
     def name(self) -> str:
         """The command's code name."""

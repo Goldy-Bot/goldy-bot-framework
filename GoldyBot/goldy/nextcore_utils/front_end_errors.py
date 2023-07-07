@@ -19,7 +19,7 @@ class FrontEndErrors(errors.GoldyBotError):
             self, 
             embed: Embed,
             message: str,
-            platter: objects.GoldPlatter, 
+            platter: objects.Platter, 
             delete_after = 8,
             logger: log.Logger = None
         ):
@@ -31,8 +31,8 @@ class FrontEndErrors(errors.GoldyBotError):
                     embed
                 ],
                 reply = True, 
-                delete_after = None if isinstance(platter.command, slash_command.SlashCommand) else delete_after,
-                flags = 1 << 6 if isinstance(platter.command, slash_command.SlashCommand) else None
+                delete_after = None if isinstance(platter.invoker, slash_command.SlashCommand) else delete_after,
+                flags = 1 << 6 if isinstance(platter.invoker, slash_command.SlashCommand) else None
             )
         )
 
