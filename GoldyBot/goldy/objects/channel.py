@@ -11,13 +11,16 @@ if TYPE_CHECKING:
     from . import Message
     from .. import Goldy
     from ..nextcore_utils.embeds.embed import Embed
-    from ..nextcore_utils.components import Recipe
+    from ..recipes import Recipe
+    from ..guilds.guild import Guild
 
 logger = LoggerAdapter(goldy_bot_logger, prefix="Channel")
 
+# TODO: Change this into a normal class.
 @dataclass
 class Channel(DictDataclass):
     data: ChannelData = field(repr=False)
+    guild: Guild = field(repr=False)
     goldy: Goldy = field(repr=False)
 
     id: str = field(init=False)
@@ -33,7 +36,7 @@ class Channel(DictDataclass):
 
         self.id = self.get("id")
         self.mention = f"<#{self.id}>"
-    
+
     async def send_message(
         self, 
         text: str = None, 
@@ -70,7 +73,7 @@ class Channel(DictDataclass):
         
         """
         return await nextcore_utils.send_msg(self, text, embeds, recipes, reply, delete_after, **extra)
-    
+
     async def delete(self, reason: str = None) -> Channel:
         return await nextcore_utils.delete_channel(self, reason)
 

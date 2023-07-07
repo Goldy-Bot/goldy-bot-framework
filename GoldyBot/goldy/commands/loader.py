@@ -52,9 +52,7 @@ class CommandLoader():
 
             command._is_loaded = True
 
-            self.logger.debug(
-                f"Command '{command.name}' loaded."
-            )
+            command.logger.debug("Command loaded.")
 
         # Create slash commands for each allowed guild.
         # ----------------------------------------------
@@ -78,6 +76,9 @@ class CommandLoader():
             for interaction in registered_interactions:
 
                 for command in self.goldy.pre_invokables:
+
+                    if not isinstance(command, slash_command.SlashCommand):
+                        continue
 
                     if command.name == interaction["name"]:
                         command.register(interaction["id"])

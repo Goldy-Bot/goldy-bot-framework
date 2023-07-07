@@ -45,4 +45,4 @@ async def get_channels(guild: Guild) -> List[objects.Channel]:
 
     logger.debug(f"Grabbed all channels from the guild '{guild.code_name}'.")
 
-    return [objects.Channel(channel_data, goldy) for channel_data in guild_channels]
+    return [objects.Channel(channel_data, guild, goldy) for channel_data in guild_channels]

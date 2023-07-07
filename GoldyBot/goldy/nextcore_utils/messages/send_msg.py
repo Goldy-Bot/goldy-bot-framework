@@ -24,6 +24,7 @@ async def send_msg(
     embeds: List[Embed] = None, 
     recipes: List[Recipe] = None, 
     reply: bool = False, 
+    delete_after: float = None,
     **extra: MessageData | InteractionCallbackData
 ) -> objects.Message: # Work in progress...
     """
@@ -43,6 +44,8 @@ async def send_msg(
         Components to include in the message.
     ``reply``
         Whether goldy bot should liberally reply to the message the command was invoked.
+    ``delete_after``
+        Deletes the sent message after said amount of seconds.
     ``**extra``
         Allows you to pass the extra parameters that are missing.
 
@@ -59,6 +62,7 @@ async def send_msg(
     text: str = None,
     embeds: List[Embed] = None, 
     recipes: List[Recipe] = None, 
+    delete_after: float = None,
     **extra: MessageData | InteractionCallbackData
 ) -> objects.Message:
     """
@@ -76,6 +80,8 @@ async def send_msg(
         Embeds to include in the message.
     ``recipes``
         Components to include in the message.
+    ``delete_after``
+        Deletes the sent message after said amount of seconds.
     ``**extra``
         Allows you to pass the extra parameters that are missing.
         
@@ -92,6 +98,7 @@ async def send_msg(
     text: str = None, 
     embeds: List[Embed] = None, 
     recipes: List[Recipe] = None, 
+    delete_after: float = None,
     **extra: MessageData | InteractionCallbackData
 ) -> objects.Message:
     """
@@ -109,6 +116,8 @@ async def send_msg(
         Embeds to include in the message.
     ``recipes``
         Components to include in the message.
+    ``delete_after``
+        Deletes the sent message after said amount of seconds.
     ``**extra``
         Allows you to pass the extra parameters that are missing.
 

@@ -32,7 +32,7 @@ class Invokable(ABC, dict):
 
         # Preregistering invokables.
         if pre_register:
-            self.goldy.pre_invokables.append(self)
+            self.goldy.pre_invokables.add(self)
             self.logger.debug("Invokable has been PRE-registered.")
 
         super().__init__(data)
@@ -50,7 +50,7 @@ class Invokable(ABC, dict):
     def register(self, id: str) -> None:
         """Method to register this as an invokable."""
         self.__id = id
-        self.goldy.invokables.append((id, self))
+        self.goldy.invokables.add((id, self))
         self.goldy.pre_invokables.remove(self)
         self.logger.debug(f"'{self.name}' has been registered with id '{id}'!")
 
