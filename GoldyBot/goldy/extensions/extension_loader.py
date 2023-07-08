@@ -128,13 +128,13 @@ class ExtensionLoader():
             except Exception as e:
                 if isinstance(e, AttributeError):
                     error_str = \
-                        f"We encountered an error while trying to load the extension at '{path}'! " \
-                        f"You likely forgot the 'load()' function. " \
+                        f"We encountered an error while trying to load the extension at '{'/'.join(path.split(os.path.sep)[-2:])}'! " \
+                        f"\nYou likely forgot the 'load()' function. " \
                         "Check out https://goldybot.devgoldy.xyz/goldy.extensions.html#how-to-create-an-extension" \
                         f"\nERROR --> {e}"
                 else:
                     error_str = \
-                        f"We encountered an error while trying to load the extension at '{path}'! " \
+                        f"We encountered an error while trying to load the extension at '{'/'.join(path.split(os.path.sep)[-2:])}'! " \
                         f"\nERROR --> {e}"
                 
                 if self.raise_on_load_error:
@@ -151,7 +151,7 @@ class ExtensionLoader():
     async def reload(self) -> None:
         """Reloads all extensions loaded in goldy bot."""
         ...
-    
+
     @overload
     async def reload(self, extensions: List[Extension]) -> None:
         """Reloads each extension in the list."""
@@ -168,7 +168,7 @@ class ExtensionLoader():
 
         for extension in extensions:
             # Unload all commands in extension.
-            await extension.unload()
+            extension.unload()
 
             # Get the full path the extension was loaded from so we can load it again with ExtensionLoader().
             if extension.loaded_path not in loaded_paths:

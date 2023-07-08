@@ -122,4 +122,13 @@ class Button(Recipe):
         else:
             data["custom_id"] = custom_id
 
-        super().__init__(data, data["label"], author_only, callback, **callback_args)
+        super().__init__(
+            data = data, 
+            name = data["label"],
+            callback = callback,
+            author_only = author_only, 
+            **callback_args
+        )
+
+        if not style == ButtonStyle.LINK.value:
+            self.register(custom_id)

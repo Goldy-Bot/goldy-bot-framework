@@ -77,12 +77,11 @@ class SlashOption(dict):
         Each SlashOptionChoice MUST have the same value type or else you'll get an invalid form body error from discord :)
 
     """
-
     def __init__(
         self, 
         name: str = None, 
         description: str = None, 
-        choices: List[SlashOptionChoice] = None, 
+        choices: List[SlashOptionChoice | str] = None, 
         type: SlashOptionTypes | Literal[6, 7, 8, 11] = None,
         required: bool = True, 
         **extra: ApplicationCommandOptionData
@@ -99,12 +98,13 @@ class SlashOption(dict):
 
         # Check if all choices are same type.
         if choices is not None:
+            if isinstance(choices, str):
+                choices = [SlashOptionChoice(x, x) for x in choices]
+
             allowed_type = type_(choices[0]["value"])
 
-            for choice in choices:
-                if not type_(choice["value"]) == allowed_type:
-                    raise GoldyBotError("All choices got to have the same value type!")
-
+            if not all([type_(choice["value"]) == allowed_type for choice in choices]):
+                raise GoldyBotError("All choices got to have the same value type!")
 
         if type is not None:
 
@@ -129,7 +129,7 @@ class SlashOption(dict):
                 self.data["type"] = 5
 
 
-        self.data["name"] = name # If this is None it will get handled by the nextcore_utils.params_to_options() function respectively.
+        self.data["name"] = name # If this is None it will get handled by the Command().params_to_options() function respectively.
         self.data["description"] = description
 
         if choices is not None:
@@ -140,4 +140,3 @@ class SlashOption(dict):
         self.data.update(extra)
         
         super().__init__(self.data)
-

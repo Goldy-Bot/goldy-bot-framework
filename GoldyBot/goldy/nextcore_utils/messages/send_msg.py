@@ -7,10 +7,12 @@ from aiohttp import FormData
 from nextcore.http import Route
 from nextcore.common import json_dumps
 
-from ... import objects, utils
+from ... import objects
+from .... import utils
+from ...commands import slash_command
+from ...recipes import Recipe
 
 if TYPE_CHECKING:
-    from ..components import Recipe
     from ..embeds.embed import Embed
 
 # TODO: Add more options to allow using channel instead of platter.
@@ -22,6 +24,7 @@ async def send_msg(
     embeds: List[Embed] = None, 
     recipes: List[Recipe] = None, 
     reply: bool = False, 
+    delete_after: float = None,
     **extra: MessageData | InteractionCallbackData
 ) -> objects.Message: # Work in progress...
     """
@@ -41,6 +44,8 @@ async def send_msg(
         Components to include in the message.
     ``reply``
         Whether goldy bot should liberally reply to the message the command was invoked.
+    ``delete_after``
+        Deletes the sent message after said amount of seconds.
     ``**extra``
         Allows you to pass the extra parameters that are missing.
 
@@ -57,6 +62,7 @@ async def send_msg(
     text: str = None,
     embeds: List[Embed] = None, 
     recipes: List[Recipe] = None, 
+    delete_after: float = None,
     **extra: MessageData | InteractionCallbackData
 ) -> objects.Message:
     """
@@ -74,6 +80,8 @@ async def send_msg(
         Embeds to include in the message.
     ``recipes``
         Components to include in the message.
+    ``delete_after``
+        Deletes the sent message after said amount of seconds.
     ``**extra``
         Allows you to pass the extra parameters that are missing.
         
@@ -90,6 +98,7 @@ async def send_msg(
     text: str = None, 
     embeds: List[Embed] = None, 
     recipes: List[Recipe] = None, 
+    delete_after: float = None,
     **extra: MessageData | InteractionCallbackData
 ) -> objects.Message:
     """
@@ -107,6 +116,8 @@ async def send_msg(
         Embeds to include in the message.
     ``recipes``
         Components to include in the message.
+    ``delete_after``
+        Deletes the sent message after said amount of seconds.
     ``**extra``
         Allows you to pass the extra parameters that are missing.
 
@@ -118,7 +129,7 @@ async def send_msg(
     ...
 
 async def send_msg(
-    object: objects.GoldPlatter | objects.Member | objects.Channel, 
+    object: objects.Platter | objects.Member | objects.Channel, 
     text: str = None, 
     embeds: List[Embed] = None, 
     recipes: List[Recipe] = None, 
@@ -144,14 +155,14 @@ async def send_msg(
         component_count = 0
         for recipe in recipes:
             # Recipes need the command platter object for when checking if it was the author who invoked a recipe.
-            recipe.cmd_platter = object 
+            recipe.command_platter = object 
 
             if count / 5 == 0:
                 component_count += 1
                 components[component_count] = ActionRowData(type=1, components=[])
 
             components[component_count]["components"].append(recipe)
-            
+
             count += 1
 
         payload["components"] = [components[component] for component in components]
@@ -161,10 +172,10 @@ async def send_msg(
 
     message_data: MessageData = None
 
-    if isinstance(object, objects.GoldPlatter):
-        platter: objects.GoldPlatter = object
+    if isinstance(object, objects.Platter):
+        platter: objects.Platter = object
 
-        if platter.type.value == 1:
+        if isinstance(platter.invokable, (slash_command.SlashCommand, Recipe)):
             # Perform interaction response.
             # ------------------------------
 

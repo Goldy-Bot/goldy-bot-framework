@@ -9,7 +9,7 @@ from ... import goldy_bot_logger, LoggerAdapter
 
 if TYPE_CHECKING:
     from ... import Goldy
-    from ..commands import Command
+    from ..commands.command import Command
 
 extensions_cache: List[Tuple[str, object]] = []
 """
@@ -108,18 +108,18 @@ class Extension():
 
         return None
 
-    async def unload(self) -> None:
+    def unload(self) -> None:
         """
         Unloads and deletes itself from cache and all the commands with it. 
         You won't be able to load the extension again without the load path.
         """
         for command in self.commands:
-            await command.unload()
+            command.delete()
 
         extensions_cache.remove(
             (self.name, self)
         )
 
-        self.logger.debug(f"Extension '{self.name}' removed!")
+        self.logger.debug(f"Extension '{self.name}' unloaded!")
 
         return None

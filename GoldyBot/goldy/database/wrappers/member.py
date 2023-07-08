@@ -63,8 +63,6 @@ class MemberDBWrapper(DatabaseWrapper):
                 f"'{self.member.username}'s global member data doesn't exist so we are generating one..."
             )
 
-            await database.find_
-
             await database.create_collection(
                 self.member.id,
                 data = {

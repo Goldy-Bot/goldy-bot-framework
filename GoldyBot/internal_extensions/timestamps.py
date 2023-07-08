@@ -39,17 +39,21 @@ class Timestamps(GoldyBot.Extension):
             colour = GoldyBot.Colours.RED
         )
 
-    @GoldyBot.command()
-    async def timestamp(self, platter: GoldyBot.GoldPlatter):
-        ...
+    timestamp = GoldyBot.GroupCommand("timestamp")
 
     @timestamp.sub_command(description = "Sends a discord timestamp of that time and date.", slash_options = {
-        "date": GoldyBot.SlashOption(
+        "date": GoldyBot.SlashOptionAutoComplete(
             description = "The date goes here like example, 13.08.2022 or even 2022/08/22.", 
+            recommendations = [
+                "today"
+            ],
             required = True,
         ),
-        "time": GoldyBot.SlashOption(
+        "time": GoldyBot.SlashOptionAutoComplete(
             description = "The time goes here like example, 15:00.", 
+            recommendations = [
+                "now"
+            ],
             required = True
         ),
         "flag": GoldyBot.SlashOption(
@@ -66,8 +70,9 @@ class Timestamps(GoldyBot.Extension):
             ]
         ),
         "timezone": GoldyBot.SlashOption(
-            description = "The timezone to use. Goldy Bot defaults to Europe/London timezone.", required=False),
-        "date_format": GoldyBot.SlashOption(description="The format we should read your date in. The order more specifically.", 
+            description = "The timezone to use. Goldy Bot defaults to Europe/London timezone.", required = False),
+        "date_format": GoldyBot.SlashOption(
+            description = "The format we should read your date in. The order more specifically.", 
             choices = [
                 GoldyBot.SlashOptionChoice("D/M/Y", 0),
                 GoldyBot.SlashOptionChoice("Y/M/D", 1)
@@ -139,6 +144,15 @@ class Timestamps(GoldyBot.Extension):
                 delete_after = 30,
                 logger = self.logger
             )
+
+    """
+    @create.auto_complete()
+    async def create_custom_auto_complete(self, platter: GoldyBot.GoldPlatter):
+        # TODO: This may be alright for custom auto completes but I REALLY don't want to do it this way.
+        # I want a similar implementation as what I did with callback in buttons. 
+        # So perhaps we should have another SlashOption class but for auto completion.
+        ...
+    """
 
     @timestamp.sub_command(description = "Allows you to sets default timezone and date format for /timestamp command.", slash_options = {
         "timezone" : GoldyBot.SlashOption(
