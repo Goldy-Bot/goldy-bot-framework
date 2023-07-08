@@ -6,13 +6,14 @@ from discord_typings import ApplicationCommandOptionInteractionData, Autocomplet
 from nextcore.http import Route
 
 if TYPE_CHECKING:
-    from .... import Goldy, commands
+    from .... import Goldy
+    from ....commands.slash_command import SlashCommand
 
 async def send_auto_complete(
     data: AutocompleteInteractionData,
-    goldy: Goldy, 
     current_typing_option: ApplicationCommandOptionInteractionData, 
-    command: commands.Command
+    goldy: Goldy, 
+    command: SlashCommand
 ) -> None:
     # TODO: Continue this later.
 

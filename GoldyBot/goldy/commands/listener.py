@@ -91,9 +91,11 @@ class CommandListener():
             # Command auto complete
             # -----------------------
             elif interaction["type"] == 4:
-                command: Tuple[str, Command] = utils.cache_lookup(interaction["data"]["name"], self.goldy.invokables)
+                command: Tuple[str, SlashCommand] = utils.cache_lookup(interaction["data"]["id"], self.goldy.invokables)
 
                 current_typing_option: ApplicationCommandOptionInteractionData = None
+
+                print(">>>", interaction["data"]["options"]) # TODO: Something is wrong with this. Fix!
 
                 for option in interaction["data"]["options"]:
                     if option.get("focused"):
@@ -102,9 +104,9 @@ class CommandListener():
 
                 if command is not None:
                     await send_auto_complete(
-                        data = interaction,
-                        goldy = self.goldy,
-                        current_typing_option = current_typing_option,
+                        data = interaction, 
+                        current_typing_option = current_typing_option, 
+                        goldy = self.goldy, 
                         command = command[1]
                     )
 
