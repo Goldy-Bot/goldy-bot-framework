@@ -8,7 +8,7 @@ class Example(GoldyBot.Extension):
 
     # Sub command example.
     # ----------------------
-    @GoldyBot.command()
+    @GoldyBot.command(group=True)
     async def game(self, platter: GoldyBot.GoldPlatter):
         if platter.author.id == "332592361307897856": # Replace this with your discord id and watch what happens.
             return True

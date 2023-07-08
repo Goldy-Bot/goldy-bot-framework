@@ -34,7 +34,7 @@ class Example(GoldyBot.Extension):
         casualties = random.randint(800, 10000)
 
         await platter.send_message(
-            f"> 💣 You nuked {city}, there was {casualties} casualties.",
+            f"> 💣 You nuked {city}, there were {casualties} casualties.",
             reply = True
         )
 
