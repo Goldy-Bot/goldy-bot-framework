@@ -10,7 +10,7 @@
 .. toctree::
    :maxdepth: 1
 
-   documentation
+   api_documentation
    examples
 
 

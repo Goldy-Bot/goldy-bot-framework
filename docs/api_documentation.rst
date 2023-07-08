@@ -9,6 +9,7 @@ The documentation for the goldy bot v5 framework programming api.
 
    cli
    goldy
+   utils
 
 Logging
 --------

@@ -8,7 +8,6 @@
    goldy.nextcore_utils.embeds
    goldy.nextcore_utils.messages
    goldy.nextcore_utils.channels
-   goldy.nextcore_utils.components
    goldy.nextcore_utils.slash_options
 
 

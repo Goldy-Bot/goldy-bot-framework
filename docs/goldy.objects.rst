@@ -3,7 +3,21 @@
 
 The Golden Platter
 --------------------
-.. automodule:: GoldyBot.goldy.objects.golden_platter
+.. automodule:: GoldyBot.goldy.objects.platter.golden_platter
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+The Silver Platter
+--------------------
+.. automodule:: GoldyBot.goldy.objects.platter.silver_platter
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Invokable
+----------
+.. automodule:: GoldyBot.goldy.objects.invokable
    :members:
    :undoc-members:
    :show-inheritance:
