@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import GoldyBot
-from GoldyBot import cache_lookup
+from GoldyBot import cache_lookup, Perms
 from GoldyBot.goldy.extensions import extensions_cache
 
 class Extensions(GoldyBot.Extension):
@@ -32,7 +32,7 @@ class Extensions(GoldyBot.Extension):
             colour = GoldyBot.Colours.GREY # TODO: Replace this with brown.
         )
 
-    extensions = GoldyBot.GroupCommand("extensions", hidden=True)
+    extensions = GoldyBot.GroupCommand("extensions", hidden=True, required_roles = [Perms.BOT_DEV])
 
     @extensions.sub_command(
         description = "A command for enabling a Goldy Bot extension that is disabled.",

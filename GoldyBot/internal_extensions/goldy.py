@@ -13,8 +13,8 @@ class Goldy(GoldyBot.Extension):
                 GoldyBot.EmbedField(
                     name = "🗒️ __Stats:__", 
                     value = """
-                    **• UpTime: {up_time}
-                    • Guild Count: ``{guild_count}``**
+                    **- UpTime: {up_time}
+                    - Guild Count: ``{guild_count}``**
                     """,
                     inline = False
                 ),
@@ -22,11 +22,11 @@ class Goldy(GoldyBot.Extension):
                 GoldyBot.EmbedField(
                     name = "📦 __Resources:__", 
                     value = """
-                    **• Ping: ``{ping}``
-                    • OS: ``{os}``
-                    • CPU: ``{cpu}%``
-                    • RAM: ``{ram} GB``
-                    • DISK: ``{disk} MB/s``
+                    **- Ping: ``{ping}``
+                    - OS: ``{os}``
+                    - CPU: ``{cpu}%``
+                    - RAM: ``{ram} MB``
+                    - DISK: ``{disk} MB/s``
 
                     [Made with {heart} By](https://github.com/Goldy-Bot/Goldy-Bot-V5) <@332592361307897856>**
                     """,
@@ -36,9 +36,9 @@ class Goldy(GoldyBot.Extension):
                 GoldyBot.EmbedField(
                     name = "⚡ __Version:__",
                     value = """
-                    **• GoldyBot: ``{version}``
-                    • Nextcore: ``{nc_version}``
-                    • Python: ``{py_version}``**
+                    **- GoldyBot: ``{version}``
+                    - Nextcore: ``{nc_version}``
+                    - Python: ``{py_version}``**
                     """,
                     inline = True
                 )
@@ -55,7 +55,7 @@ class Goldy(GoldyBot.Extension):
             version = GoldyBot.info.VERSION,
             nc_version = nextcore.__version__,
             py_version = self.goldy.system.python_version,
-            ping = (lambda x: "(Not Available)" if x is None else f"{round(x * 1000, 2)}ms")(self.goldy.latency),
+            ping = (lambda x: "(Not Available Yet)" if x is None else f"{round(x * 1000, 2)}ms")(self.goldy.latency),
             os = (lambda x: x[:22] + "..." if len(x) >= 26 else x)(self.goldy.system.os),
             cpu = self.goldy.system.cpu,
             ram = self.goldy.system.ram,
