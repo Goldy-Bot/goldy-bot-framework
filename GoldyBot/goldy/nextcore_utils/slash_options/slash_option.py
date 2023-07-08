@@ -129,7 +129,7 @@ class SlashOption(dict):
                 self.data["type"] = 5
 
 
-        self.data["name"] = name # If this is None it will get handled by the nextcore_utils.params_to_options() function respectively.
+        self.data["name"] = name # If this is None it will get handled by the Command().params_to_options() function respectively.
         self.data["description"] = description
 
         if choices is not None:

@@ -51,6 +51,7 @@ class PrefixCommand(Command):
 
         return f"{self.parent_command.name + ' ' if self.is_child else ''}{self.name} {command_args_string[:-1]}{command_sub_cmds_string[:-1]}"
 
+
     def register_sub_command(self, command: PrefixCommand) -> None:
         """Method that registers prefix sub command."""
         command._parent_command = self

@@ -1,6 +1,5 @@
 from __future__ import annotations
 from typing import Dict, List, TYPE_CHECKING, Tuple, overload, Callable
-from discord_typings import ApplicationCommandOptionData
 
 from devgoldyutils import LoggerAdapter
 
