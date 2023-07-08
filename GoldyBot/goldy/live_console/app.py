@@ -3,8 +3,7 @@ from __future__ import annotations
 import cmd2
 from typing import TYPE_CHECKING, Tuple
 
-from .. import utils
-from ... import log
+from ... import log, utils
 from ..extensions import extensions_cache, Extension
 
 if TYPE_CHECKING:
@@ -30,21 +29,34 @@ class LiveConsoleApp(cmd2.Cmd):
             if extension is None:
                 self.logger.error(f"The extension '{extension_name}' was not found.")
                 return False
-        
+            else:
+                self.logger.info(f"Found '{extension_name}'.")
+
         self.logger.info("Reloading extension(s)...")
         self.logger.warning("This may take a minute to begin...")
         self.goldy.async_loop.create_task(
-            self.goldy.extension_loader.reload((lambda x: [x[1]] if x is not None else None)(extension))
+            self.goldy.extension_loader.reload(
+                (lambda x: [x[1]] if x is not None else None)(extension)
+            )
         )
 
         # Rerun guilds setup...
         # ----------------------
-        self.goldy.guilds.guilds.clear()
+        self.goldy.guild_manager.guilds.clear()
 
         self.goldy.async_loop.create_task(
-            self.goldy.guilds.setup()
+            self.goldy.guild_manager.setup()
         )
 
+    def do_reload_configs(self, _: cmd2.Statement):
+        self.goldy.config.__init__()
+
+        self.goldy.guild_manager.guilds.clear()
+
+        self.logger.warning("Wait, we're reloading guilds... (This may halt the discord for a while!)")
+        self.goldy.async_loop.create_task(
+            self.goldy.guild_manager.setup()
+        )
 
     def do_quit(self, _: cmd2.Statement):
         self.logger.info("Exiting...")

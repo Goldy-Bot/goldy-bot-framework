@@ -73,7 +73,7 @@ class Button(Recipe):
     @overload
     def __init__(
         self, 
-        style: Literal[5], 
+        style: Literal[ButtonStyle.LINK, 5], 
         label: str, 
         url: str, 
         emoji: str = None, 
@@ -122,4 +122,13 @@ class Button(Recipe):
         else:
             data["custom_id"] = custom_id
 
-        super().__init__(data, data["label"], author_only, callback, **callback_args)
+        super().__init__(
+            data = data, 
+            name = data["label"],
+            callback = callback,
+            author_only = author_only, 
+            **callback_args
+        )
+
+        if not style == ButtonStyle.LINK.value:
+            self.register(custom_id)

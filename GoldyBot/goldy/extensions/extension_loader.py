@@ -24,7 +24,9 @@ class ExtensionLoader():
             self.raise_on_load_error = self.goldy.config.raise_on_extension_loader_error
 
         self.path_to_extensions_folder:str|None = (lambda x: os.path.abspath(x) if isinstance(x, str) else x)(goldy.config.extension_folder_location)
+        
         self.ignored_extensions = goldy.config.ignored_extensions
+        self.late_load_extensions = goldy.config.late_load_extensions + ["extensions.py"]
 
         self.logger = LoggerAdapter(goldy_bot_logger, prefix="ExtensionLoader")
 
@@ -34,6 +36,7 @@ class ExtensionLoader():
         internal_path = Paths.INTERNAL_EXTENSIONS
 
         paths = []
+        late_load_paths = []
         
         # Finding external extensions folder path if none.
         # -------------------------------------------------
@@ -64,20 +67,25 @@ class ExtensionLoader():
                 if file.is_file() or file.is_dir():
 
                     if file.is_dir():
-                        
+
                         if "__init__.py" not in [x.name for x in file.iterdir()]:
-                            self.logger.debug(f"Module '{file.name}' has no __init__.py so I'm ignoring it...")
+                            self.logger.warn(f"Extension module '{file.name}' has no __init__.py so I'm ignoring it...")
                             continue
 
-                        paths.append(
-                            os.path.join(file.__str__(), "__init__.py")
-                        )
+                        load_path = os.path.join(str(file), "__init__.py")
 
-                    if file.is_file():
-                        paths.append(file.__str__())
+                    else:
+                        load_path = str(file)
+
+                    if file.name in self.late_load_extensions:
+                        self.logger.info(f"The extension '{file.name}' will load late (after all other extensions).")
+                        late_load_paths.append(load_path)
+                    else:
+                        paths.append(load_path)
                     
                     self.logger.debug(f"Found the module '{file.name}' in extensions.")
 
+        paths.extend(late_load_paths)
         return paths
 
 
@@ -120,13 +128,13 @@ class ExtensionLoader():
             except Exception as e:
                 if isinstance(e, AttributeError):
                     error_str = \
-                        f"We encountered an error while trying to load the extension at '{path}'! " \
-                        f"You likely forgot the 'load()' function. " \
-                        "Check out https://goldybot.devgoldy.me/goldy.extensions.html#how-to-create-an-extension" \
+                        f"We encountered an error while trying to load the extension at '{'/'.join(path.split(os.path.sep)[-2:])}'! " \
+                        f"\nYou likely forgot the 'load()' function. " \
+                        "Check out https://goldybot.devgoldy.xyz/goldy.extensions.html#how-to-create-an-extension" \
                         f"\nERROR --> {e}"
                 else:
                     error_str = \
-                        f"We encountered an error while trying to load the extension at '{path}'! " \
+                        f"We encountered an error while trying to load the extension at '{'/'.join(path.split(os.path.sep)[-2:])}'! " \
                         f"\nERROR --> {e}"
                 
                 if self.raise_on_load_error:
@@ -143,7 +151,7 @@ class ExtensionLoader():
     async def reload(self) -> None:
         """Reloads all extensions loaded in goldy bot."""
         ...
-    
+
     @overload
     async def reload(self, extensions: List[Extension]) -> None:
         """Reloads each extension in the list."""
@@ -160,7 +168,7 @@ class ExtensionLoader():
 
         for extension in extensions:
             # Unload all commands in extension.
-            await extension.unload()
+            extension.unload()
 
             # Get the full path the extension was loaded from so we can load it again with ExtensionLoader().
             if extension.loaded_path not in loaded_paths:

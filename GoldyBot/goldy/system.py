@@ -27,8 +27,8 @@ class System():
 
     @property
     def ram(self) -> int:
-        """Returns amount of ram Goldy Bot is using on your system in gigabytes."""
-        return self.__convert_to_GB(self.process.memory_info().rss)
+        """Returns amount of ram Goldy Bot is using on your system in megabytes."""
+        return self.__convert_to_MB(self.process.memory_info().rss)
 
     @property
     def disk(self):

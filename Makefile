@@ -19,3 +19,6 @@ build-clean-docs:
 
 build-docs:
 	cd docs && make html
+
+update-pip:
+	python -m pip install --upgrade pip

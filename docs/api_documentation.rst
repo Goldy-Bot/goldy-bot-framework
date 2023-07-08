@@ -1,7 +1,7 @@
 :og:description: The documentation for the goldy bot v5 framework programming api.
 
-📘 Documentation
-==================
+📘 API Documentation
+======================
 The documentation for the goldy bot v5 framework programming api.
 
 .. toctree::
@@ -9,6 +9,7 @@ The documentation for the goldy bot v5 framework programming api.
 
    cli
    goldy
+   utils
 
 Logging
 --------

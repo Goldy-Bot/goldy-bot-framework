@@ -8,9 +8,30 @@ Command Decorator
    :undoc-members:
    :show-inheritance:
 
-Command
+Group Command
 ---------------
-.. automodule:: GoldyBot.goldy.commands
+.. automodule:: GoldyBot.goldy.commands.group_command
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Command
+--------
+.. automodule:: GoldyBot.goldy.commands.command
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Slash Command
+--------------
+.. automodule:: GoldyBot.goldy.commands.slash_command
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Prefix Command
+---------------
+.. automodule:: GoldyBot.goldy.commands.prefix_command
    :members:
    :undoc-members:
    :show-inheritance:

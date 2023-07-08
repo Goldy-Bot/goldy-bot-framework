@@ -2,21 +2,26 @@ from __future__ import annotations
 
 from typing import List, Tuple
 
-from .. import Goldy, utils
+from devgoldyutils import Colours
+
+from .. import Goldy, LoggerAdapter, goldy_bot_logger
+from ... import utils, errors
 from ..database import DatabaseEnums
-from ...errors import GoldyBotError
 
 from .guild import Guild
 
-class Guilds():
+import logging
+
+class GuildManager():
     def __init__(self, goldy: Goldy) -> None:
         self.goldy = goldy
         self.allowed_guilds = goldy.config.allowed_guilds
+        self.logger = LoggerAdapter(goldy_bot_logger, prefix=Colours.ORANGE.apply("GuildManager"))
 
         if self.allowed_guilds == []:
-            raise AllowedGuildsNotSpecified()
+            raise AllowedGuildsNotSpecified(self.logger)
         
-        self.guilds:List[Tuple[str|int, Guild]] = []
+        self.guilds: List[Tuple[str|int, Guild]] = []
 
     # TODO: In the future we might have to add some sort of way to reload the guild config of a guild from the database. (or just run setup again on that particular guild if that works well)
     # I can see this being needed if the v5 framework is going to be running public invite-able bots.
@@ -26,6 +31,7 @@ class Guilds():
         """Adds guilds specified in goldy.json to the database if not already added."""
         # TODO: Find better way to organize this code, it's too long and complex for my liking.
         # 08/04/2023: idk is it really that complex... i'll come back to it later...
+        self.logger.info("Setting up guilds...")
 
         database = self.goldy.database.get_goldy_database(DatabaseEnums.GOLDY_MAIN)
 
@@ -62,7 +68,7 @@ class Guilds():
                 await database.insert("guild_configs", data = guild_config)
 
             else:
-                # Check if any keys are missing in the guild config, if it is update the config with that new item.
+                # Check if any keys are missing in the guild config, if any are update the config with the new item.
                 # ---------------------------------------------------------------------------------------------------
                 if not guild_config_template.keys() == guild_config.keys():
                     
@@ -71,6 +77,9 @@ class Guilds():
 
                         if item not in guild_config:
                             guild_config[item] = guild_config_template[item]
+                            self.logger.debug(
+                                f"Added key '{item}' to {guild[1]}'s database config because it was missing."
+                            )
 
                     await database.edit("guild_configs", query = {"_id": guild[0]}, data = guild_config)
 
@@ -80,6 +89,8 @@ class Guilds():
             self.guilds.append(
                 (guild[0], Guild(guild_config, self.goldy))
             )
+
+            self.logger.info("Done setting up guilds.")
 
 
     def get_guild(self, guild_id: str | int) -> Guild | None:
@@ -97,8 +108,9 @@ class Guilds():
 
 # Exceptions
 # ------------
-class AllowedGuildsNotSpecified(GoldyBotError):
-    def __init__(self):
+class AllowedGuildsNotSpecified(errors.GoldyBotError):
+    def __init__(self, logger: logging.Logger = None):
         super().__init__(
-            "Please add your guild id to the allowed_guilds in goldy.json"
+            "Please add your guild id to the allowed_guilds in goldy.json",
+            logger = logger
         )

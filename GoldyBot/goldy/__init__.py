@@ -9,9 +9,9 @@ from datetime import datetime
 from nextcore.http.client import HTTPClient
 
 from nextcore.http import BotAuthentication, UnauthorizedError, Route
-from nextcore.gateway import ShardManager, GatewayOpcode
+from nextcore.gateway import ShardManager
 
-from typing import Dict, Any, TYPE_CHECKING
+from typing import Dict, Any, TYPE_CHECKING, Tuple, Set
 from discord_typings import UpdatePresenceData, PartialActivityData, ApplicationData
 from devgoldyutils import Colours
 
@@ -24,6 +24,7 @@ from .token import Token
 
 if TYPE_CHECKING:
     from . import objects
+    from .objects.invokable import INVOKABLE_TYPES
 
 # Fixes this https://github.com/nextsnake/nextcore/issues/189.
 if sys.platform == "win32":
@@ -73,6 +74,10 @@ class Goldy():
         self.start_up_time: datetime | None = None
         """The datetime object of when the framework was booted up. Is None if the :py:meth:`~GoldyBot.Goldy.start` method isn't ran."""
 
+        self.pre_invokables: Set[INVOKABLE_TYPES] = set()
+        self.invokables: Set[Tuple[str, INVOKABLE_TYPES]] = set()
+        """List of all commands, buttons and events registered."""
+
         self.bot_user: objects.Member = None
         """The bot's user/member object."""
         self.application_data: ApplicationData = None
@@ -102,7 +107,9 @@ class Goldy():
         """Class that handles extension loading and reloading."""
         self.live_console = LiveConsole(self)
         """The goldy bot live console."""
-        self.guilds = Guilds(self)
+        self.guild_manager = GuildManager(self)
+        self.permission_system = PermissionSystem(self)
+        """A goldy bot class that contains methods to handle member/command permissions."""
 
     @property
     def latency(self) -> float | None:
@@ -158,7 +165,9 @@ class Goldy():
         await self.pre_setup()
         await self.setup()
 
-        if self.system.in_docker is False: # Live console is disabled when running a docker container.
+        if self.system.in_docker is True: # Live console is disabled when running a docker container.
+            self.logger.info(Colours.BLUE.apply("We detected that you are running Goldy Bot in 🐬docker. Live console will be disabled."))
+        else:
             self.live_console.start()
 
         # Raise a error and exit whenever a critical error occurs.
@@ -195,18 +204,18 @@ class Goldy():
         )
 
         bot_user = await r.json()
-        self.bot_user = Member(bot_user, self)
+        self.bot_user = Member(bot_user, None, self)
         self.logger.debug("Bot's user object requested!")
 
     async def setup(self):
         """Method ran to set up goldy bot."""
-        await self.guilds.setup()
+        await self.guild_manager.setup()
         
         self.extension_loader.load()
         await self.command_loader.load()
         await self.command_listener.start_listening()
 
-    def stop(self, reason:str = "Unknown Reason"):
+    def stop(self, reason: str = "Unknown Reason"):
         """Shuts down goldy bot right away and safely incase anything sussy wussy is going on. 😳"""
         self.live_console.stop()
 
@@ -263,4 +272,5 @@ from .commands.loader import CommandLoader
 from .commands.listener import CommandListener
 from .live_console import LiveConsole
 from .objects import Member
-from .guilds import Guilds
+from .guilds import GuildManager
+from .permission_system import PermissionSystem

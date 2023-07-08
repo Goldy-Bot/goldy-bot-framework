@@ -4,6 +4,7 @@
    :maxdepth: 1
 
    goldy.database.databases
+   goldy.database.wrappers
 
 Database
 ----------

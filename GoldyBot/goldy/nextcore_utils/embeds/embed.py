@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import List
 from discord_typings import EmbedData, EmbedFieldData, EmbedImageData
 from ..colours import Colours
-from ... import utils
+from .... import utils
 
 class EmbedImage(dict):
     """A class used to add an image to a embed."""
@@ -74,8 +74,8 @@ class Embed(dict):
     """
     def __init__(
         self, 
-        title: str=None, 
-        description: str=None, 
+        title: str = None, 
+        description: str = None, 
         fields: List[EmbedField] = None, 
         color: Colours | int = None, 
         colour: Colours | int = None, 

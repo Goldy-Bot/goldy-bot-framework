@@ -11,7 +11,8 @@
    goldy.live_console
    goldy.nextcore_utils
    goldy.objects
-   goldy.utils
+   goldy.recipes
+   
 
 
 Goldy Core Class
