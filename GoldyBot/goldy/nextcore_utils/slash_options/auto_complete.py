@@ -4,10 +4,11 @@ from typing import List, TYPE_CHECKING
 from discord_typings import ApplicationCommandOptionData, AutocompleteInteractionData
 
 from nextcore.http import Route
-from devgoldyutils import LoggerAdapter
+from devgoldyutils import LoggerAdapter, Colours
 
 from .... import goldy_bot_logger
 from .slash_option import SlashOption, SlashOptionChoice
+from ...objects.member import Member
 
 if TYPE_CHECKING:
     from .... import Goldy
@@ -28,7 +29,7 @@ class SlashOptionAutoComplete(SlashOption):
 
         self.recommendations = recommendations
 
-        self.logger = LoggerAdapter(goldy_bot_logger, prefix="SlashOptionAutoComplete")
+        self.logger = LoggerAdapter(goldy_bot_logger, prefix=Colours.PURPLE.apply("SlashOptionAutoComplete"))
 
         super().__init__(
             name = name, 
@@ -42,13 +43,21 @@ class SlashOptionAutoComplete(SlashOption):
     async def send_auto_complete(
         self,
         data: AutocompleteInteractionData,
+        current_typing_value: str,
         command: SlashCommand,
         goldy: Goldy, 
     ) -> None:
 
         payload = {}
+        payload["choices"] = []
 
-        payload["choices"] = self.recommendations
+        member = Member(data["member"]["user"], goldy.guild_manager.get_guild(data["guild_id"]), goldy)
+        self.logger.debug(f"We got --> '{current_typing_value}' from {member.name}#{member.discriminator}")
+
+        # Implemented some fuzzy searching.
+        for choice in self.recommendations:
+            if current_typing_value.lower() in choice["name"].lower():
+                payload["choices"].append(choice)
 
         self.logger.debug(
             f"Sending auto complete '{payload['choices']}' to --> slash command '{command.name}'."

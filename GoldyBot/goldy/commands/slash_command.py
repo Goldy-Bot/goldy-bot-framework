@@ -86,6 +86,7 @@ class SlashCommand(Command):
 
     async def invoke_auto_complete(self, data: AutocompleteInteractionData):
         command: SlashCommand = None
+        current_typing_value: str = None
         auto_complete_option: SlashOptionAutoComplete = None
         options = data["data"]["options"]
 
@@ -105,6 +106,7 @@ class SlashCommand(Command):
         for option in options:
             if option.get("focused"):
                 current_typing_option = option
+                current_typing_value = option["value"]
 
                 for param in command.slash_options:
                     option = command.slash_options[param]
@@ -116,7 +118,7 @@ class SlashCommand(Command):
                 break
 
         await auto_complete_option.send_auto_complete(
-            data, self, self.goldy, 
+            data, current_typing_value, self, self.goldy, 
         )
 
 
