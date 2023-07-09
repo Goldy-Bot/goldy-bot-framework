@@ -52,7 +52,7 @@ class CommandListener():
             # Slash command.
             # ---------------
             if interaction["type"] == 2:
-                command: Tuple[str, SlashCommand] = utils.cache_lookup(interaction["data"]["id"], self.goldy.invokables)
+                command: Tuple[str, SlashCommand] = utils.cache_lookup(f"{guild.id}:{interaction['data']['id']}", self.goldy.invokables)
 
                 if command is not None:
                     gold_platter = GoldPlatter(
@@ -87,7 +87,7 @@ class CommandListener():
             # Command auto complete
             # -----------------------
             elif interaction["type"] == 4:
-                command: Tuple[str, SlashCommand] = utils.cache_lookup(interaction["data"]["id"], self.goldy.invokables)
+                command: Tuple[str, SlashCommand] = utils.cache_lookup(f"{guild.id}:{interaction['data']['id']}", self.goldy.invokables)
 
                 if command is not None:
                     await command[1].invoke_auto_complete(interaction)

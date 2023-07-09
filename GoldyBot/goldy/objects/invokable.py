@@ -54,7 +54,10 @@ class Invokable(ABC, dict):
         """Method to register this as an invokable."""
         self.__id = id
         self.goldy.invokables.add((id, self))
-        self.goldy.pre_invokables.remove(self)
+
+        if self in self.goldy.pre_invokables:
+            self.goldy.pre_invokables.remove(self)
+
         self.logger.debug(f"'{self.name}' has been registered with id '{id}'!")
 
     def unregister(self) -> None:

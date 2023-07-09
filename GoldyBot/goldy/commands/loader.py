@@ -54,6 +54,8 @@ class CommandLoader():
 
             command.logger.debug("Command loaded.")
 
+        slash_commands_to_register = [x for x in self.goldy.pre_invokables if isinstance(x, slash_command.SlashCommand)]
+
         # Create slash commands for each allowed guild.
         # ----------------------------------------------
         for guild in self.goldy.guild_manager.allowed_guilds:
@@ -75,13 +77,10 @@ class CommandLoader():
             # Registering slash commands with the id given by discord.
             for interaction in registered_interactions:
 
-                for command in self.goldy.pre_invokables:
-
-                    if not isinstance(command, slash_command.SlashCommand):
-                        continue
+                for command in slash_commands_to_register:
 
                     if command.name == interaction["name"]:
-                        command.register(interaction["id"])
+                        command.register(f"{guild[0]}:{interaction['id']}")
                         break
 
             self.logger.debug(f"Created slash cmds for guild '{guild[1]}'.")
