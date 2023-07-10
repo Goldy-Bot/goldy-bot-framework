@@ -1,24 +1,25 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
+
+import logging
 from devgoldyutils import DictClass, LoggerAdapter, Colours
 from abc import abstractmethod, ABC
 from .. import DatabaseEnums
-from ... import objects
 
 if TYPE_CHECKING:
+    from ... import Goldy
     from ...guilds import Guild
 
 class DatabaseWrapper(DictClass, ABC):
     """✨ A useful interface class to build a database wrapper for easy of access to database data like member data, guild data and more."""
-    def __init__(self, object: objects.Member | Guild) -> None:
-        self.goldy = object.goldy
-        self.guild = object.guild
+    def __init__(self, goldy: Goldy, logger: logging.Logger) -> None:
+        self.goldy = goldy
 
         self.data = {}
 
         super().__init__(
-            LoggerAdapter(object.logger, prefix=Colours.PINK_GREY.apply("Database Wrapper"))
+            LoggerAdapter(logger, prefix=Colours.PINK_GREY.apply("Database Wrapper"))
         )
 
     @abstractmethod
@@ -31,7 +32,7 @@ class DatabaseWrapper(DictClass, ABC):
         """Update the wrapper with the greatest and latest data from the database."""
         ...
 
-        """
+        """ # TODO: Remove this when guild database wrapper is implemented.
         if isinstance(self.goldy, Guild):
             database = self.goldy.database.get_goldy_database(DatabaseEnums.GOLDY_MAIN)
 

@@ -53,7 +53,7 @@ class LiveConsoleApp(cmd2.Cmd):
 
         self.goldy.guild_manager.guilds.clear()
 
-        self.logger.warning("Wait, we're reloading guilds... (This may halt the discord for a while!)")
+        self.logger.warning("Wait, we're reloading guilds... (This may halt the bot for a while!)")
         self.goldy.async_loop.create_task(
             self.goldy.guild_manager.setup()
         )

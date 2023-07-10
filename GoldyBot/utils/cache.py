@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, Tuple, overload
+from typing import Any, Tuple, overload, List
 
 @overload
 def cache_lookup(key: str|int, cache: dict) -> Any | None:
@@ -12,7 +12,7 @@ def cache_lookup(key: str, cache: dict, cap_sensitive = True) -> Tuple[str, ...]
 
 
 @overload
-def cache_lookup(key: str|int, cache: list) -> Tuple[str, ...] | None:
+def cache_lookup(key: str|int, cache: List[tuple]) -> Tuple[str, ...] | None:
     ...
 
 @overload
