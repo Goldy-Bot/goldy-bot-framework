@@ -7,11 +7,11 @@ from nextcore.http import Route
 from ... import LoggerAdapter, goldy_bot_logger
 
 if TYPE_CHECKING:
-    from ...guilds import Guild
+    from ... import Goldy
 
-logger = LoggerAdapter(goldy_bot_logger, prefix="get_channels")
+logger = LoggerAdapter(goldy_bot_logger, prefix="get_guild_data")
 
-async def get_guild_data(guild: Guild) -> GuildData:
+async def get_guild_data(guild_id: str, goldy: Goldy) -> GuildData:
     """
     Returns the guild's discord data.
 
@@ -19,15 +19,14 @@ async def get_guild_data(guild: Guild) -> GuildData:
 
     Parameters
     ----------
-    ``guild``
-        The guild object.
+    ``guild_id``
+        The id of the guild.
 
     Returns
     -------
     :py:meth:`~discord_typings.GuildData`
         A dictionary of guild data.
     """
-    goldy = guild.goldy
 
     headers = goldy.nc_authentication.headers
 
@@ -35,7 +34,7 @@ async def get_guild_data(guild: Guild) -> GuildData:
         Route(
             "GET",
             "/guilds/{guild_id}",
-            guild_id = guild.id
+            guild_id = str(guild_id)
         ),
         rate_limit_key = goldy.nc_authentication.rate_limit_key,
         headers = headers,
@@ -43,6 +42,6 @@ async def get_guild_data(guild: Guild) -> GuildData:
 
     guild_data: GuildData = await r.json()
 
-    logger.debug(f"Grabbed guild data for the guild '{guild.code_name}'.")
+    logger.debug(f"Grabbed guild data for the guild with id '{guild_id}'.")
 
     return guild_data

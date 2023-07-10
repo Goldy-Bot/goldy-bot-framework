@@ -1,16 +1,21 @@
 from __future__ import annotations
-from typing import Literal
+from typing import Literal, TYPE_CHECKING
 
 from . import DatabaseWrapper
 
 from .. import DatabaseEnums
-from ... import objects
+
+if TYPE_CHECKING:
+    from ... import objects
 
 class MemberDBWrapper(DatabaseWrapper):
     """A database wrapper for goldy bot members."""
     def __init__(self, member: objects.Member) -> None:
         self.member = member
-        super().__init__(member)
+
+        super().__init__(
+            member.goldy, member.logger
+        )
 
     async def push(self, type: Literal[DatabaseEnums.MEMBER_GUILD_DATA, DatabaseEnums.MEMBER_GLOBAL_DATA] | str, data: dict) -> None:
         self.logger.info("Pushing data to the database...")
@@ -22,7 +27,7 @@ class MemberDBWrapper(DatabaseWrapper):
         doc_id = "1" # Global document.
 
         if type == DatabaseEnums.MEMBER_GUILD_DATA:
-            doc_id = self.guild.id
+            doc_id = self.member.guild.id
 
         await database.edit(self.member.id, {"_id": doc_id}, data)
 

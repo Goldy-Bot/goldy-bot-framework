@@ -1,3 +1,12 @@
+"""
+This module contains common things we send to discord, 
+like e.g embeds, slash options the list goes on.
+
+It also contains numerous http wrappers like ``send_msg()`` and ``get_channels()``.
+
+If there's something you would like to get added, feel free to open an issue.
+"""
+
 DISCORD_CDN = "https://cdn.discordapp.com/"
 
 from .embeds.embed import Embed, EmbedField, EmbedImage

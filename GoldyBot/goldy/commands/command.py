@@ -161,7 +161,7 @@ class Command(Invokable):
     async def invoke(self, platter: objects.GoldPlatter, lambda_func: Callable) -> None:
         self.logger.debug("Attempting to invoke command...")
 
-        if platter.guild.is_extension_allowed(self.extension) is False:
+        if await platter.guild.is_extension_allowed(self.extension) is False:
             raise front_end_errors.ExtensionNotAllowedInGuild(platter, self.logger)
 
         if self.is_disabled:
@@ -175,7 +175,7 @@ class Command(Invokable):
                     f"Command invoked by '{platter.author.username}#{platter.author.discriminator}'."
                 )
             )
-            return await lambda_func() 
+            return await lambda_func()
 
         # If member has no perms raise MissingPerms exception.
         raise front_end_errors.MissingPerms(platter, self.logger)

@@ -52,7 +52,7 @@ class PermissionSystem():
 
                 if role_code_name not in ["bot_dev"]:
                     try:
-                        role_id_uwu = platter.guild.roles[role_code_name]
+                        role_id_uwu = platter.guild.config_wrapper.roles[role_code_name]
                     except KeyError:
                         # Maybe there is a better way of handling this but I'll leave this as temporary solution for now.
                         self.logger.error(

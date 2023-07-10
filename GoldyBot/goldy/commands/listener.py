@@ -105,9 +105,10 @@ class CommandListener():
         if guild is not None:
             #await guild.update() # Since v5.0dev5 the guild database data is no longer updated automatically via the on message event.
             # This means if you manually change the command prefix in the database you have to also manually run "reload_config" in live console.
-            
+
             # Check if prefix is correct.
-            if not guild.prefix == message["content"][0]:
+            guild_config = await guild.config
+            if not guild_config.prefix == message["content"][0]:
                 return
 
             # i really hope this doesn't break
