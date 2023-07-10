@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-from typing import List, TYPE_CHECKING
+from typing import TYPE_CHECKING
 from discord_typings import GuildData
 
 from devgoldyutils import DictClass, LoggerAdapter, Colours
 
-from ... import goldy_bot_logger, utils
+from ... import goldy_bot_logger
 from ..database.wrappers.guild import GuildDBWrapper
 
 if TYPE_CHECKING:
