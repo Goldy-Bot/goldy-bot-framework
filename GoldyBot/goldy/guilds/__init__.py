@@ -53,10 +53,8 @@ class GuildManager():
 
                 "extensions": {
                     "allowed": [],
-                    "disallowed": [],
-                    "hidden": []
-                },
-
+                    "disallowed": []
+                }
             }
 
             # Add guild to database.
