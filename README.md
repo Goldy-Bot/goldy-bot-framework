@@ -52,11 +52,11 @@ These instructions assume you have a [MongoDB database](https://www.mongodb.com/
 
 > ℹ We recommend a clean mongo database, GoldyBot will connect to your mongoDB database and create stuff the first time you run.
 
-1. ~~**Install package from pypi.**~~ *not on there yet... here's a git install*
+1. **Install package from pypi.**
 ```sh
 # Windows/Linux
 
-pip install GoldyBot@git+https://github.com/Goldy-Bot/Goldy-Bot-V5
+pip install GoldyBot
 ```
 
 2. **Generate a quick template.**
