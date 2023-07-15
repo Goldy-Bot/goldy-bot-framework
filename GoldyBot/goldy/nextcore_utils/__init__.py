@@ -14,6 +14,7 @@ from .embeds.embed import Embed, EmbedField, EmbedImage
 from .slash_options.auto_complete import SlashOptionAutoComplete
 from .slash_options.slash_option import SlashOption, SlashOptionChoice, SlashOptionTypes
 
+from .defer import wait
 from .messages.send_msg import send_msg
 from .messages.delete_msg import delete_msg
 from .guilds.get_channels import get_channels

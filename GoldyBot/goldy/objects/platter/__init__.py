@@ -29,6 +29,18 @@ class Platter(ABC, DictClass):
         self._interaction_responded = False
         """An internal property that is set by the :py:meth:`~GoldyBot.nextcore_utils.send_msg` method when a slash command is responded to."""
 
+    async def wait(self) -> None:
+        """
+        Use this to inform Discord and the member that this command will take longer than usual to respond or that a respond is being cooked up. 🍳🍲
+        
+        ------------------
+
+        Returns
+        -------
+        ``None``
+        """
+        return await nextcore_utils.wait(self)
+
     async def send_message(
         self, 
         text: str = None, 

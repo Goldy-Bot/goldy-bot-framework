@@ -85,7 +85,7 @@ class SlashCommand(Command):
 
 
     async def invoke_auto_complete(self, data: AutocompleteInteractionData):
-        command: SlashCommand = None
+        command: SlashCommand = self
         current_typing_value: str = None
         auto_complete_option: SlashOptionAutoComplete = None
         options = data["data"]["options"]
