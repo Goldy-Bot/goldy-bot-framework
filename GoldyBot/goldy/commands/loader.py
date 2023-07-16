@@ -113,8 +113,18 @@ class CommandLoader():
                 guild_id = testing_server[0],
             )
 
+            # Adding test warning to all slash commands for the test server.
             for payload in slash_command_payloads:
-                payload["description"] = "⚒️ THIS IS A TEST COMMAND REGISTERED JUST FOR THIS GUILD"
+                test_description = "⚒️ THIS IS A TEST COMMAND REGISTERED JUST FOR THIS GUILD"
+                
+                # Setting test description to all first layer sub commands.
+                for option in payload["options"]:
+                    if not option["type"] == 1:
+                        continue
+
+                    option["description"] = test_description
+
+                payload["description"] = test_description
 
             # Creating guild commands for testing server.
             r = await self.goldy.http_client.request(

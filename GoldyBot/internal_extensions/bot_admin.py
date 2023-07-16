@@ -4,7 +4,7 @@ import GoldyBot
 from GoldyBot import cache_lookup, Perms
 from GoldyBot.goldy.extensions import extensions_cache
 
-class Extensions(GoldyBot.Extension):
+class BotAdmin(GoldyBot.Extension):
     def __init__(self):
         super().__init__()
 
@@ -32,9 +32,9 @@ class Extensions(GoldyBot.Extension):
             colour = GoldyBot.Colours.GREY # TODO: Replace this with brown.
         )
 
-    extensions = GoldyBot.GroupCommand("extensions", hidden=True, required_roles = [Perms.BOT_DEV])
+    admin = GoldyBot.GroupCommand("admin", required_roles = [Perms.BOT_DEV, Perms.BOT_ADMIN], hidden = True)
 
-    @extensions.sub_command(
+    @admin.sub_command(
         description = "A command for enabling a Goldy Bot extension that is disabled.",
         slash_options = {
             "extension": GoldyBot.SlashOption(
@@ -42,7 +42,7 @@ class Extensions(GoldyBot.Extension):
             )
         }
     )
-    async def enable(self, platter: GoldyBot.GoldPlatter, extension: str):
+    async def extension_enable(self, platter: GoldyBot.GoldPlatter, extension: str):
         extension: GoldyBot.Extension = cache_lookup(extension, extensions_cache)[1]
 
         if not extension.is_disabled:
@@ -52,7 +52,7 @@ class Extensions(GoldyBot.Extension):
         extension.enable()
         await platter.send_message(embeds = [self.extension_enabled])
 
-    @extensions.sub_command(
+    @admin.sub_command(
         description = "A command for disabling a Goldy Bot extension that is enabled.",
         slash_options = {
             "extension": GoldyBot.SlashOption(
@@ -60,7 +60,7 @@ class Extensions(GoldyBot.Extension):
             )
         }
     )
-    async def disable(self, platter: GoldyBot.GoldPlatter, extension: str):
+    async def extension_disable(self, platter: GoldyBot.GoldPlatter, extension: str):
         extension: GoldyBot.Extension = cache_lookup(extension, extensions_cache)[1]
 
         if extension.is_disabled:
@@ -71,4 +71,4 @@ class Extensions(GoldyBot.Extension):
         await platter.send_message(embeds = [self.extension_disabled])
 
 def load():
-    Extensions()
+    BotAdmin()

@@ -31,8 +31,8 @@ class FrontEndErrors(errors.GoldyBotError):
                     embed
                 ],
                 reply = True, 
-                delete_after = None if isinstance(platter.invoker, slash_command.SlashCommand) else delete_after,
-                flags = 1 << 6 if isinstance(platter.invoker, slash_command.SlashCommand) else None
+                delete_after = None if isinstance(platter.invokable, slash_command.SlashCommand) else delete_after,
+                flags = 1 << 6 if isinstance(platter.invokable, slash_command.SlashCommand) else None
             )
         )
 

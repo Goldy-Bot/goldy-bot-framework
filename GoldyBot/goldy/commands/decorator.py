@@ -8,13 +8,13 @@ from .prefix_command import PrefixCommand
 from ... import get_goldy_instance
 
 if TYPE_CHECKING:
-    from GoldyBot import SlashOption
+    from GoldyBot import SlashOption, Perms
 
 @overload
 def command(
     name: str = None, 
     description: str = None, 
-    required_roles: List[str] = None, 
+    required_roles: List[str | Perms] = None, 
     slash_options: Dict[str, SlashOption] = None,
     slash_cmd_only: bool = False, 
     hidden: bool = False,
@@ -26,7 +26,7 @@ def command(
 def command(
     name: str = None, 
     description: str = None, 
-    required_roles: List[str] = None, 
+    required_roles: List[str | Perms] = None, 
     slash_cmd_only: bool = False, 
     hidden: bool = False,
     group: Literal[True] = False
@@ -36,7 +36,7 @@ def command(
 def command(
     name: str = None, 
     description: str = None, 
-    required_roles: List[str] = None, 
+    required_roles: List[str | Perms] = None, 
     slash_options: Dict[str, SlashOption] = None,
     slash_cmd_only: bool = False, 
     hidden: bool = False,
