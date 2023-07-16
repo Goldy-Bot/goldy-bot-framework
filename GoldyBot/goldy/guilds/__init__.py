@@ -29,20 +29,20 @@ class GuildManager():
         """Adds guilds specified in goldy.json to the database if not already added."""
         self.logger.info("Setting up guilds...")
 
-        for allowed_guild in self.allowed_guilds:
+        for guild_id, guild_code_name in self.allowed_guilds:
 
             # Getting guild discord data
             # ---------------------------
             try:
-                guild_data = await nextcore_utils.get_guild_data(allowed_guild[0], self.goldy)
+                guild_data = await nextcore_utils.get_guild_data(guild_id, self.goldy)
             except NotFoundError:
                 raise GuildNotFound(
-                    allowed_guild[1], self.logger
+                    guild_code_name, self.logger
                 )
 
             guild = Guild(
-                id = allowed_guild[0], 
-                code_name = allowed_guild[1], 
+                id = guild_id, 
+                code_name = guild_code_name, 
                 data = guild_data, 
                 goldy = self.goldy
             )
@@ -52,7 +52,7 @@ class GuildManager():
             # Add guild to list.
             # --------------------
             self.guilds.append(
-                (allowed_guild[0], guild)
+                (guild_id, guild)
             )
 
             self.logger.debug(f"Guild '{guild.code_name}' set up.")

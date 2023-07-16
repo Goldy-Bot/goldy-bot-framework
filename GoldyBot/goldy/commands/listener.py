@@ -49,21 +49,34 @@ class CommandListener():
         if guild is not None:
             author = objects.Member(interaction["member"]["user"], guild, self.goldy)
 
-            # Slash command.
-            # ---------------
-            if interaction["type"] == 2:
-                command: Tuple[str, SlashCommand] = utils.cache_lookup(f"{guild.id}:{interaction['data']['id']}", self.goldy.invokables)
+            # Slash commands and slash auto complete.
+            # ------------------------------------------
+            if interaction["type"] == 2 or interaction["type"] == 4:
+                command: Tuple[str, SlashCommand] = utils.cache_lookup(f"{interaction['data']['id']}", self.goldy.invokables)
+
+                # uhhhh, let's hope this doesn't cause the biggest catastrophe EVER!!
+
+                if command is None and guild.code_name == "test_server": 
+                    command: Tuple[str, SlashCommand] = utils.cache_lookup(
+                        f"{guild.id}:{interaction['data']['id']}", 
+                        self.goldy.invokables
+                    )
 
                 if command is not None:
-                    gold_platter = GoldPlatter(
-                        data = interaction, 
-                        author = author,
-                        command = command[1]
-                    )
 
-                    await command[1].invoke(
-                        gold_platter
-                    )
+                    if interaction["type"] == 2:
+                        gold_platter = GoldPlatter(
+                            data = interaction, 
+                            author = author,
+                            command = command[1]
+                        )
+
+                        await command[1].invoke(
+                            gold_platter
+                        )
+
+                    elif interaction["type"] == 4:
+                        await command[1].invoke_auto_complete(interaction)
 
 
             # Message components.
@@ -82,15 +95,6 @@ class CommandListener():
                     await message_component[1].invoke(
                         silver_platter
                     )
-
-
-            # Command auto complete
-            # -----------------------
-            elif interaction["type"] == 4:
-                command: Tuple[str, SlashCommand] = utils.cache_lookup(f"{guild.id}:{interaction['data']['id']}", self.goldy.invokables)
-
-                if command is not None:
-                    await command[1].invoke_auto_complete(interaction)
 
         return None
 
