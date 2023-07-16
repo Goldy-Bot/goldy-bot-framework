@@ -80,27 +80,18 @@ class CommandLoader():
         self, 
         slash_commands_to_register: List[slash_command.SlashCommand], 
         slash_command_payloads: List[ApplicationCommandPayload], 
-        testing_server: Tuple[str, str]
-    ):
-        testing_guild_route: Route = None
+        testing_server: Tuple[str, str] | None
+    ) -> None:
         created_interactions: List[ApplicationCommandData] = []
 
+        # Creating global commands.
+        # --------------------------
         global_route = Route(
             "PUT",
             "/applications/{application_id}/commands",
             application_id = self.goldy.application_data["id"]
         )
-
-        if testing_server is not None:
-            testing_guild_route = Route(
-                "PUT",
-                "/applications/{application_id}/guilds/{guild_id}/commands",
-                application_id = self.goldy.application_data["id"],
-                guild_id = testing_server[0],
-            )
-
-
-        # Creating global commands.
+        
         r = await self.goldy.http_client.request(
             global_route,
             rate_limit_key = self.goldy.nc_authentication.rate_limit_key,
@@ -109,22 +100,37 @@ class CommandLoader():
         )
 
         created_interactions += await r.json()
+        self.logger.debug("Created global commands.")
 
-        for payload in slash_command_payloads:
-            payload["description"] = "⚒️ THIS IS A TEST COMMAND REGISTERED JUST FOR THIS GUILD"
 
         # Creating guild commands for testing server.
-        r = await self.goldy.http_client.request(
-            testing_guild_route,
-            rate_limit_key = self.goldy.nc_authentication.rate_limit_key,
-            headers = self.goldy.nc_authentication.headers,
-            json = slash_command_payloads
-        )
+        # --------------------------------------------
+        if testing_server is not None:
+            testing_guild_route = Route(
+                "PUT",
+                "/applications/{application_id}/guilds/{guild_id}/commands",
+                application_id = self.goldy.application_data["id"],
+                guild_id = testing_server[0],
+            )
 
-        created_interactions += await r.json()
+            for payload in slash_command_payloads:
+                payload["description"] = "⚒️ THIS IS A TEST COMMAND REGISTERED JUST FOR THIS GUILD"
+
+            # Creating guild commands for testing server.
+            r = await self.goldy.http_client.request(
+                testing_guild_route,
+                rate_limit_key = self.goldy.nc_authentication.rate_limit_key,
+                headers = self.goldy.nc_authentication.headers,
+                json = slash_command_payloads
+            )
+
+            created_interactions += await r.json()
+
+            self.logger.debug("Created guild commands for test server.")
 
 
         # Registering slash commands with the id given by discord.
+        # ----------------------------------------------------------
         for interaction in created_interactions:
 
             for command in slash_commands_to_register:
