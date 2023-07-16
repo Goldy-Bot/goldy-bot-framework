@@ -45,7 +45,7 @@ async def wait(platter: GoldPlatter) -> None:
 
         platter._interaction_responded = True
 
-        logger.debug(f"We told discord to wait a little longer for this response.")
+        logger.debug("We told discord to wait a little longer for this response.")
 
     else:
         ... # TODO: Add support for prefix commands.

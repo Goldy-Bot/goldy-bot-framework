@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import List, TYPE_CHECKING, overload, Callable, Union
+from typing import List, TYPE_CHECKING, overload, Callable
 from discord_typings import ApplicationCommandOptionData, AutocompleteInteractionData
 
 from nextcore.http import Route
@@ -8,7 +8,6 @@ from devgoldyutils import LoggerAdapter, Colours
 from .... import goldy_bot_logger
 from .slash_option import SlashOption, SlashOptionChoice
 from ...objects.member import Member
-from ...objects.platter.golden_platter import GoldPlatter
 
 if TYPE_CHECKING:
     from .... import Goldy
