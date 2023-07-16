@@ -79,7 +79,7 @@ MONGODB_URL="MONGO DATABASE URL HERE"
 
 Also, make sure to add your discord guild to ``allowed_guilds`` in ``goldy.json``.
 
-You may change ``"test_server"`` BUT **ONLY** if it's not a server you're going to be developing and testing on. The code name ``"test_server"`` is already reserved for you to use as a development environment to test your commands. Slash Commands will reload/update quicker in the ``test_server`` as they will be registered as guild commands instead of global commands. Check out [discord's explanation](https://discord.com/developers/docs/interactions/application-commands#registering-a-command) of global and guild commands for more clarification. 
+You may change ``"test_server"`` BUT **ONLY** if it's not a server you're going to be developing and testing on. The code name ``test_server`` is already reserved for you to use as a development environment to test your commands. Slash Commands will reload/update quicker in the ``test_server`` as they will be registered as guild commands instead of global commands. Check out [discord's explanation](https://discord.com/developers/docs/interactions/application-commands#registering-a-command) of global and guild commands for more clarification. 
 
 If your guild/server is not a testing server you may name it whatever you like but just remember this will be the code_name of the guild within goldy bot and you'll use this code_name to reference it later.
 
