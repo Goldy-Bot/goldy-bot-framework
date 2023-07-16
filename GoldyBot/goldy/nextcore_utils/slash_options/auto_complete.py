@@ -15,7 +15,7 @@ if TYPE_CHECKING:
     from ...commands.slash_command import SlashCommand
     from ...extensions import Extension
 
-    AUTO_COMPLETE_CALLBACK = Callable[[Extension, str], List[str]]
+    AUTO_COMPLETE_CALLBACK = Callable[[Extension, str], List[SlashOptionChoice | str]]
 
 class SlashOptionAutoComplete(SlashOption):
     @overload
@@ -94,7 +94,7 @@ class SlashOptionAutoComplete(SlashOption):
                     choices.append(choice)
 
 
-        choices = [SlashOptionChoice(x, x) for x in choices if isinstance(x, str)]
+        choices = [SlashOptionChoice(x, x) if isinstance(x, str) else x for x in choices]
         payload["choices"] = choices[:24] # Discord only allows max of 25 choices.
 
         self.logger.debug(
