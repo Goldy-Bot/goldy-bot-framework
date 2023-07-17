@@ -31,6 +31,8 @@ class PermissionSystem():
                     self.logger.debug("Member is a bot developer :)")
                     return True
 
+            # TODO: Add bot admin.
+
             # Check if member has any of the required roles.
             #----------------------------------------------------
 
