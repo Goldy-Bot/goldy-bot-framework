@@ -10,6 +10,7 @@ if TYPE_CHECKING:
     from ..message import Message
     from ...recipes import Recipe
     from ...nextcore_utils.embeds.embed import Embed
+    from ...nextcore_utils.files import File
 
 class Platter(ABC, DictClass):
     def __init__(self, data: dict, invoker: Member, invokable: Invokable) -> None:
@@ -46,6 +47,7 @@ class Platter(ABC, DictClass):
         text: str = None, 
         embeds: List[Embed] = None, 
         recipes: List[Recipe] = None, 
+        files: List[File] = None,
         reply: bool = False, 
         delete_after: float = None, 
         **extra
@@ -63,6 +65,8 @@ class Platter(ABC, DictClass):
             Embeds to include in the message.
         ``recipes``
             Components to include in the message, e.g buttons and dropdowns.
+        ``files``
+            Files you may upload with this message.
         ``reply``
             Whether goldy bot should liberally reply to the message the command was invoked.
         ``delete_after``
@@ -76,6 +80,6 @@ class Platter(ABC, DictClass):
             The message that was sent.
         
         """
-        return await nextcore_utils.send_msg(self, text, embeds, recipes, reply, delete_after, **extra)
+        return await nextcore_utils.send_msg(self, text, embeds, recipes, files, reply, delete_after, **extra)
 
 from ... import nextcore_utils # This must be here to avoid circular import.

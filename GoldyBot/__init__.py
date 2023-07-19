@@ -31,6 +31,7 @@ from .goldy.database.wrappers import DatabaseWrapper
 from .goldy import nextcore_utils
 from .goldy.nextcore_utils import (
     Colours,
+    File,
     Embed, EmbedField, EmbedImage,
     SlashOption, SlashOptionChoice, SlashOptionTypes,
     SlashOptionAutoComplete,

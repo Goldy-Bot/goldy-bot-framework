@@ -22,5 +22,6 @@ from .guilds.get_guild_data import get_guild_data
 from .channels.get_channel import get_channel
 from .channels.delete_channel import delete_channel
 
+from .files import File
 from .colours import Colours
 from .front_end_errors import FrontEndErrors
