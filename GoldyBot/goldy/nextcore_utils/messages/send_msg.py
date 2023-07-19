@@ -13,6 +13,7 @@ from ...commands import slash_command
 from ...recipes import Recipe
 
 if TYPE_CHECKING:
+    from ..files import File
     from ..embeds.embed import Embed
 
 # TODO: Add more options to allow using channel instead of platter.
@@ -23,6 +24,7 @@ async def send_msg(
     text: str = None, 
     embeds: List[Embed] = None, 
     recipes: List[Recipe] = None, 
+    files: List[File] = None, 
     reply: bool = False, 
     delete_after: float = None,
     **extra: MessageData | InteractionCallbackData
@@ -42,6 +44,8 @@ async def send_msg(
         Embeds to include in the message.
     ``recipes``
         Components to include in the message.
+    ``files``
+        Files you may upload with this message.
     ``reply``
         Whether goldy bot should liberally reply to the message the command was invoked.
     ``delete_after``
@@ -62,6 +66,7 @@ async def send_msg(
     text: str = None,
     embeds: List[Embed] = None, 
     recipes: List[Recipe] = None, 
+    files: List[File] = None, 
     delete_after: float = None,
     **extra: MessageData | InteractionCallbackData
 ) -> objects.Message:
@@ -80,6 +85,8 @@ async def send_msg(
         Embeds to include in the message.
     ``recipes``
         Components to include in the message.
+    ``files``
+        Files you may upload with this message.
     ``delete_after``
         Deletes the sent message after said amount of seconds.
     ``**extra``
@@ -98,6 +105,7 @@ async def send_msg(
     text: str = None, 
     embeds: List[Embed] = None, 
     recipes: List[Recipe] = None, 
+    files: List[File] = None, 
     delete_after: float = None,
     **extra: MessageData | InteractionCallbackData
 ) -> objects.Message:
@@ -116,6 +124,8 @@ async def send_msg(
         Embeds to include in the message.
     ``recipes``
         Components to include in the message.
+    ``files``
+        Files you may upload with this message.
     ``delete_after``
         Deletes the sent message after said amount of seconds.
     ``**extra``
@@ -133,6 +143,7 @@ async def send_msg(
     text: str = None, 
     embeds: List[Embed] = None, 
     recipes: List[Recipe] = None, 
+    files: List[File] = None, 
     reply: bool = False, 
     delete_after: float = None,
     **extra: MessageData | InteractionCallbackData
@@ -172,6 +183,15 @@ async def send_msg(
 
     message_data: MessageData = None
 
+    form_data = FormData()
+
+    # Adding files to form data.
+    if files is not None:
+        for file in files:
+            form_data.add_field(
+                file.name.split(".")[-2], file.contents, filename = file.name
+            )
+
     if isinstance(object, objects.Platter):
         platter: objects.Platter = object
 
@@ -183,6 +203,15 @@ async def send_msg(
             # ------------------
             if platter._interaction_responded is False:
 
+                form_data.add_field(
+                    "payload_json", json_dumps(
+                        {
+                            "type": 4, 
+                            "data": payload
+                        }
+                    )
+                )
+
                 await goldy.http_client.request(
                     Route(
                         "POST", 
@@ -191,10 +220,7 @@ async def send_msg(
                         interaction_token = platter.data["token"]
                     ),
                     rate_limit_key = goldy.nc_authentication.rate_limit_key,
-                    json = {
-                        "type": 4, 
-                        "data": payload
-                    }
+                    data = form_data
                 )
 
                 platter._interaction_responded = True
@@ -220,6 +246,10 @@ async def send_msg(
             # Is sent when you want to respond again after sending the original response to an interaction command.
             else:
 
+                form_data.add_field(
+                    "payload_json", json_dumps(payload)
+                )
+
                 r = await goldy.http_client.request(
                     Route(
                         "POST", 
@@ -228,7 +258,7 @@ async def send_msg(
                         interaction_token = platter.data["token"]
                     ),
                     rate_limit_key = goldy.nc_authentication.rate_limit_key,
-                    json = payload
+                    data = form_data
                 )
 
                 message_data = await r.json()
@@ -238,16 +268,12 @@ async def send_msg(
         else:
             # Perform normal message response.
             # ----------------------------------
-
             if reply:
                 payload["message_reference"] = MessageReferenceData(
                     message_id = platter.data["id"],
                     channel_id = platter.data["channel_id"],
                     guild_id = platter.data["guild_id"]
                 )
-
-            form_data = FormData()
-            form_data.add_field("payload_json", json_dumps(payload))
 
             r = await goldy.http_client.request(
                 Route(
@@ -268,9 +294,6 @@ async def send_msg(
     # If object is a channel object just send the message in the channel.
     if isinstance(object, objects.Channel):
         channel: objects.Channel = object
-
-        form_data = FormData()
-        form_data.add_field("payload_json", json_dumps(payload))
 
         r = await goldy.http_client.request(
             Route(
