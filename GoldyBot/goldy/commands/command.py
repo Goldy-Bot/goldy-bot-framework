@@ -39,7 +39,7 @@ class Command(Invokable):
             name = func.__name__
 
         if description is None:
-            description = "🪹 Oops daisy, looks like no description was set for this command."
+            description = "🪹 Oopsie daisy, looks like no description was set for this command."
 
         if required_roles is None:
             self.__required_roles = []

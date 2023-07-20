@@ -93,8 +93,10 @@ class PrefixCommand(Command):
                     logger = self.logger
                 )
 
-            # TODO: When exceptions raise in commands wrap them in a goldy bot command exception.
-            raise e
+            raise front_end_errors.UnknownError(platter, logger = self.logger)
+
+        except Exception as e:
+            raise front_end_errors.UnknownError(platter, e, self.logger)
 
     async def __invoke_sub_command(self, data: MessageData, platter: objects.GoldPlatter) -> None:
         for arg in data["content"].split(" ")[1:]:

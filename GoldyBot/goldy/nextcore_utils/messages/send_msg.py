@@ -275,6 +275,10 @@ async def send_msg(
                     guild_id = platter.data["guild_id"]
                 )
 
+            form_data.add_field(
+                "payload_json", json_dumps(payload)
+            )
+
             r = await goldy.http_client.request(
                 Route(
                     "POST", 
@@ -294,6 +298,10 @@ async def send_msg(
     # If object is a channel object just send the message in the channel.
     if isinstance(object, objects.Channel):
         channel: objects.Channel = object
+
+        form_data.add_field(
+            "payload_json", json_dumps(payload)
+        )
 
         r = await goldy.http_client.request(
             Route(

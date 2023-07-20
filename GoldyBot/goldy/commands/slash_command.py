@@ -2,6 +2,8 @@ from __future__ import annotations
 from typing import Any, Callable, Dict, List, TYPE_CHECKING
 from discord_typings import ApplicationCommandOptionData, InteractionData, AutocompleteInteractionData
 
+from ..nextcore_utils import front_end_errors
+
 if TYPE_CHECKING:
     from .. import Goldy, objects
     from ... import Extension
@@ -71,17 +73,19 @@ class SlashCommand(Command):
         params = self.__invoke_data_to_params(data)
         if not params == {}: self.logger.debug(f"Got args --> {params}")
 
-        return_value = await super().invoke(
-            platter, lambda: self.func(platter.command.extension, platter, **params)
-        )
+        try:
+            return_value = await super().invoke(
+                platter, lambda: self.func(platter.command.extension, platter, **params)
+            )
 
-        # Handle sub commands.
-        # ----------------------
-        # Invoke sub command if there is one in invoke data.
-        if return_value is not False:
-            await self.__invoke_sub_command(data, platter)
+            # Handle sub commands.
+            # ----------------------
+            # Invoke sub command if there is one in invoke data.
+            if return_value is not False:
+                await self.__invoke_sub_command(data, platter)
 
-        # TODO: When exceptions raise in commands wrap them in a goldy bot command exception.
+        except Exception as e:
+            raise front_end_errors.UnknownError(platter, e, self.logger)
 
 
     async def invoke_auto_complete(self, data: AutocompleteInteractionData):
