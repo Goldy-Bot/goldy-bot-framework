@@ -178,7 +178,7 @@ class ExtensionLoader():
                 for character in [">", "=", "^", "<"]:
                     dependency = dependency.split(character)[0]
 
-                if not dependency.lower() in self.__installed_dependencies:
+                if dependency.lower() not in self.__installed_dependencies:
                     self.logger.warning(f"Missing dependency '{dependency}'.")
                     missing_dependencies.append(
                         (dependency, dependency_with_install_operations)
