@@ -2,8 +2,10 @@ from __future__ import annotations
 
 import os
 import sys
+import toml
 import pathlib
-from typing import List, overload, TYPE_CHECKING
+import pkg_resources
+from typing import List, overload, TYPE_CHECKING, Dict, Tuple
 import importlib.util
 
 from .. import Goldy, GoldyBotError
@@ -30,64 +32,7 @@ class ExtensionLoader():
 
         self.logger = LoggerAdapter(goldy_bot_logger, prefix="ExtensionLoader")
 
-    def __find_all_paths(self) -> List[str]:
-        """Searches for all extensions, internal and external then returns their paths."""
-        external_path = None
-        internal_path = Paths.INTERNAL_EXTENSIONS
-
-        paths = []
-        late_load_paths = []
-        
-        # Finding external extensions folder path if none.
-        # -------------------------------------------------
-        if self.path_to_extensions_folder is None:
-            # Go look in the root dir.
-            for file in os.listdir("."):
-                if file == "extensions":
-                    external_path = os.path.abspath(f"./{file}")
-                    break
-        else:
-            external_path = self.path_to_extensions_folder
-
-        # Getting all paths of each individual extension.
-        # -------------------------------------------------
-        for path in [external_path, internal_path]:
-            path_object = pathlib.Path(path)
-
-            if path_object.exists() is False:
-                self.logger.warn(f"Couldn't find extension folder path at '{path_object}'!")
-                continue
-
-            self.logger.info(f"Found extension folder at '{path}'.")
-
-            for file in path_object.iterdir():
-                if file.name == "__pycache__":
-                    continue
-
-                if file.is_file() or file.is_dir():
-
-                    if file.is_dir():
-
-                        if "__init__.py" not in [x.name for x in file.iterdir()]:
-                            self.logger.warn(f"Extension module '{file.name}' has no __init__.py so I'm ignoring it...")
-                            continue
-
-                        load_path = os.path.join(str(file), "__init__.py")
-
-                    else:
-                        load_path = str(file)
-
-                    if file.name in self.late_load_extensions:
-                        self.logger.info(f"The extension '{file.name}' will load late (after all other extensions).")
-                        late_load_paths.append(load_path)
-                    else:
-                        paths.append(load_path)
-                    
-                    self.logger.debug(f"Found the module '{file.name}' in extensions.")
-
-        paths.extend(late_load_paths)
-        return paths
-
+        self.__installed_dependencies = {pkg.key for pkg in pkg_resources.working_set}
 
     @overload
     def load(self) -> None:
@@ -104,11 +49,18 @@ class ExtensionLoader():
         if extension_paths is None:
             extension_paths = self.__find_all_paths()
 
+        # self.check_dependencies() # TODO: Add method that checks dependencies from pyproject.toml and installs them if they are missing.
+
         for path in extension_paths:
             # Specify and get the module.
             self.logger.debug(f"Loading the extension at '{path}'...")
             spec_module = importlib.util.spec_from_file_location(path[:-3], path)
             module_py = importlib.util.module_from_spec(spec_module)
+
+            # Pip install extension missing dependencies.
+            for dependency in self.__check_dependencies(path):
+                self.logger.info(f"Installing '{dependency[0]}'...")
+                os.system(f'pip install "{dependency[1]}"')
 
             # Run module and load function.
             try:
@@ -180,3 +132,101 @@ class ExtensionLoader():
         await self.goldy.command_loader.load()
 
         return None
+
+
+    def __check_dependencies(self, extension_path: str) -> List[Tuple[str, str]]:
+        """Returns list of missing dependencies needed to execute the extension."""
+        missing_dependencies = []
+
+        # Dependency check only works with extensions that are packages and contain a pyproject.toml file in their directory.
+        if extension_path.endswith("__init__.py"): 
+            self.logger.debug(f"Checking missing dependencies for extension at '{extension_path}'...")
+
+            try:
+                pyproject_toml: Dict[str, str] = toml.load(
+                    open(os.path.split(extension_path)[0] + "/pyproject.toml")
+                )
+
+                for dependency in pyproject_toml["project"]["dependencies"]:
+                    dependency_with_install_operations = dependency
+
+                    for character in [">", "=", "^", "<"]:
+                        dependency = dependency.split(character)[0]
+
+                    if not dependency.lower() in self.__installed_dependencies:
+                        self.logger.warning(f"Missing dependency '{dependency}'.")
+                        missing_dependencies.append(
+                            (dependency, dependency_with_install_operations)
+                        )
+
+            except KeyError as e:
+                raise GoldyBotError(
+                    f"Umm, seems like we couldn't find 'dependencies' in the pyproject.toml file for the extension at '{extension_path}'.\n" \
+                    "Make sure you are following PEP 621! (https://peps.python.org/pep-0621/)\n" \
+                    f"Error >> {e}"
+                )
+
+            except FileNotFoundError:
+                self.logger.info(
+                    f"Dependency check ignored for extension at '{extension_path}' as it's directory does not contain a pyproject.toml."
+                )
+
+        return missing_dependencies
+
+    def __find_all_paths(self) -> List[str]:
+        """Searches for all extensions, internal and external then returns their paths."""
+        external_path = None
+        internal_path = Paths.INTERNAL_EXTENSIONS
+
+        paths = []
+        late_load_paths = []
+        
+        # Finding external extensions folder path if none.
+        # -------------------------------------------------
+        if self.path_to_extensions_folder is None:
+            # Go look in the root dir.
+            for file in os.listdir("."):
+                if file == "extensions":
+                    external_path = os.path.abspath(f"./{file}")
+                    break
+        else:
+            external_path = self.path_to_extensions_folder
+
+        # Getting all paths of each individual extension.
+        # -------------------------------------------------
+        for path in [external_path, internal_path]:
+            path_object = pathlib.Path(path)
+
+            if path_object.exists() is False:
+                self.logger.warn(f"Couldn't find extension folder path at '{path_object}'!")
+                continue
+
+            self.logger.info(f"Found extension folder at '{path}'.")
+
+            for file in path_object.iterdir():
+                if file.name == "__pycache__":
+                    continue
+
+                if file.is_file() or file.is_dir():
+
+                    if file.is_dir():
+
+                        if "__init__.py" not in [x.name for x in file.iterdir()]:
+                            self.logger.warn(f"Extension module '{file.name}' has no __init__.py so I'm ignoring it...")
+                            continue
+
+                        load_path = os.path.join(str(file), "__init__.py")
+
+                    else:
+                        load_path = str(file)
+
+                    if file.name in self.late_load_extensions:
+                        self.logger.info(f"The extension '{file.name}' will load late (after all other extensions).")
+                        late_load_paths.append(load_path)
+                    else:
+                        paths.append(load_path)
+                    
+                    self.logger.debug(f"Found the module '{file.name}' in extensions.")
+
+        paths.extend(late_load_paths)
+        return paths

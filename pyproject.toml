@@ -34,11 +34,7 @@ dependencies = [
     "psutil",
     "dateparser",
     "pytz",
-
-    # Dependencies for the optional internal extensions.
-    # ---------------------------------------------------
-    # MalCord extension.
-    "jikanpy-v4",
+    "toml",
 ]
 
 dynamic = ["version"]
