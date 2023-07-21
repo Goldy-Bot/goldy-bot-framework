@@ -12,6 +12,7 @@ from .. import Goldy, GoldyBotError
 from ... import goldy_bot_logger, LoggerAdapter
 from ...paths import Paths
 from . import extensions_cache
+from .extension_metadata import ExtensionMetadata
 
 if TYPE_CHECKING:
     from . import Extension
@@ -133,6 +134,24 @@ class ExtensionLoader():
 
         return None
 
+    def phrase_pyproject(self, extension_path: str) -> ExtensionMetadata | None:
+        """Phrases the pyproject.toml file in that extension path."""
+        if not extension_path.endswith("__init__.py"): 
+            return None
+
+        try:
+            pyproject_toml: Dict[str, str] = toml.load(
+                open(os.path.split(extension_path)[0] + "/pyproject.toml")
+            )
+
+            return ExtensionMetadata(pyproject_toml)
+
+        except FileNotFoundError:
+            self.logger.info(
+                f"Couldn't phrase pyproject.toml for the extension at '{extension_path}' as it's directory does not contain a pyproject.toml file."
+            )
+
+        return None
 
     def __check_dependencies(self, extension_path: str) -> List[Tuple[str, str]]:
         """Returns list of missing dependencies needed to execute the extension."""
@@ -142,34 +161,30 @@ class ExtensionLoader():
         if extension_path.endswith("__init__.py"): 
             self.logger.debug(f"Checking missing dependencies for extension at '{extension_path}'...")
 
-            try:
-                pyproject_toml: Dict[str, str] = toml.load(
-                    open(os.path.split(extension_path)[0] + "/pyproject.toml")
-                )
+            extension_metadata = self.phrase_pyproject(extension_path)
 
-                for dependency in pyproject_toml["project"]["dependencies"]:
-                    dependency_with_install_operations = dependency
+            if extension_metadata is None:
+                return []
 
-                    for character in [">", "=", "^", "<"]:
-                        dependency = dependency.split(character)[0]
-
-                    if not dependency.lower() in self.__installed_dependencies:
-                        self.logger.warning(f"Missing dependency '{dependency}'.")
-                        missing_dependencies.append(
-                            (dependency, dependency_with_install_operations)
-                        )
-
-            except KeyError as e:
+            if extension_metadata.dependencies is None:
                 raise GoldyBotError(
                     f"Umm, seems like we couldn't find 'dependencies' in the pyproject.toml file for the extension at '{extension_path}'.\n" \
-                    "Make sure you are following PEP 621! (https://peps.python.org/pep-0621/)\n" \
-                    f"Error >> {e}"
+                    "Make sure you are following PEP 621! (https://peps.python.org/pep-0621/)"
                 )
 
-            except FileNotFoundError:
-                self.logger.info(
-                    f"Dependency check ignored for extension at '{extension_path}' as it's directory does not contain a pyproject.toml."
-                )
+            for dependency in extension_metadata.dependencies:
+                dependency_with_install_operations = dependency
+
+                for character in [">", "=", "^", "<"]:
+                    dependency = dependency.split(character)[0]
+
+                if not dependency.lower() in self.__installed_dependencies:
+                    self.logger.warning(f"Missing dependency '{dependency}'.")
+                    missing_dependencies.append(
+                        (dependency, dependency_with_install_operations)
+                    )
+                else:
+                    self.logger.debug(f"'{dependency}' dependency found.")
 
         return missing_dependencies
 
