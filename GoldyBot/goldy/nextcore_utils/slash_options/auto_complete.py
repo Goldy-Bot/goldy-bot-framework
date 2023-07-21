@@ -17,6 +17,15 @@ if TYPE_CHECKING:
     AUTO_COMPLETE_CALLBACK = Callable[[Extension, str], List[SlashOptionChoice | str]]
 
 class SlashOptionAutoComplete(SlashOption):
+    """
+    Like :py:meth:`~GoldyBot.SlashOption` but it auto completes while the member is typing and it doesn't force them to pick those options.
+    You can also override the callback and implement your own auto complete mechanism like I did in [mal_cord](https://github.com/THEGOLDENPRO/mal_cord/blob/main/__init__.py#L23).
+
+    ---------------
+
+    ⭐ Example:
+    -------------
+    """
     @overload
     def __init__(
         self, 
