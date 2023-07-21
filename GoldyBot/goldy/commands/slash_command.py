@@ -19,7 +19,7 @@ class SlashCommand(Command):
         func: Callable[[Extension, objects.GoldPlatter], Any], 
         name: str = None, 
         description: str = None, 
-        required_roles: List[str] = None, 
+        required_perms: List[str] = None, 
         slash_options: Dict[str, ApplicationCommandOptionData] = None, 
         hidden: bool = False,
         pre_register: bool = True
@@ -31,7 +31,7 @@ class SlashCommand(Command):
             func = func, 
             name = name, 
             description = description, 
-            required_roles = required_roles, 
+            required_perms = required_perms, 
             slash_options = slash_options, 
             hidden = hidden,
             pre_register = pre_register

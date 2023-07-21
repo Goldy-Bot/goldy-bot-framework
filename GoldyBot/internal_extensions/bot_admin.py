@@ -32,7 +32,7 @@ class BotAdmin(GoldyBot.Extension):
             colour = GoldyBot.Colours.GREY # TODO: Replace this with brown.
         )
 
-    admin = GoldyBot.GroupCommand("admin", required_roles = [Perms.BOT_DEV, Perms.BOT_ADMIN], hidden = True)
+    admin = GoldyBot.GroupCommand("admin", required_perms = [Perms.BOT_DEV, Perms.BOT_ADMIN], hidden = True)
 
     @admin.sub_command(
         description = "A command for enabling a Goldy Bot extension that is disabled.",

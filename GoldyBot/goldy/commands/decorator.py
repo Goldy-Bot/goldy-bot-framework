@@ -14,7 +14,7 @@ if TYPE_CHECKING:
 def command(
     name: str = None, 
     description: str = None, 
-    required_roles: List[str | Perms] = None, 
+    required_perms: List[str | Perms] = None, 
     slash_options: Dict[str, SlashOption] = None,
     slash_cmd_only: bool = False, 
     hidden: bool = False,
@@ -26,7 +26,7 @@ def command(
 def command(
     name: str = None, 
     description: str = None, 
-    required_roles: List[str | Perms] = None, 
+    required_perms: List[str | Perms] = None, 
     slash_cmd_only: bool = False, 
     hidden: bool = False,
     group: Literal[True] = False
@@ -36,7 +36,7 @@ def command(
 def command(
     name: str = None, 
     description: str = None, 
-    required_roles: List[str | Perms] = None, 
+    required_perms: List[str | Perms] = None, 
     slash_options: Dict[str, SlashOption] = None,
     slash_cmd_only: bool = False, 
     hidden: bool = False,
@@ -72,7 +72,7 @@ def command(
                     func = func, 
                     name = name, 
                     description = description, 
-                    required_roles = required_roles, 
+                    required_perms = required_perms, 
                     slash_options = slash_options,
                     hidden = hidden
                 ),
@@ -81,7 +81,7 @@ def command(
                     func = func,
                     name = name,
                     description = description,
-                    required_roles = required_roles,
+                    required_perms = required_perms,
                     hidden = hidden
                 ) if slash_cmd_only is False else None
             )

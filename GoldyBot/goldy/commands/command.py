@@ -24,7 +24,7 @@ class Command(Invokable):
         func: Callable[[Extension, objects.GoldPlatter], Any], 
         name: str = None, 
         description: str = None, 
-        required_roles: List[str] = None, 
+        required_perms: List[str] = None, 
         slash_options: Dict[str, ApplicationCommandOptionData] = None, 
         hidden: bool = False, 
         pre_register = True
@@ -41,10 +41,10 @@ class Command(Invokable):
         if description is None:
             description = "🪹 Oopsie daisy, looks like no description was set for this command."
 
-        if required_roles is None:
-            self.__required_roles = []
+        if required_perms is None:
+            self.__required_perms = []
         else:
-            self.__required_roles = [str(role) for role in required_roles]
+            self.__required_perms = [str(role) for role in required_perms]
 
         if slash_options is None:
             self.__slash_options = {}
@@ -85,9 +85,9 @@ class Command(Invokable):
         return self.get("description")
 
     @property
-    def required_roles(self):
+    def required_perms(self):
         """The code names for the roles needed to access this command."""
-        return self.__required_roles
+        return self.__required_perms
 
     @property
     def slash_options(self):
