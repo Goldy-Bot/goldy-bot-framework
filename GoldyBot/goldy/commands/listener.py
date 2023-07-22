@@ -112,21 +112,21 @@ class CommandListener():
 
             # Check if prefix is correct.
             guild_config = await guild.config
-            if not guild_config.prefix == message["content"][0]:
+            if len(message["content"]) < 1 or not guild_config.prefix == message["content"][0]:
                 return
 
             # i really hope this doesn't break
             command: Tuple[str, PrefixCommand] = utils.cache_lookup(message["content"].split(" ")[0][1:], self.goldy.invokables)
 
-            if command is not None: # TODO: move this to invoke method and add a front end exception.
+            if command is not None:
                 gold_platter = GoldPlatter(
                     data = message, 
                     author = objects.Member(message["author"], guild, self.goldy),
                     command = command[1],
                 )
-                
+
                 await command[1].invoke(
                     gold_platter
                 )
-        
+
         return None
