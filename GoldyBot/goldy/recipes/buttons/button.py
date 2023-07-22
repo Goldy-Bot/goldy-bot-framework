@@ -94,8 +94,8 @@ class Button(Recipe):
     ) -> ButtonComponentData:
         """
         Creates a discord button to use in action rows. 😋
-        
-        ⭐ Documentation at https://discord.com/developers/docs/interactions/message-components#buttons
+
+        https://discord.com/developers/docs/interactions/message-components#buttons
         """
         data: ButtonComponentData = {}
 

@@ -34,7 +34,7 @@ class EmbedField(dict):
         """
         Creates an embed field. 😋
         
-        ⭐ Documentation at https://discord.com/developers/docs/resources/channel#embed-object-embed-field-structure
+        https://discord.com/developers/docs/resources/channel#embed-object-embed-field-structure
         """
         data: EmbedFieldData = {}
 
@@ -86,7 +86,7 @@ class Embed(dict):
         """
         Creates a discord embed. 😋
         
-        ⭐ Documentation at https://discord.com/developers/docs/resources/channel#embed-object
+        https://discord.com/developers/docs/resources/channel#embed-object
         """
         data: EmbedData = {}
 

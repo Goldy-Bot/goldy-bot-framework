@@ -23,7 +23,7 @@ class SlashOptionChoice(dict):
         """
         Creates an slash option choice. 😋
         
-        ⭐ Documentation at https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-choice-structure
+        https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-choice-structure
         """
         data: StrCommandOptionChoiceData | IntCommandOptionChoiceData = {}
 
@@ -89,7 +89,7 @@ class SlashOption(dict):
         """
         Creates a slash command option. 😋
         
-        ⭐ Documentation at https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure
+        https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure
         """
         self.data: ApplicationCommandOptionData = {}
 
