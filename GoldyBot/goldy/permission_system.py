@@ -21,12 +21,12 @@ class PermissionSystem():
     async def got_perms(self, platter: GoldPlatter) -> bool: # TODO: I might rename this method.
         """Method that checks if the command author has the perms to run this command."""
         
-        if not platter.command.required_perms == []:
+        if not platter.invokable.required_perms == []:
             self.logger.debug("Checking if member has perms to run command...")
 
             # If the required roles contain 'bot_dev' and the bot dev is running the command allow the command to execute.
             # --------------------------------------------------------------------------------------------------------------
-            if "bot_dev" in platter.command.required_perms:
+            if "bot_dev" in platter.invokable.required_perms:
                 if platter.author.id == self.goldy.config.bot_dev:
                     self.logger.debug("Member is a bot developer :)")
                     return True
@@ -50,7 +50,7 @@ class PermissionSystem():
 
             member_data: GuildMemberData = await r.json()
 
-            for role_code_name in platter.command.required_perms:
+            for role_code_name in platter.invokable.required_perms:
 
                 if role_code_name not in ["bot_dev"]:
                     try:
@@ -58,7 +58,7 @@ class PermissionSystem():
                     except KeyError:
                         # Maybe there is a better way of handling this but I'll leave this as temporary solution for now.
                         self.logger.error(
-                            f"This guild ({platter.guild.code_name}) hasn't been configured to include the required role '{role_code_name}' you entered for the command '{platter.command.name}'."
+                            f"This guild ({platter.guild.code_name}) hasn't been configured to include the required role '{role_code_name}' you entered for the command '{platter.invokable.name}'."
                         )
                         return False
 

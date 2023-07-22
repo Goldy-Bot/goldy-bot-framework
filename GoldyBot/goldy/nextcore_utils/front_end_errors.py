@@ -52,7 +52,7 @@ class MissingArgument(FrontEndErrors):
                 *You missed the argument(s): ``{missing_args_string[:-2]}``*
 
                 ```
-                Command Usage -> {platter.guild.config_wrapper.prefix}{platter.command.command_usage}
+                Command Usage -> {platter.guild.config_wrapper.prefix}{platter.invokable.command_usage}
                 ```
                 """,
                 colour = Colours.AKI_ORANGE
@@ -78,7 +78,7 @@ class InvalidArguments(FrontEndErrors):
                 - It doesn't take any arguments at all.
 
                 ```
-                Command Usage -> {platter.guild.config_wrapper.prefix}{platter.command.command_usage}
+                Command Usage -> {platter.guild.config_wrapper.prefix}{platter.invokable.command_usage}
                 ```
                 """,
                 colour = Colours.YELLOW
@@ -99,7 +99,7 @@ class MissingPerms(FrontEndErrors):
 
         message = f"The command author '{platter.author.username}#{platter.author.discriminator}' doesn't have the perms to run this command."
 
-        if platter.command.hidden and isinstance(platter.command, prefix_command.PrefixCommand):
+        if platter.invokable.hidden and isinstance(platter.invokable, prefix_command.PrefixCommand):
             raise errors.GoldyBotError(message)
 
         super().__init__(
@@ -170,7 +170,7 @@ class UnknownError(FrontEndErrors):
                     "text": "Report button will be coming soon."
                 }
             ),
-            message = f"Error occurred in the command '{platter.command.name}' executed by '{platter.author}'!",
+            message = f"Error occurred in the command '{platter.invokable.name}' executed by '{platter.author}'!",
             platter = platter, 
             delete_after = 12,
             logger = logger

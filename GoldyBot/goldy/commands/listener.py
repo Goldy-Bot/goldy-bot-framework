@@ -10,7 +10,6 @@ from ..recipes.buttons.button import Button
 from .. import objects
 from ... import LoggerAdapter, goldy_bot_logger, utils
 from ..objects.platter.golden_platter import GoldPlatter
-from ..objects.platter.silver_platter import SilverPlatter
 
 if TYPE_CHECKING:
     from .. import Goldy
@@ -68,7 +67,7 @@ class CommandListener():
                         gold_platter = GoldPlatter(
                             data = interaction, 
                             author = author,
-                            command = command[1]
+                            invokable = command[1]
                         )
 
                         await command[1].invoke(
@@ -86,14 +85,14 @@ class CommandListener():
                 message_component: Tuple[str, Button] = utils.cache_lookup(interaction["data"]["custom_id"], self.goldy.invokables)
 
                 if message_component is not None:
-                    silver_platter = SilverPlatter(
+                    golden_platter = GoldPlatter(
                         data = interaction, 
                         author = author,
-                        recipe = message_component[1]
+                        invokable = message_component[1]
                     )
 
                     await message_component[1].invoke(
-                        silver_platter
+                        golden_platter
                     )
 
         return None
@@ -122,7 +121,7 @@ class CommandListener():
                 gold_platter = GoldPlatter(
                     data = message, 
                     author = objects.Member(message["author"], guild, self.goldy),
-                    command = command[1],
+                    invokable = command[1],
                 )
 
                 await command[1].invoke(

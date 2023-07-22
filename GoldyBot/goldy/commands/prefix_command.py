@@ -67,7 +67,7 @@ class PrefixCommand(Command):
 
         try:
             return_value = await super().invoke(
-                platter, lambda: self.func(platter.command.extension, platter, *params)
+                platter, lambda: self.func(platter.invokable.extension, platter, *params)
             )
 
             # Handle sub commands.
