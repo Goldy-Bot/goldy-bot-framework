@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import List, TYPE_CHECKING, overload, Callable
+from typing import List, TYPE_CHECKING, overload, Callable, Union
 from discord_typings import AutocompleteOptionData, AutocompleteInteractionData
 
 from nextcore.http import Route
@@ -14,7 +14,7 @@ if TYPE_CHECKING:
     from ...commands.slash_command import SlashCommand
     from ...extensions import Extension
 
-    AUTO_COMPLETE_CALLBACK = Callable[[Extension, str], List[SlashOptionChoice | str]]
+    AUTO_COMPLETE_CALLBACK = Callable[[Extension, str], List[Union[SlashOptionChoice, str]]]
 
 class SlashOptionAutoComplete(SlashOption):
     r"""
