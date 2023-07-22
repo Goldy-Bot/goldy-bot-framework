@@ -109,7 +109,7 @@ class PrefixCommand(Command):
                     platter = objects.GoldPlatter(
                         data = data, 
                         author = platter.author,
-                        command = command,
+                        invokable = command,
                     )
 
                     await command.invoke(platter)

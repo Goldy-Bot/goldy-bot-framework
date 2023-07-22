@@ -124,13 +124,14 @@ class SlashOptionAutoComplete(SlashOption):
 
         if self.callback is not None:
             choices = await self.callback(command.extension, current_typing_value) # Might add a platter for this in the future, idk yet.
-            # TODO: Where I left off last night (15/07/2023)
 
         else: # If no callback was given then default to recommendations list.
             for choice in self.recommendations: # Some shit fuzzy searching. I'll improve it later :L
+                if isinstance(choice, str):
+                    choice = SlashOptionChoice(choice, choice)
+
                 if current_typing_value.lower() in choice["name"].lower():
                     choices.append(choice)
-
 
         choices = [SlashOptionChoice(x, x) if isinstance(x, str) else x for x in choices]
         payload["choices"] = choices[:24] # Discord only allows max of 25 choices.

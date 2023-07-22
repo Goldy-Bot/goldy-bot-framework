@@ -97,6 +97,11 @@ class Button(Recipe):
 
         https://discord.com/developers/docs/interactions/message-components#buttons
         """
+        if url is None and callback is None:
+            raise TypeError(
+                "Button class cannot have both url and callback set to None. Take a closer look at the arguments please."
+            )
+
         data: ButtonComponentData = {}
 
         if isinstance(style, ButtonStyle):

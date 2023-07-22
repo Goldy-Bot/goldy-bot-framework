@@ -143,7 +143,7 @@ class SlashCommand(Command):
                     platter = GoldPlatter(
                         data = data, 
                         author = platter.author,
-                        command = command,
+                        invokable = command,
                     )
                     platter._interaction_responded = interaction_responded
 

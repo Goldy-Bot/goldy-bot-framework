@@ -98,7 +98,7 @@ class SlashOption(dict):
 
         # Check if all choices are same type.
         if choices is not None:
-            if isinstance(choices, str):
+            if isinstance(choices[0], str):
                 choices = [SlashOptionChoice(x, x) for x in choices]
 
             allowed_type = type_(choices[0]["value"])
