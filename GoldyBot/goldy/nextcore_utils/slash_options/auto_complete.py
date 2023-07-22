@@ -1,6 +1,6 @@
 from __future__ import annotations
 from typing import List, TYPE_CHECKING, overload, Callable
-from discord_typings import ApplicationCommandOptionData, AutocompleteInteractionData
+from discord_typings import AutocompleteOptionData, AutocompleteInteractionData
 
 from nextcore.http import Route
 from devgoldyutils import LoggerAdapter, Colours
@@ -17,14 +17,44 @@ if TYPE_CHECKING:
     AUTO_COMPLETE_CALLBACK = Callable[[Extension, str], List[SlashOptionChoice | str]]
 
 class SlashOptionAutoComplete(SlashOption):
-    """
+    r"""
     Like :py:meth:`~GoldyBot.SlashOption` but it auto completes while the member is typing and it doesn't force them to pick those options.
-    You can also override the callback and implement your own auto complete mechanism like I did in [mal_cord](https://github.com/THEGOLDENPRO/mal_cord/blob/main/__init__.py#L23).
+    You can also override the callback and implement your own auto complete mechanism like I did in mal_cord (https://github.com/THEGOLDENPRO/mal_cord/blob/main/__init__.py#L23).
 
     ---------------
 
     ⭐ Example:
     -------------
+    This is how you use auto complete slash options::
+
+        @GoldyBot.command(
+            slash_options = {
+                "bear_name": SlashOptionAutoComplete( # Now when you type these choices will be recommended to you but not forced on you.
+                    description = "⭐ Pick a custom bear name.",
+                    recommendations = [
+                        "Simba",
+                        "Paddington",
+                        "Goldilocks",
+                        "Toto"
+                    ]
+                )
+            }
+        )
+        async def custom_bear(self, platter: GoldyBot.GoldPlatter, bear_name: str):
+            if bear_name.lower() == "goldilocks":
+                return await platter.send_message("*Goldilocks is not a bear you fool!*", reply=True)
+
+            text = \
+                "*> In the woods, there lived three bears in their cozy house. " \
+                "There was a small wee bear, a middle-sized bear, " \
+                f"and a great, huge bear known as* **{bear_name}**..." \
+
+            await platter.send_message(text, reply=True)
+
+    .. note::
+
+        More at https://goldybot.devgoldy.xyz/examples.slash_options.html
+
     """
     @overload
     def __init__(
@@ -33,7 +63,7 @@ class SlashOptionAutoComplete(SlashOption):
         name: str = None, 
         description: str = None, 
         required: bool = True, 
-        **extra: ApplicationCommandOptionData
+        **extra: AutocompleteOptionData
     ) -> None:
         ...
 
@@ -44,7 +74,7 @@ class SlashOptionAutoComplete(SlashOption):
         name: str = None, 
         description: str = None, 
         required: bool = True, 
-        **extra: ApplicationCommandOptionData
+        **extra: AutocompleteOptionData
     ) -> None:
         ...
 
@@ -55,7 +85,7 @@ class SlashOptionAutoComplete(SlashOption):
         callback: AUTO_COMPLETE_CALLBACK = None, 
         recommendations: List[SlashOptionChoice | str] = None, 
         required: bool = True, 
-        **extra: ApplicationCommandOptionData
+        **extra: AutocompleteOptionData
     ) -> None:
 
         if recommendations is None:
