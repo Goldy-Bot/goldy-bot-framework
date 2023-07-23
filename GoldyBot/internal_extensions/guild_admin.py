@@ -4,7 +4,7 @@ import GoldyBot
 from GoldyBot import cache_lookup, Perms
 from GoldyBot.goldy.extensions import extensions_cache
 
-class BotAdmin(GoldyBot.Extension):
+class GuildAdmin(GoldyBot.Extension):
     def __init__(self):
         super().__init__()
 
@@ -32,7 +32,7 @@ class BotAdmin(GoldyBot.Extension):
             colour = GoldyBot.Colours.GREY # TODO: Replace this with brown.
         )
 
-    admin = GoldyBot.GroupCommand("admin", required_perms = [Perms.BOT_DEV, Perms.BOT_ADMIN], hidden = True)
+    admin = GoldyBot.GroupCommand("admin", required_perms = [Perms.GUILD_OWNER], hidden = True)
 
     @admin.sub_command(
         description = "A command for enabling a Goldy Bot extension that is disabled.",
@@ -71,4 +71,4 @@ class BotAdmin(GoldyBot.Extension):
         await platter.send_message(embeds = [self.extension_disabled])
 
 def load():
-    BotAdmin()
+    GuildAdmin()

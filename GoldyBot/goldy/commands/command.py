@@ -10,6 +10,7 @@ from ..extensions import extensions_cache
 from ... import goldy_bot_logger, utils
 from ..objects import Invokable
 from ... import errors
+from ..perms import Perms
 from ..nextcore_utils import front_end_errors
 
 if TYPE_CHECKING:
@@ -24,7 +25,7 @@ class Command(Invokable):
         func: Callable[[Extension, objects.GoldPlatter], Any], 
         name: str = None, 
         description: str = None, 
-        required_perms: List[str] = None, 
+        required_perms: List[Perms | str] = None, 
         slash_options: Dict[str, ApplicationCommandOptionData] = None, 
         hidden: bool = False, 
         pre_register = True
@@ -44,7 +45,7 @@ class Command(Invokable):
         if required_perms is None:
             self.__required_perms = []
         else:
-            self.__required_perms = [str(role) for role in required_perms]
+            self.__required_perms = required_perms
 
         if slash_options is None:
             self.__slash_options = {}

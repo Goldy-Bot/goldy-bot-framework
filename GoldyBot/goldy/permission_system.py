@@ -5,6 +5,7 @@ from discord_typings import GuildMemberData
 from nextcore.http import Route
 from devgoldyutils import LoggerAdapter, Colours
 
+from .perms import Perms
 from .. import goldy_bot_logger
 
 if TYPE_CHECKING:
@@ -26,12 +27,19 @@ class PermissionSystem():
 
             # If the required roles contain 'bot_dev' and the bot dev is running the command allow the command to execute.
             # --------------------------------------------------------------------------------------------------------------
-            if "bot_dev" in platter.invokable.required_perms:
+            if Perms.BOT_DEV in platter.invokable.required_perms:
                 if platter.author.id == self.goldy.config.bot_dev:
                     self.logger.debug("Member is a bot developer :)")
                     return True
 
             # TODO: Add bot admin.
+
+            # Server owner check.
+            # --------------------
+            if Perms.GUILD_OWNER in platter.invokable.required_perms:
+                if platter.author.id == platter.guild.get("owner_id"):
+                    self.logger.debug("Member is server owner ✅")
+                    return True
 
             # Check if member has any of the required roles.
             #----------------------------------------------------
@@ -52,7 +60,7 @@ class PermissionSystem():
 
             for role_code_name in platter.invokable.required_perms:
 
-                if role_code_name not in ["bot_dev"]:
+                if role_code_name not in Perms:
                     try:
                         role_id_uwu = platter.guild.config_wrapper.roles[role_code_name]
                     except KeyError:
