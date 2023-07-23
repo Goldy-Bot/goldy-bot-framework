@@ -59,7 +59,7 @@ class GuildAdmin(GoldyBot.Extension):
         extension: GoldyBot.Extension = cache_lookup(extension, extensions_cache)[1]
 
         if extension.name in guild_config.allowed_extensions or guild_config.allowed_extensions == []:
-            if not extension.name in guild_config.disallowed_extensions and not guild_config.disallowed_extensions == ["."]:
+            if extension.name not in guild_config.disallowed_extensions and not guild_config.disallowed_extensions == ["."]:
                 await platter.send_message(embeds = [self.extension_already_enabled], hide = True)
                 return
 
@@ -101,7 +101,7 @@ class GuildAdmin(GoldyBot.Extension):
         extension: GoldyBot.Extension = cache_lookup(extension, extensions_cache)[1]
 
         if extension.name in guild_config.disallowed_extensions or guild_config.disallowed_extensions == ["."]:
-            if not extension.name in guild_config.allowed_extensions:
+            if extension.name not in guild_config.allowed_extensions:
                 await platter.send_message(embeds = [self.extension_already_disabled], hide = True)
                 return
 
