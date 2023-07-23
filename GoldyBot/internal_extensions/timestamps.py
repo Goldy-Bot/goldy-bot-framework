@@ -96,8 +96,6 @@ class Timestamps(GoldyBot.Extension):
 
         datetime = get_datetime(f"{date} {time}", option = HumanDatetimeOptions.BOTH, datetime_formats = datetime_formats)
 
-        # TODO: Phrase the timezone. (idk, maybe add some convenient aliases.)
-
         if timezone is None:
             timezone = (lambda x: x if x is not None else self.default_timezone)(member_data.get("timezone", optional=True))
 
