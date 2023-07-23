@@ -70,6 +70,8 @@ class CommandListener():
                             invokable = command[1]
                         )
 
+                        await gold_platter.guild.config_wrapper.update()
+
                         await command[1].invoke(
                             gold_platter
                         )
@@ -85,14 +87,16 @@ class CommandListener():
                 message_component: Tuple[str, Button] = utils.cache_lookup(interaction["data"]["custom_id"], self.goldy.invokables)
 
                 if message_component is not None:
-                    golden_platter = GoldPlatter(
+                    gold_platter = GoldPlatter(
                         data = interaction, 
                         author = author,
                         invokable = message_component[1]
                     )
 
+                    await gold_platter.guild.config_wrapper.update()
+
                     await message_component[1].invoke(
-                        golden_platter
+                        gold_platter
                     )
 
         return None
@@ -123,6 +127,8 @@ class CommandListener():
                     author = objects.Member(message["author"], guild, self.goldy),
                     invokable = command[1],
                 )
+
+                await gold_platter.guild.config_wrapper.update()
 
                 await command[1].invoke(
                     gold_platter

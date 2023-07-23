@@ -29,7 +29,7 @@ class MemberDBWrapper(DatabaseWrapper):
         if type == DatabaseEnums.MEMBER_GUILD_DATA:
             doc_id = self.member.guild.id
 
-        await database.edit(self.member.id, {"_id": doc_id}, data)
+        await database.edit(self.member.id, {"_id": doc_id}, data, overwrite = False)
 
     async def update(self) -> None:
         self.logger.info("Pulling updated member data from database...")

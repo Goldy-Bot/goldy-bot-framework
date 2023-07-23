@@ -27,9 +27,9 @@ class ExtensionLoader():
             self.raise_on_load_error = self.goldy.config.raise_on_extension_loader_error
 
         self.path_to_extensions_folder:str|None = (lambda x: os.path.abspath(x) if isinstance(x, str) else x)(goldy.config.extension_folder_location)
-        
+
         self.ignored_extensions = goldy.config.ignored_extensions
-        self.late_load_extensions = goldy.config.late_load_extensions + ["extensions.py"]
+        self.late_load_extensions = goldy.config.late_load_extensions + ["guild_admin.py"]
 
         self.logger = LoggerAdapter(goldy_bot_logger, prefix="ExtensionLoader")
 

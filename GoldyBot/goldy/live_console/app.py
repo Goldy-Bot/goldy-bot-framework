@@ -30,7 +30,7 @@ class LiveConsoleApp(cmd2.Cmd):
                 self.logger.error(f"The extension '{extension_name}' was not found.")
                 return False
             else:
-                self.logger.info(f"Found '{extension_name}'.")
+                self.logger.info(f"Found '{extension[1].name}'.")
 
         self.logger.info("Reloading extension(s)...")
         self.logger.warning("This may take a minute to begin...")

@@ -10,6 +10,8 @@ VERSION = f"{VER}{STAGE[0]}{STAGE[1]}"
 DISPLAY_NAME = f"Goldy Bot (v{VERSION})"
 """Display name of goldy bot with it's version, like e.g ``Goldy Bot (v5.0alpha8)``."""
 
+GITHUB_REPO = "https://github.com/Goldy-Bot/Goldy-Bot-V5"
+
 COPYRIGHT = "Copyright (C) 2023 - Goldy"
 
 __version__ = VERSION

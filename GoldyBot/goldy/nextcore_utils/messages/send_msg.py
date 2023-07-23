@@ -16,8 +16,6 @@ if TYPE_CHECKING:
     from ..files import File
     from ..embeds.embed import Embed
 
-# TODO: Add more options to allow using channel instead of platter.
-
 @overload
 async def send_msg(
     platter: objects.GoldPlatter, 
@@ -27,6 +25,7 @@ async def send_msg(
     files: List[File] = None, 
     reply: bool = False, 
     delete_after: float = None,
+    hide: bool = False,
     **extra: MessageData | InteractionCallbackData
 ) -> objects.Message: # Work in progress...
     """
@@ -50,6 +49,8 @@ async def send_msg(
         Whether goldy bot should liberally reply to the message the command was invoked.
     ``delete_after``
         Deletes the sent message after said amount of seconds.
+    ``hide``
+        Hides the message in interaction commands and deletes the message after 3 seconds on prefix commands.
     ``**extra``
         Allows you to pass the extra parameters that are missing.
 
@@ -68,6 +69,7 @@ async def send_msg(
     recipes: List[Recipe] = None, 
     files: List[File] = None, 
     delete_after: float = None,
+    hide: bool = False,
     **extra: MessageData | InteractionCallbackData
 ) -> objects.Message:
     """
@@ -89,6 +91,8 @@ async def send_msg(
         Files you may upload with this message.
     ``delete_after``
         Deletes the sent message after said amount of seconds.
+    ``hide``
+        Hides the message in interaction commands and deletes the message after 3 seconds on prefix commands.
     ``**extra``
         Allows you to pass the extra parameters that are missing.
         
@@ -107,6 +111,7 @@ async def send_msg(
     recipes: List[Recipe] = None, 
     files: List[File] = None, 
     delete_after: float = None,
+    hide: bool = False,
     **extra: MessageData | InteractionCallbackData
 ) -> objects.Message:
     """
@@ -128,6 +133,8 @@ async def send_msg(
         Files you may upload with this message.
     ``delete_after``
         Deletes the sent message after said amount of seconds.
+    ``hide``
+        Hides the message in interaction commands and deletes the message after 3 seconds on prefix commands.
     ``**extra``
         Allows you to pass the extra parameters that are missing.
 
@@ -146,11 +153,13 @@ async def send_msg(
     files: List[File] = None, 
     reply: bool = False, 
     delete_after: float = None,
+    hide: bool = False,
     **extra: MessageData | InteractionCallbackData
 ) -> objects.Message:
     
     goldy = object.goldy
-    
+
+    form_data = FormData()
     payload: MessageBase | InteractionMessageCallbackData = {}
 
     if text is not None:
@@ -178,13 +187,6 @@ async def send_msg(
 
         payload["components"] = [components[component] for component in components]
 
-    payload.update(extra)
-
-
-    message_data: MessageData = None
-
-    form_data = FormData()
-
     # Adding files to form data.
     if files is not None:
         for file in files:
@@ -192,12 +194,18 @@ async def send_msg(
                 file.name.split(".")[-2], file.contents, filename = file.name
             )
 
-    if isinstance(object, objects.Platter):
-        platter: objects.Platter = object
+    payload.update(extra)
+
+    message_data: MessageData = None
+
+    if isinstance(object, objects.GoldPlatter):
+        platter: objects.GoldPlatter = object
 
         if isinstance(platter.invokable, (slash_command.SlashCommand, Recipe)):
             # Perform interaction response.
             # ------------------------------
+            if hide:
+                payload["flags"] = 1 << 6
 
             # Callback message.
             # ------------------
@@ -268,6 +276,9 @@ async def send_msg(
         else:
             # Perform normal message response.
             # ----------------------------------
+            if hide and delete_after is not None:
+                delete_after = 3
+
             if reply:
                 payload["message_reference"] = MessageReferenceData(
                     message_id = platter.data["id"],
@@ -318,8 +329,10 @@ async def send_msg(
 
         channel.logger.debug(f"Message was sent in channel '{channel.data['name']}'.")
 
+
     message = objects.Message(message_data, object.guild, goldy)
 
+    # TODO: Find a way to also delete the author's prefix command message.
     if delete_after is not None:
         utils.delay(
             coro = message.delete(f"delete_after was set to {delete_after} seconds"), 

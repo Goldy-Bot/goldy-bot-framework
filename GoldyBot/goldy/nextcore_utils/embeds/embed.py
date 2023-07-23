@@ -128,9 +128,9 @@ class Embed(dict):
         "Just like the str.format() method but it formats the embed's description for you " \
         "so you can avoid the catastrophe at https://github.com/Goldy-Bot/Goldy-Bot-V5/issues/35."
         data: EmbedData = super().copy()
-        
-        data["description"] = data["description"].format(kwargs = keys)
-        
+
+        data["description"] = data["description"].format(**keys)
+
         self.update(data)
 
     def format_fields(self, **keys) -> None:
@@ -143,7 +143,7 @@ class Embed(dict):
 
         for index, field in enumerate(data["fields"]):
             data["fields"][index]["value"] = field["value"].format(**keys)
-        
+
         self.update(data)
 
     def copy(self) -> Embed:

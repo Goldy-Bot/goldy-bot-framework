@@ -71,7 +71,7 @@ class GuildDBWrapper(DatabaseWrapper):
 
         doc_id = self.guild.id
 
-        await database.edit("guild_configs", {"_id": doc_id}, data)
+        await database.edit("guild_configs", {"_id": doc_id}, data, overwrite = False)
 
     async def update(self) -> None:
         self.logger.info("Pulling updated guild configuration data from database...")

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from ... import LoggerAdapter
+from .... import utils
 
 from typing import List
 from devgoldyutils import Colours
@@ -21,10 +22,15 @@ class GoldyDB():
         await self.database[collection].insert_one(data)
         self.logger.debug(f"Inserted '{data}' into '{collection}.'")
 
-    async def edit(self, collection: str, query, data: dict) -> None:
+    async def edit(self, collection: str, query, data: dict, overwrite: bool = True) -> None:
         """Finds and edits a document in this database and collection with the data provided."""
-        await self.database[collection].update_one(query, {"$set": data})
-        self.logger.debug(f"Edited '{query}' into '{data}.'")
+        if overwrite:
+            await self.database[collection].update_one(query, {"$set": data})
+        else:
+            document_data = await self.find_one("guild_configs", query)
+            new_data = utils.update_dict(document_data, data) # Override the document's data with the new data.
+            await self.database[collection].update_one(query, {"$set": new_data})
+        self.logger.debug(f"Edited '{query}' with '{data}.'")
 
     async def remove(self, collection: str, data) -> None:
         """Finds and deletes a copy of this data from a collection in this database."""

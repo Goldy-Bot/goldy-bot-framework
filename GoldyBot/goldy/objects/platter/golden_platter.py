@@ -73,6 +73,7 @@ class GoldPlatter(Platter):
         files: List[File] = None,
         reply: bool = False, 
         delete_after: float = None, 
+        hide: bool = False,
         **extra
     ) -> Message:
         """
@@ -93,7 +94,9 @@ class GoldPlatter(Platter):
         ``reply``
             Whether goldy bot should liberally reply to the message the command was invoked.
         ``delete_after``
-            Deletes the message after this amount of seconds. 
+            Deletes the message after this amount of seconds.
+        ``hide``
+            Hides the message in interaction commands and deletes the message after a few seconds on prefix commands.
         ``**extra``
             Allows you to pass the extra parameters that are missing.
 
@@ -103,6 +106,6 @@ class GoldPlatter(Platter):
             The message that was sent.
         
         """
-        return await nextcore_utils.send_msg(self, text, embeds, recipes, files, reply, delete_after, **extra)
+        return await nextcore_utils.send_msg(self, text, embeds, recipes, files, reply, delete_after, hide, **extra)
 
 from ... import nextcore_utils # This must be here to avoid circular import. (shit will blow up if this is moved, trust me)

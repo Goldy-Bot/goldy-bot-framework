@@ -19,7 +19,7 @@ class FrontEndErrors(errors.GoldyBotError):
             self, 
             embed: Embed,
             message: str,
-            platter: objects.Platter, 
+            platter: objects.GoldPlatter, 
             delete_after = 8,
             logger: log.Logger = None
         ):
