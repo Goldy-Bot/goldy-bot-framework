@@ -1,7 +1,8 @@
 from __future__ import annotations
-
 from typing import List
 from discord_typings import EmbedData, EmbedFieldData, EmbedImageData
+
+import copy
 from ..colours import Colours
 from .... import utils
 
@@ -127,7 +128,7 @@ class Embed(dict):
     def format_description(self, **keys) -> None:
         "Just like the str.format() method but it formats the embed's description for you " \
         "so you can avoid the catastrophe at https://github.com/Goldy-Bot/Goldy-Bot-V5/issues/35."
-        data: EmbedData = super().copy()
+        data: EmbedData = dict(self)
 
         data["description"] = data["description"].format(**keys)
 
@@ -139,12 +140,14 @@ class Embed(dict):
         
         This was added because of https://github.com/Goldy-Bot/Goldy-Bot-V5/issues/35.
         """
-        data: EmbedData = super().copy()
+        data: EmbedData = dict(self)
 
         for index, field in enumerate(data["fields"]):
+            print(">>>", field["value"])
             data["fields"][index]["value"] = field["value"].format(**keys)
 
         self.update(data)
 
     def copy(self) -> Embed:
-        return Embed(**super().copy())
+        """Returns copy of embed."""
+        return Embed(**copy.deepcopy(dict(self)))
