@@ -1,3 +1,6 @@
 [submodule "GoldyBot/internal_extensions/mal_cord"]
 	path = GoldyBot/internal_extensions/mal_cord
 	url = https://github.com/THEGOLDENPRO/mal_cord
+[submodule "GoldyBot/internal_extensions/aghpb"]
+	path = GoldyBot/internal_extensions/aghpb
+	url = https://github.com/THEGOLDENPRO/cat_ears
