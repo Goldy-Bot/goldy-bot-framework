@@ -143,7 +143,6 @@ class Embed(dict):
         data: EmbedData = dict(self)
 
         for index, field in enumerate(data["fields"]):
-            print(">>>", field["value"])
             data["fields"][index]["value"] = field["value"].format(**keys)
 
         self.update(data)
