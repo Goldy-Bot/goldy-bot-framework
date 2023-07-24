@@ -1,10 +1,11 @@
 from __future__ import annotations
-from typing import Dict, List, TYPE_CHECKING, Tuple, overload, Callable
+from typing import Dict, List, TYPE_CHECKING, Tuple, overload, Callable, Any
 
 from devgoldyutils import LoggerAdapter
 
 if TYPE_CHECKING:
     from ..nextcore_utils.slash_options.slash_option import SlashOption
+    from ..objects.platter.golden_platter import GoldPlatter
 
 from .slash_command import SlashCommand
 from .prefix_command import PrefixCommand
@@ -194,7 +195,7 @@ class GroupCommand():
 
         """
         def decorate(func):
-            def inner(func: Callable) -> None:
+            def inner(func: Callable) -> Callable[[GoldPlatter], Any]:
                 slash_cmd, prefix_cmd = self.commands
 
                 if slash_cmd is not None:
@@ -223,6 +224,8 @@ class GroupCommand():
                             pre_register = False
                         )
                     )
+
+                return func
 
             return inner(func)
 

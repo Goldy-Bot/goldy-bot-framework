@@ -19,7 +19,7 @@ def command(
     slash_cmd_only: bool = False, 
     hidden: bool = False,
     group: Literal[False] = False
-) -> Callable[..., None]:
+) -> Callable[..., Callable]:
     ...
 
 @overload
@@ -86,7 +86,7 @@ def command(
                 ) if slash_cmd_only is False else None
             )
 
-            return GroupCommand(base_commands = commands) if group else None
+            return GroupCommand(base_commands = commands) if group else func
 
         return inner(func)
 

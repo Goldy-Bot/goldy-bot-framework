@@ -125,6 +125,15 @@ class Embed(dict):
 
         super().__init__(data)
 
+    def format_title(self, **keys) -> None:
+        "Just like the str.format() method but it formats the embed's title for you " \
+        "so you can avoid the catastrophe at https://github.com/Goldy-Bot/Goldy-Bot-V5/issues/35."
+        data: EmbedData = dict(self)
+
+        data["title"] = data["title"].format(**keys)
+
+        self.update(data)
+
     def format_description(self, **keys) -> None:
         "Just like the str.format() method but it formats the embed's description for you " \
         "so you can avoid the catastrophe at https://github.com/Goldy-Bot/Goldy-Bot-V5/issues/35."

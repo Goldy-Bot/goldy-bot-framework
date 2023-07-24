@@ -1,3 +1,11 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from typing_extensions import Self
+    from .files import File
+
+from colorthief import ColorThief
 from enum import Enum
 
 class Colours(Enum):
@@ -19,3 +27,17 @@ class Colours(Enum):
 
     INVISIBLE = 0x2B2D31
     """Makes the embed colour the same as the background essentially giving the embed colour a transparent look."""
+
+    def __init__(self, colour: int):
+        ...
+
+    @classmethod
+    def from_rgb(cls, r: int, g:int, b:int) -> int:
+        """Converts rgb values into colour."""
+        return (r << 16) + (g << 8) + b
+
+    @classmethod
+    def from_image(cls, file: File, accuracy: int = 5) -> int:
+        """Returns the dominant colour in that image."""
+        r, g, b = ColorThief(file.file_io).get_color(accuracy)
+        return cls.from_rgb(r, g, b)
