@@ -32,7 +32,7 @@ from .goldy import nextcore_utils
 from .goldy.nextcore_utils import (
     Colours,
     File,
-    Embed, EmbedField, EmbedImage,
+    Embed, EmbedField, EmbedImage, EmbedFooter,
     SlashOption, SlashOptionChoice, SlashOptionTypes,
     SlashOptionAutoComplete,
     send_msg, delete_msg,

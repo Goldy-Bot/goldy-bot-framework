@@ -9,7 +9,7 @@ If there's something you would like to get added, feel free to open an issue.
 
 DISCORD_CDN = "https://cdn.discordapp.com/"
 
-from .embeds.embed import Embed, EmbedField, EmbedImage
+from .embeds.embed import Embed, EmbedField, EmbedImage, EmbedFooter
 
 from .slash_options.auto_complete import SlashOptionAutoComplete
 from .slash_options.slash_option import SlashOption, SlashOptionChoice, SlashOptionTypes
