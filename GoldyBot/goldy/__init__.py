@@ -219,7 +219,10 @@ class Goldy():
         """Shuts down goldy bot right away and safely incase anything sussy wussy is going on. 😳"""
         self.live_console.stop()
 
-        self.async_loop.create_task(self.shard_manager.dispatcher.dispatch("critical", "Goldy Exiting: " + reason)) # Raises critical error within nextcore and stops it.
+        # Raises critical error within nextcore and stops it.
+        self.async_loop.create_task(
+            self.shard_manager.dispatcher.dispatch("critical", "Goldy Exiting: " + reason)
+        ) 
 
     async def stop_async(self, reason:str = "Unknown Reason"):
         """Shuts down goldy bot asynchronously."""
