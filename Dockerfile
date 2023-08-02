@@ -2,11 +2,13 @@ FROM python:3.10
 
 WORKDIR /app
 
+COPY .git .
 COPY GoldyBot ./GoldyBot
 COPY pyproject.toml .
 COPY docker_stuff .
 
 RUN pip install .
+RUN git submodule update --init --recursive
 
 ENV DOCKER true
 
