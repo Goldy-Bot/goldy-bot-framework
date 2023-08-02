@@ -10,6 +10,7 @@ from ..extensions import extensions_cache
 from ... import goldy_bot_logger, utils
 from ..objects import Invokable
 from ... import errors
+from ..perms import Perms
 from ..nextcore_utils import front_end_errors
 
 if TYPE_CHECKING:
@@ -24,7 +25,7 @@ class Command(Invokable):
         func: Callable[[Extension, objects.GoldPlatter], Any], 
         name: str = None, 
         description: str = None, 
-        required_roles: List[str] = None, 
+        required_perms: List[Perms | str] = None, 
         slash_options: Dict[str, ApplicationCommandOptionData] = None, 
         hidden: bool = False, 
         pre_register = True
@@ -39,12 +40,12 @@ class Command(Invokable):
             name = func.__name__
 
         if description is None:
-            description = "🪹 Oops daisy, looks like no description was set for this command."
+            description = "🪹 Oopsie daisy, looks like no description was set for this command."
 
-        if required_roles is None:
-            self.__required_roles = []
+        if required_perms is None:
+            self.__required_perms = []
         else:
-            self.__required_roles = [str(role) for role in required_roles]
+            self.__required_perms = required_perms
 
         if slash_options is None:
             self.__slash_options = {}
@@ -85,9 +86,9 @@ class Command(Invokable):
         return self.get("description")
 
     @property
-    def required_roles(self):
+    def required_perms(self):
         """The code names for the roles needed to access this command."""
-        return self.__required_roles
+        return self.__required_perms
 
     @property
     def slash_options(self):
@@ -161,7 +162,7 @@ class Command(Invokable):
     async def invoke(self, platter: objects.GoldPlatter, lambda_func: Callable) -> None:
         self.logger.debug("Attempting to invoke command...")
 
-        if platter.guild.is_extension_allowed(self.extension) is False:
+        if await platter.guild.is_extension_allowed(self.extension) is False:
             raise front_end_errors.ExtensionNotAllowedInGuild(platter, self.logger)
 
         if self.is_disabled:
@@ -175,7 +176,7 @@ class Command(Invokable):
                     f"Command invoked by '{platter.author.username}#{platter.author.discriminator}'."
                 )
             )
-            return await lambda_func() 
+            return await lambda_func()
 
         # If member has no perms raise MissingPerms exception.
         raise front_end_errors.MissingPerms(platter, self.logger)

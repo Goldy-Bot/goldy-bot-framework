@@ -23,7 +23,7 @@ class SlashOptionChoice(dict):
         """
         Creates an slash option choice. 😋
         
-        ⭐ Documentation at https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-choice-structure
+        https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-choice-structure
         """
         data: StrCommandOptionChoiceData | IntCommandOptionChoiceData = {}
 
@@ -89,7 +89,7 @@ class SlashOption(dict):
         """
         Creates a slash command option. 😋
         
-        ⭐ Documentation at https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure
+        https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure
         """
         self.data: ApplicationCommandOptionData = {}
 
@@ -98,7 +98,7 @@ class SlashOption(dict):
 
         # Check if all choices are same type.
         if choices is not None:
-            if isinstance(choices, str):
+            if isinstance(choices[0], str):
                 choices = [SlashOptionChoice(x, x) for x in choices]
 
             allowed_type = type_(choices[0]["value"])

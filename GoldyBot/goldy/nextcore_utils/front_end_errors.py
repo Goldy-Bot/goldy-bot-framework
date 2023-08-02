@@ -19,7 +19,7 @@ class FrontEndErrors(errors.GoldyBotError):
             self, 
             embed: Embed,
             message: str,
-            platter: objects.Platter, 
+            platter: objects.GoldPlatter, 
             delete_after = 8,
             logger: log.Logger = None
         ):
@@ -31,8 +31,8 @@ class FrontEndErrors(errors.GoldyBotError):
                     embed
                 ],
                 reply = True, 
-                delete_after = None if isinstance(platter.invoker, slash_command.SlashCommand) else delete_after,
-                flags = 1 << 6 if isinstance(platter.invoker, slash_command.SlashCommand) else None
+                delete_after = None if isinstance(platter.invokable, slash_command.SlashCommand) else delete_after,
+                flags = 1 << 6 if isinstance(platter.invokable, slash_command.SlashCommand) else None
             )
         )
 
@@ -51,8 +51,10 @@ class MissingArgument(FrontEndErrors):
                 description = f"""
                 *You missed the argument(s): ``{missing_args_string[:-2]}``*
 
-                **Command Usage -> ``{platter.guild.prefix}{platter.command.command_usage}``**
-                """, # TODO: Add command usage string to command class.
+                ```
+                Command Usage -> {platter.guild.config_wrapper.prefix}{platter.invokable.command_usage}
+                ```
+                """,
                 colour = Colours.AKI_ORANGE
             ),
             message = f"The command author missed the arguments -> '{missing_args_string[:-2]}'.",
@@ -76,7 +78,7 @@ class InvalidArguments(FrontEndErrors):
                 - It doesn't take any arguments at all.
 
                 ```
-                Command Usage -> {platter.guild.prefix}{platter.command.command_usage}
+                Command Usage -> {platter.guild.config_wrapper.prefix}{platter.invokable.command_usage}
                 ```
                 """,
                 colour = Colours.YELLOW
@@ -97,7 +99,7 @@ class MissingPerms(FrontEndErrors):
 
         message = f"The command author '{platter.author.username}#{platter.author.discriminator}' doesn't have the perms to run this command."
 
-        if platter.command.hidden and isinstance(platter.command, prefix_command.PrefixCommand):
+        if platter.invokable.hidden and isinstance(platter.invokable, prefix_command.PrefixCommand):
             raise errors.GoldyBotError(message)
 
         super().__init__(
@@ -148,7 +150,28 @@ class OnlyAuthorCanInvokeRecipe(FrontEndErrors):
                 description = "Sorry, only the command author can invoke this.",
                 colour = Colours.AKI_ORANGE
             ),
-            message = f"'{platter.author.username}#{platter.author.discriminator}' tried to invoke an 'author only' recipe.",
+            message = f"'{platter.author}' tried to invoke an 'author only' recipe.",
             platter = platter, 
+            logger = logger
+        )
+
+class UnknownError(FrontEndErrors):
+    def __init__(self, platter: objects.GoldPlatter, error: Exception = None, logger: log.Logger = None):
+        # If the exception caught is a goldy bot exception continue raising that exception otherwise raise this unknown exception.
+        if error is not None and isinstance(error, errors.GoldyBotError):
+            raise error
+
+        super().__init__(
+            embed = Embed(
+                title = "❤️ An Error Occurred!", 
+                description = "Oopsie daisy, an internal unknown error occurred. *Sorry I'm still new to this.* 🥺",
+                colour = Colours.RED,
+                footer = {
+                    "text": "Report button will be coming soon."
+                }
+            ),
+            message = f"Error occurred in the command '{platter.invokable.name}' executed by '{platter.author}'!",
+            platter = platter, 
+            delete_after = 12,
             logger = logger
         )

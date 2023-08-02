@@ -1,9 +1,9 @@
 from enum import Enum
 
 class Perms(Enum):
-    """Goldy Bot's built-in perms."""
-    BOT_DEV = "bot_dev"
-    BOT_ADMIN = "bot_admin"
+    """Goldy Bot's built-in permissions."""
+    BOT_DEV = 0
+    BOT_ADMIN = 1
 
-    def __str__(self) -> str:
-        return str(self.value)
+    GUILD_OWNER = 2
+    GUILD_ADMIN = 3

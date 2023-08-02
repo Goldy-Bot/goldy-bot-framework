@@ -6,13 +6,13 @@ from devgoldyutils import LoggerAdapter, Colours
 
 from ... import goldy_bot_logger
 from ..objects.invokable import Invokable
-from ..objects.platter.silver_platter import SilverPlatter
+from ..objects.platter.golden_platter import GoldPlatter
 from ..nextcore_utils import front_end_errors
 
 if TYPE_CHECKING:
     from ... import objects
 
-RECIPE_CALLBACK = Callable[[SilverPlatter], Any]
+RECIPE_CALLBACK = Callable[[GoldPlatter], Any]
 
 class Recipe(Invokable):
     """A recipe is equivalent to an item or message component. This is inherited by all message components in Goldy Bot. This can be passed into a send_msg function."""
@@ -44,12 +44,12 @@ class Recipe(Invokable):
             logger = self.logger 
         )
 
-    async def invoke(self, platter: objects.SilverPlatter) -> Any:
+    async def invoke(self, platter: objects.GoldPlatter) -> Any:
         """Runs/triggers this recipe. This method is usually used internally."""
         self.logger.debug(f"Attempting to invoke '{self.__class__.__name__}'...")
 
         if self.author_only:
-            if not platter.author.id == platter.recipe.command_platter.author.id:
+            if not platter.author.id == platter.invokable.command_platter.author.id:
                 raise front_end_errors.OnlyAuthorCanInvokeRecipe(platter, self.logger)
 
         try:

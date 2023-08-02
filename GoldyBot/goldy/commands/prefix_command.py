@@ -18,7 +18,7 @@ class PrefixCommand(Command):
         func: Callable[[Extension, objects.GoldPlatter], Any], 
         name: str = None, 
         description: str = None, 
-        required_roles: List[str] = None, 
+        required_perms: List[str] = None, 
         hidden: bool = False,
         pre_register: bool = True
     ):
@@ -29,7 +29,7 @@ class PrefixCommand(Command):
             func = func, 
             name = name, 
             description = description, 
-            required_roles = required_roles, 
+            required_perms = required_perms, 
             hidden = hidden,
             pre_register = pre_register
         )
@@ -67,7 +67,7 @@ class PrefixCommand(Command):
 
         try:
             return_value = await super().invoke(
-                platter, lambda: self.func(platter.command.extension, platter, *params)
+                platter, lambda: self.func(platter.invokable.extension, platter, *params)
             )
 
             # Handle sub commands.
@@ -93,8 +93,10 @@ class PrefixCommand(Command):
                     logger = self.logger
                 )
 
-            # TODO: When exceptions raise in commands wrap them in a goldy bot command exception.
-            raise e
+            raise front_end_errors.UnknownError(platter, logger = self.logger)
+
+        except Exception as e:
+            raise front_end_errors.UnknownError(platter, e, self.logger)
 
     async def __invoke_sub_command(self, data: MessageData, platter: objects.GoldPlatter) -> None:
         for arg in data["content"].split(" ")[1:]:
@@ -107,7 +109,7 @@ class PrefixCommand(Command):
                     platter = objects.GoldPlatter(
                         data = data, 
                         author = platter.author,
-                        command = command,
+                        invokable = command,
                     )
 
                     await command.invoke(platter)

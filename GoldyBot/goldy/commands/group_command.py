@@ -1,10 +1,11 @@
 from __future__ import annotations
-from typing import Dict, List, TYPE_CHECKING, Tuple, overload, Callable
+from typing import Dict, List, TYPE_CHECKING, Tuple, overload, Callable, Any
 
 from devgoldyutils import LoggerAdapter
 
 if TYPE_CHECKING:
     from ..nextcore_utils.slash_options.slash_option import SlashOption
+    from ..objects.platter.golden_platter import GoldPlatter
 
 from .slash_command import SlashCommand
 from .prefix_command import PrefixCommand
@@ -52,7 +53,7 @@ class GroupCommand():
         self, 
         name: str, 
         description: str = None, 
-        required_roles: List[str] = None, 
+        required_perms: List[str] = None, 
         slash_cmd_only: bool = False, 
         hidden: bool = False,
     ):
@@ -69,7 +70,7 @@ class GroupCommand():
         self, 
         name: str = None, 
         description: str = None, 
-        required_roles: List[str] = None, 
+        required_perms: List[str] = None, 
         slash_cmd_only: bool = False, 
         hidden: bool = False,
         base_commands: Tuple[SlashCommand, PrefixCommand] = None
@@ -86,7 +87,7 @@ class GroupCommand():
                     func = lambda x, y: self.__dummy__(),
                     name = name,
                     description = description,
-                    required_roles = required_roles,
+                    required_perms = required_perms,
                     hidden = hidden
                 ),
                 PrefixCommand(
@@ -94,7 +95,7 @@ class GroupCommand():
                     func = lambda x, y: self.__dummy__(),
                     name = name,
                     description = description,
-                    required_roles = required_roles,
+                    required_perms = required_perms,
                     hidden = hidden
                 ) if slash_cmd_only is False else None
             )
@@ -124,7 +125,7 @@ class GroupCommand():
         self,
         name: str = None, 
         description: str = None, 
-        required_roles: List[str]=None, 
+        required_perms: List[str]=None, 
         slash_options: Dict[str, SlashOption] = None
     ):
         """
@@ -194,7 +195,7 @@ class GroupCommand():
 
         """
         def decorate(func):
-            def inner(func: Callable) -> None:
+            def inner(func: Callable) -> Callable[[GoldPlatter], Any]:
                 slash_cmd, prefix_cmd = self.commands
 
                 if slash_cmd is not None:
@@ -205,7 +206,7 @@ class GroupCommand():
                             func,
                             name,
                             description,
-                            required_roles,
+                            required_perms,
                             slash_options,
                             pre_register = False
                         )
@@ -219,10 +220,12 @@ class GroupCommand():
                             func,
                             name,
                             description,
-                            required_roles,
+                            required_perms,
                             pre_register = False
                         )
                     )
+
+                return func
 
             return inner(func)
 

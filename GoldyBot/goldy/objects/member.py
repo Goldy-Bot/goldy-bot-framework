@@ -23,6 +23,9 @@ class Member(DictClass):
 
         self.db_wrapper = MemberDBWrapper(self)
 
+    def __repr__(self) -> str:
+        return f"{self.name}#{self.discriminator}"
+
     @property
     def id(self) -> str:
         """Member's id duhhhh."""

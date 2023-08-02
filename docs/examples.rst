@@ -11,3 +11,4 @@ Basically a mirror of the repo's /examples folder.
    examples.reply
    examples.slash_options
    examples.sub_commands
+   examples.database_wrapper

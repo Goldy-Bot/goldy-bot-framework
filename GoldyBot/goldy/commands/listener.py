@@ -10,7 +10,6 @@ from ..recipes.buttons.button import Button
 from .. import objects
 from ... import LoggerAdapter, goldy_bot_logger, utils
 from ..objects.platter.golden_platter import GoldPlatter
-from ..objects.platter.silver_platter import SilverPlatter
 
 if TYPE_CHECKING:
     from .. import Goldy
@@ -49,21 +48,36 @@ class CommandListener():
         if guild is not None:
             author = objects.Member(interaction["member"]["user"], guild, self.goldy)
 
-            # Slash command.
-            # ---------------
-            if interaction["type"] == 2:
-                command: Tuple[str, SlashCommand] = utils.cache_lookup(f"{guild.id}:{interaction['data']['id']}", self.goldy.invokables)
+            # Slash commands and slash auto complete.
+            # ------------------------------------------
+            if interaction["type"] == 2 or interaction["type"] == 4:
+                command: Tuple[str, SlashCommand] = utils.cache_lookup(f"{interaction['data']['id']}", self.goldy.invokables)
+
+                # uhhhh, let's hope this doesn't cause the biggest catastrophe EVER!!
+
+                if command is None and guild.code_name == "test_server": 
+                    command: Tuple[str, SlashCommand] = utils.cache_lookup(
+                        f"{guild.id}:{interaction['data']['id']}", 
+                        self.goldy.invokables
+                    )
 
                 if command is not None:
-                    gold_platter = GoldPlatter(
-                        data = interaction, 
-                        author = author,
-                        command = command[1]
-                    )
 
-                    await command[1].invoke(
-                        gold_platter
-                    )
+                    if interaction["type"] == 2:
+                        gold_platter = GoldPlatter(
+                            data = interaction, 
+                            author = author,
+                            invokable = command[1]
+                        )
+
+                        await gold_platter.guild.config_wrapper.update()
+
+                        await command[1].invoke(
+                            gold_platter
+                        )
+
+                    elif interaction["type"] == 4:
+                        await command[1].invoke_auto_complete(interaction)
 
 
             # Message components.
@@ -73,24 +87,17 @@ class CommandListener():
                 message_component: Tuple[str, Button] = utils.cache_lookup(interaction["data"]["custom_id"], self.goldy.invokables)
 
                 if message_component is not None:
-                    silver_platter = SilverPlatter(
+                    gold_platter = GoldPlatter(
                         data = interaction, 
                         author = author,
-                        recipe = message_component[1]
+                        invokable = message_component[1]
                     )
+
+                    await gold_platter.guild.config_wrapper.update()
 
                     await message_component[1].invoke(
-                        silver_platter
+                        gold_platter
                     )
-
-
-            # Command auto complete
-            # -----------------------
-            elif interaction["type"] == 4:
-                command: Tuple[str, SlashCommand] = utils.cache_lookup(f"{guild.id}:{interaction['data']['id']}", self.goldy.invokables)
-
-                if command is not None:
-                    await command[1].invoke_auto_complete(interaction)
 
         return None
 
@@ -105,23 +112,26 @@ class CommandListener():
         if guild is not None:
             #await guild.update() # Since v5.0dev5 the guild database data is no longer updated automatically via the on message event.
             # This means if you manually change the command prefix in the database you have to also manually run "reload_config" in live console.
-            
+
             # Check if prefix is correct.
-            if not guild.prefix == message["content"][0]:
+            guild_config = await guild.config
+            if len(message["content"]) < 1 or not guild_config.prefix == message["content"][0]:
                 return
 
             # i really hope this doesn't break
             command: Tuple[str, PrefixCommand] = utils.cache_lookup(message["content"].split(" ")[0][1:], self.goldy.invokables)
 
-            if command is not None: # TODO: move this to invoke method and add a front end exception.
+            if command is not None:
                 gold_platter = GoldPlatter(
                     data = message, 
                     author = objects.Member(message["author"], guild, self.goldy),
-                    command = command[1],
+                    invokable = command[1],
                 )
-                
+
+                await gold_platter.guild.config_wrapper.update()
+
                 await command[1].invoke(
                     gold_platter
                 )
-        
+
         return None

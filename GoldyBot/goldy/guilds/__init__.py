@@ -2,8 +2,10 @@ from __future__ import annotations
 
 from typing import List, Tuple
 
+from nextcore.http import Route, NotFoundError
 from devgoldyutils import Colours
 
+from .. import nextcore_utils
 from .. import Goldy, LoggerAdapter, goldy_bot_logger
 from ... import utils, errors
 from ..database import DatabaseEnums
@@ -23,74 +25,39 @@ class GuildManager():
         
         self.guilds: List[Tuple[str|int, Guild]] = []
 
-    # TODO: In the future we might have to add some sort of way to reload the guild config of a guild from the database. (or just run setup again on that particular guild if that works well)
-    # I can see this being needed if the v5 framework is going to be running public invite-able bots.
-    # Also maybe we should rerun the setup when we reload.
-
     async def setup(self):
         """Adds guilds specified in goldy.json to the database if not already added."""
-        # TODO: Find better way to organize this code, it's too long and complex for my liking.
-        # 08/04/2023: idk is it really that complex... i'll come back to it later...
         self.logger.info("Setting up guilds...")
 
-        database = self.goldy.database.get_goldy_database(DatabaseEnums.GOLDY_MAIN)
+        for guild_id, guild_code_name in self.allowed_guilds:
 
-        for guild in self.allowed_guilds:
+            # Getting guild discord data
+            # ---------------------------
+            try:
+                guild_data = await nextcore_utils.get_guild_data(guild_id, self.goldy)
+            except NotFoundError:
+                raise GuildNotFound(
+                    guild_code_name, self.logger
+                )
 
-            guild_config_template = {
-                "_id": guild[0],
-                "code_name": guild[1],
+            guild = Guild(
+                id = guild_id, 
+                code_name = guild_code_name, 
+                data = guild_data, 
+                goldy = self.goldy
+            )
 
-                "prefix": "!",
-
-                "roles": {
-
-                },
-
-                "channels": {
-
-                },
-
-                "extensions": {
-                    "allowed": [],
-                    "disallowed": [],
-                    "hidden": []
-                },
-
-            }
-
-            # Add guild to database.
-            # --------------------------------
-            guild_config = await database.find_one("guild_configs", query = {"_id": guild[0]})
-
-            if guild_config is None:
-                guild_config = guild_config_template
-                await database.insert("guild_configs", data = guild_config)
-
-            else:
-                # Check if any keys are missing in the guild config, if any are update the config with the new item.
-                # ---------------------------------------------------------------------------------------------------
-                if not guild_config_template.keys() == guild_config.keys():
-                    
-                    # If there is an item in the template that isn't in the database add it.
-                    for item in guild_config_template:
-
-                        if item not in guild_config:
-                            guild_config[item] = guild_config_template[item]
-                            self.logger.debug(
-                                f"Added key '{item}' to {guild[1]}'s database config because it was missing."
-                            )
-
-                    await database.edit("guild_configs", query = {"_id": guild[0]}, data = guild_config)
-
+            await guild.config_wrapper.update() # This should update the guild's config data which should also generate itself configuration in the database if it's missing.
 
             # Add guild to list.
             # --------------------
             self.guilds.append(
-                (guild[0], Guild(guild_config, self.goldy))
+                (guild_id, guild)
             )
 
-            self.logger.info("Done setting up guilds.")
+            self.logger.debug(f"Guild '{guild.code_name}' set up.")
+
+        self.logger.info("Done setting up guilds.")
 
 
     def get_guild(self, guild_id: str | int) -> Guild | None:
@@ -112,5 +79,13 @@ class AllowedGuildsNotSpecified(errors.GoldyBotError):
     def __init__(self, logger: logging.Logger = None):
         super().__init__(
             "Please add your guild id to the allowed_guilds in goldy.json",
+            logger = logger
+        )
+
+class GuildNotFound(errors.GoldyBotError):
+    def __init__(self, guild_code_name: str, logger: logging.Logger = None):
+        super().__init__(
+            f"We couldn't find the guild '{guild_code_name}' you entered in allowed_guilds! " \
+            "Are you sure you have entered the guild id correctly and that goldy bot is currently present in that guild.",
             logger = logger
         )

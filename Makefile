@@ -20,5 +20,8 @@ build-clean-docs:
 build-docs:
 	cd docs && make html
 
+pull-submodules:
+	git submodule update --init --recursive
+
 update-pip:
 	python -m pip install --upgrade pip

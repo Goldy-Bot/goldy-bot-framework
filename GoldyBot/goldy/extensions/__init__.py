@@ -10,6 +10,7 @@ from ... import goldy_bot_logger, LoggerAdapter
 if TYPE_CHECKING:
     from ... import Goldy
     from ..commands.command import Command
+    from .extension_metadata import ExtensionMetadata
 
 extensions_cache: List[Tuple[str, object]] = []
 """
@@ -57,6 +58,7 @@ class Extension():
         ]
 
         self.__loaded_path = os.path.realpath(self.__class__.__module__) + ".py"
+        self.__metadata = self.goldy.extension_loader.phrase_pyproject(self.__loaded_path)
 
         if self.name.lower() in [extension.lower() for extension in self.goldy.config.ignored_extensions]:
             self.logger.info(f"Not loading the extension '{self.name}' as it's ignored.")
@@ -79,6 +81,11 @@ class Extension():
     def loaded_path(self) -> str:
         """The path where this extension was loaded."""
         return self.__loaded_path
+    
+    @property
+    def metadata(self) -> ExtensionMetadata | None:
+        """Returns some metadata if available about this extension. Returns None if not available."""
+        return self.__metadata
 
     @property
     def is_disabled(self) -> bool:

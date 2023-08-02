@@ -2,6 +2,8 @@ from __future__ import annotations
 from typing import Any, Callable, Dict, List, TYPE_CHECKING
 from discord_typings import ApplicationCommandOptionData, InteractionData, AutocompleteInteractionData
 
+from ..nextcore_utils import front_end_errors
+
 if TYPE_CHECKING:
     from .. import Goldy, objects
     from ... import Extension
@@ -17,7 +19,7 @@ class SlashCommand(Command):
         func: Callable[[Extension, objects.GoldPlatter], Any], 
         name: str = None, 
         description: str = None, 
-        required_roles: List[str] = None, 
+        required_perms: List[str] = None, 
         slash_options: Dict[str, ApplicationCommandOptionData] = None, 
         hidden: bool = False,
         pre_register: bool = True
@@ -29,7 +31,7 @@ class SlashCommand(Command):
             func = func, 
             name = name, 
             description = description, 
-            required_roles = required_roles, 
+            required_perms = required_perms, 
             slash_options = slash_options, 
             hidden = hidden,
             pre_register = pre_register
@@ -71,21 +73,23 @@ class SlashCommand(Command):
         params = self.__invoke_data_to_params(data)
         if not params == {}: self.logger.debug(f"Got args --> {params}")
 
-        return_value = await super().invoke(
-            platter, lambda: self.func(platter.command.extension, platter, **params)
-        )
+        try:
+            return_value = await super().invoke(
+                platter, lambda: self.func(platter.invokable.extension, platter, **params)
+            )
 
-        # Handle sub commands.
-        # ----------------------
-        # Invoke sub command if there is one in invoke data.
-        if return_value is not False:
-            await self.__invoke_sub_command(data, platter)
+            # Handle sub commands.
+            # ----------------------
+            # Invoke sub command if there is one in invoke data.
+            if return_value is not False:
+                await self.__invoke_sub_command(data, platter)
 
-        # TODO: When exceptions raise in commands wrap them in a goldy bot command exception.
+        except Exception as e:
+            raise front_end_errors.UnknownError(platter, e, self.logger)
 
 
     async def invoke_auto_complete(self, data: AutocompleteInteractionData):
-        command: SlashCommand = None
+        command: SlashCommand = self
         current_typing_value: str = None
         auto_complete_option: SlashOptionAutoComplete = None
         options = data["data"]["options"]
@@ -139,7 +143,7 @@ class SlashCommand(Command):
                     platter = GoldPlatter(
                         data = data, 
                         author = platter.author,
-                        command = command,
+                        invokable = command,
                     )
                     platter._interaction_responded = interaction_responded
 

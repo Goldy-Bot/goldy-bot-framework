@@ -50,7 +50,7 @@ class Goldy(GoldyBot.Extension):
     @GoldyBot.command(
         name="goldy", 
         description = "💛 Shows you stats about the current Goldy Bot framework instance.", 
-        required_roles = [GoldyBot.Perms.BOT_DEV],
+        required_perms = [GoldyBot.Perms.BOT_DEV], # Umm, should we make this command available to bot admins too.
         hidden = True
     )
     async def goldy_cmd(self, platter: GoldyBot.GoldPlatter):

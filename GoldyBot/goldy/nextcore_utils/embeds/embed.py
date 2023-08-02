@@ -1,15 +1,36 @@
 from __future__ import annotations
-
 from typing import List
-from discord_typings import EmbedData, EmbedFieldData, EmbedImageData
+from discord_typings import EmbedData, EmbedFieldData, EmbedImageData, EmbedFooterData
+
+import copy
 from ..colours import Colours
 from .... import utils
+
+class EmbedFooter(dict):
+    """A class used to create an embed's footer."""
+    def __init__(self, text: str, icon_url: str = None, proxy_icon_url: str = None, **extra) -> EmbedFooterData:
+        """
+        Creates an embed footer.
+        """
+        data: EmbedFooterData = {}
+
+        data["text"] = text
+
+        if icon_url is not None:
+            data["icon_url"] = icon_url
+
+        if proxy_icon_url is not None:
+            data["proxy_icon_url"] = proxy_icon_url
+
+        data.update(extra)
+
+        super().__init__(data)
 
 class EmbedImage(dict):
     """A class used to add an image to a embed."""
     def __init__(self, url: str, proxy_url: str = None, height: int = None, width: int = None, **extra) -> EmbedImageData:
         """
-        Creates an embed image or thumbnail. 😋
+        Creates an embed image or thumbnail.
         """
         data: EmbedImageData = {}
 
@@ -32,9 +53,9 @@ class EmbedField(dict):
     """A class used to create an embed field for an embed."""
     def __init__(self, name: str, value: str, inline: bool = None, **extra) -> EmbedFieldData:
         """
-        Creates an embed field. 😋
+        Creates an embed field.
         
-        ⭐ Documentation at https://discord.com/developers/docs/resources/channel#embed-object-embed-field-structure
+        https://discord.com/developers/docs/resources/channel#embed-object-embed-field-structure
         """
         data: EmbedFieldData = {}
 
@@ -48,7 +69,7 @@ class EmbedField(dict):
         data.update(extra)
 
         super().__init__(data)
-        
+
 
 class Embed(dict):
     """
@@ -79,14 +100,15 @@ class Embed(dict):
         fields: List[EmbedField] = None, 
         color: Colours | int = None, 
         colour: Colours | int = None, 
+        footer: EmbedFooter = None,
         image: EmbedImage = None,
         thumbnail: EmbedImage = None,
         **extra
     ) -> EmbedData:
         """
         Creates a discord embed. 😋
-        
-        ⭐ Documentation at https://discord.com/developers/docs/resources/channel#embed-object
+
+        https://discord.com/developers/docs/resources/channel#embed-object
         """
         data: EmbedData = {}
 
@@ -114,6 +136,9 @@ class Embed(dict):
             
             data["color"] = colour
 
+        if footer is not None:
+            data["footer"] = footer
+
         if image is not None:
             data["image"] = image
 
@@ -124,13 +149,22 @@ class Embed(dict):
 
         super().__init__(data)
 
+    def format_title(self, **keys) -> None:
+        "Just like the str.format() method but it formats the embed's title for you " \
+        "so you can avoid the catastrophe at https://github.com/Goldy-Bot/Goldy-Bot-V5/issues/35."
+        data: EmbedData = dict(self)
+
+        data["title"] = data["title"].format(**keys)
+
+        self.update(data)
+
     def format_description(self, **keys) -> None:
         "Just like the str.format() method but it formats the embed's description for you " \
         "so you can avoid the catastrophe at https://github.com/Goldy-Bot/Goldy-Bot-V5/issues/35."
-        data: EmbedData = super().copy()
-        
-        data["description"] = data["description"].format(kwargs = keys)
-        
+        data: EmbedData = dict(self)
+
+        data["description"] = data["description"].format(**keys)
+
         self.update(data)
 
     def format_fields(self, **keys) -> None:
@@ -139,12 +173,13 @@ class Embed(dict):
         
         This was added because of https://github.com/Goldy-Bot/Goldy-Bot-V5/issues/35.
         """
-        data: EmbedData = super().copy()
+        data: EmbedData = dict(self)
 
         for index, field in enumerate(data["fields"]):
             data["fields"][index]["value"] = field["value"].format(**keys)
-        
+
         self.update(data)
 
     def copy(self) -> Embed:
-        return Embed(**super().copy())
+        """Returns copy of embed."""
+        return Embed(**copy.deepcopy(dict(self)))

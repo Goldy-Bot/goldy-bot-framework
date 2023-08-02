@@ -5,6 +5,7 @@ from discord_typings import GuildMemberData
 from nextcore.http import Route
 from devgoldyutils import LoggerAdapter, Colours
 
+from .perms import Perms
 from .. import goldy_bot_logger
 
 if TYPE_CHECKING:
@@ -21,14 +22,23 @@ class PermissionSystem():
     async def got_perms(self, platter: GoldPlatter) -> bool: # TODO: I might rename this method.
         """Method that checks if the command author has the perms to run this command."""
         
-        if not platter.command.required_roles == []:
+        if not platter.invokable.required_perms == []:
             self.logger.debug("Checking if member has perms to run command...")
 
             # If the required roles contain 'bot_dev' and the bot dev is running the command allow the command to execute.
             # --------------------------------------------------------------------------------------------------------------
-            if "bot_dev" in platter.command.required_roles:
+            if Perms.BOT_DEV in platter.invokable.required_perms:
                 if platter.author.id == self.goldy.config.bot_dev:
                     self.logger.debug("Member is a bot developer :)")
+                    return True
+
+            # TODO: Add bot admin.
+
+            # Server owner check.
+            # --------------------
+            if Perms.GUILD_OWNER in platter.invokable.required_perms:
+                if platter.author.id == platter.guild.get("owner_id"):
+                    self.logger.debug("Member is server owner ✅")
                     return True
 
             # Check if member has any of the required roles.
@@ -48,15 +58,15 @@ class PermissionSystem():
 
             member_data: GuildMemberData = await r.json()
 
-            for role_code_name in platter.command.required_roles:
+            for role_code_name in platter.invokable.required_perms:
 
-                if role_code_name not in ["bot_dev"]:
+                if role_code_name not in Perms:
                     try:
-                        role_id_uwu = platter.guild.roles[role_code_name]
+                        role_id_uwu = platter.guild.config_wrapper.roles[role_code_name]
                     except KeyError:
                         # Maybe there is a better way of handling this but I'll leave this as temporary solution for now.
                         self.logger.error(
-                            f"This guild ({platter.guild.code_name}) hasn't been configured to include the required role '{role_code_name}' you entered for the command '{platter.command.name}'."
+                            f"This guild ({platter.guild.code_name}) hasn't been configured to include the required role '{role_code_name}' you entered for the command '{platter.invokable.name}'."
                         )
                         return False
 
