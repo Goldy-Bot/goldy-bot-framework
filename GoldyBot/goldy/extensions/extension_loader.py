@@ -141,7 +141,7 @@ class ExtensionLoader():
 
         try:
             pyproject_toml: Dict[str, str] = toml.load(
-                open(os.path.split(extension_path)[0] + "/pyproject.toml")
+                open(os.path.split(extension_path)[0] + "/pyproject.toml", encoding="UTF-8")
             )
 
             return ExtensionMetadata(pyproject_toml)
