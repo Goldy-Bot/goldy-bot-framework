@@ -1,3 +1,6 @@
+build:
+	python -m build
+
 run:
 	cd demo && python run.py
 
