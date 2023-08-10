@@ -69,8 +69,11 @@ class Timestamps(GoldyBot.Extension):
                 GoldyBot.SlashOptionChoice("in 3 hours", "R")
             ]
         ),
-        "timezone": GoldyBot.SlashOption(
-            description = "The timezone to use. Goldy Bot defaults to Europe/London timezone.", required = False),
+        "timezone": GoldyBot.SlashOptionAutoComplete(
+            description = "The timezone to use. Goldy Bot defaults to Europe/London timezone.", 
+            recommendations = pytz.all_timezones,
+            required = False
+        ),
         "date_format": GoldyBot.SlashOption(
             description = "The format we should read your date in. The order more specifically.", 
             choices = [
@@ -145,8 +148,9 @@ class Timestamps(GoldyBot.Extension):
 
 
     @timestamp.sub_command(description = "Allows you to sets default timezone and date format for /timestamp command.", slash_options = {
-        "timezone" : GoldyBot.SlashOption(
+        "timezone" : GoldyBot.SlashOptionAutoComplete(
             description = "The time zone. Must be like this --> Europe/London, America/New_York, Europe/Stockholm", 
+            recommendations = pytz.all_timezones,
             required = True
         ),
         "date_format": GoldyBot.SlashOption(
