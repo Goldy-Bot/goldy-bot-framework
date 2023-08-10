@@ -22,13 +22,13 @@ class GoldyDB():
         await self.database[collection].insert_one(data)
         self.logger.debug(f"Inserted '{data}' into '{collection}.'")
 
-    async def edit(self, collection: str, query, data: dict, overwrite: bool = True) -> None:
+    async def edit(self, collection: str, query, data: dict, overwrite: bool = False) -> None:
         """Finds and edits a document in this database and collection with the data provided."""
         if overwrite:
             await self.database[collection].update_one(query, {"$set": data})
         else:
             document_data = await self.find_one("guild_configs", query)
-            new_data = utils.update_dict(document_data, data) # Override the document's data with the new data.
+            new_data = utils.update_dict(document_data, data) if document_data is not None else data
             await self.database[collection].update_one(query, {"$set": new_data})
         self.logger.debug(f"Edited '{query}' with '{data}.'")
 

@@ -50,9 +50,9 @@ class Database():
         """Inserts the data provided into a collection in this database."""
         return await self.get_goldy_database(database).insert(collection, data)
 
-    async def edit(self, database: DatabaseEnums | str, collection: str, query, data: dict) -> bool:
+    async def edit(self, database: DatabaseEnums | str, collection: str, query, data: dict, overwrite: bool = False) -> bool:
         """Finds and edits a document in this database and collection with the data provided."""
-        return await self.get_goldy_database(database).edit(collection, query, data)
+        return await self.get_goldy_database(database).edit(collection, query, data, overwrite)
 
     async def remove(self, database: DatabaseEnums | str, collection: str, data) -> bool:
         """Finds and deletes a copy of this data from a collection in this database."""

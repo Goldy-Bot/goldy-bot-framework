@@ -106,7 +106,7 @@ class GuildDBWrapper(DatabaseWrapper):
                             f"Added key '{item}' to {self.guild.code_name}'s database config because it was missing."
                         )
 
-                await database.edit("guild_configs", query = {"_id": self.guild.id}, data = guild_config)
+                await database.edit("guild_configs", query = {"_id": self.guild.id}, data = guild_config, overwrite = True)
 
 
         self.data = guild_config
