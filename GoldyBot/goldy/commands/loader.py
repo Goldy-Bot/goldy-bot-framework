@@ -82,25 +82,26 @@ class CommandLoader():
         slash_command_payloads: List[ApplicationCommandPayload], 
         testing_server: Tuple[str, str] | None
     ) -> None:
-        created_interactions: List[ApplicationCommandData] = []
+        created_interaction_cmds: List[ApplicationCommandData] = []
 
         # Creating global commands.
         # --------------------------
-        global_route = Route(
-            "PUT",
-            "/applications/{application_id}/commands",
-            application_id = self.goldy.application_data["id"]
-        )
-        
-        r = await self.goldy.http_client.request(
-            global_route,
-            rate_limit_key = self.goldy.nc_authentication.rate_limit_key,
-            headers = self.goldy.nc_authentication.headers,
-            json = slash_command_payloads
-        )
+        if len([guild for guild in self.goldy.guild_manager.guilds if not guild[1].code_name == "test_server"]) >= 1:
+            global_route = Route(
+                "PUT",
+                "/applications/{application_id}/commands",
+                application_id = self.goldy.application_data["id"]
+            )
+            
+            r = await self.goldy.http_client.request(
+                global_route,
+                rate_limit_key = self.goldy.nc_authentication.rate_limit_key,
+                headers = self.goldy.nc_authentication.headers,
+                json = slash_command_payloads
+            )
 
-        created_interactions += await r.json()
-        self.logger.debug("Created global commands.")
+            created_interaction_cmds += await r.json()
+            self.logger.debug("Created global commands.")
 
 
         # Creating guild commands for testing server.
@@ -134,24 +135,28 @@ class CommandLoader():
                 json = slash_command_payloads
             )
 
-            created_interactions += await r.json()
-
+            created_interaction_cmds += await r.json()
             self.logger.debug("Created guild commands for test server.")
 
 
+        await self.__delete_unknown_cmds()
+
         # Registering slash commands with the id given by discord.
         # ----------------------------------------------------------
-        for interaction in created_interactions:
+        for interaction_cmd in created_interaction_cmds:
 
             for command in slash_commands_to_register:
 
-                if command.name == interaction["name"]:
+                if command.name == interaction_cmd["name"]:
 
-                    if interaction.get("guild_id") is not None:
-                        command.register(f"{interaction.get('guild_id')}:{interaction['id']}")
+                    if interaction_cmd.get("guild_id") is not None:
+                        command.register(f"{interaction_cmd.get('guild_id')}:{interaction_cmd['id']}")
                     else:
-                        command.register(f"{interaction['id']}")
+                        command.register(f"{interaction_cmd['id']}")
 
                     break
 
         return None
+    
+    async def __delete_unknown_cmds(self):
+        ...
