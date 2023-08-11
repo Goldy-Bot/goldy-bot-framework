@@ -164,6 +164,9 @@ class Command(Invokable):
 
         if await platter.guild.is_extension_allowed(self.extension) is False:
             raise front_end_errors.ExtensionNotAllowedInGuild(platter, self.logger)
+        
+        if await platter.guild.do_extension_restrictions_pass(self.extension, platter) is False:
+            ...
 
         if self.is_disabled:
             raise front_end_errors.CommandIsDisabled(platter, self.logger)

@@ -29,7 +29,8 @@ class GuildDBWrapper(DatabaseWrapper):
 
             "extensions": {
                 "allowed": [],
-                "disallowed": []
+                "disallowed": [],
+                "restriction" : {}
             }
         }
 

@@ -36,7 +36,7 @@ class GoldPlatter(Platter):
             invoker = author, 
             invokable = invokable
         )
-
+        self.data: MessageData | InteractionData
         self.invokable: GOLD_PLATTER_INVOKABLE_TYPES
 
         self.guild: Guild = self.goldy.guild_manager.get_guild(self.get("guild_id"))
