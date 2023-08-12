@@ -142,6 +142,20 @@ class ExtensionNotAllowedInGuild(FrontEndErrors):
         )
 
 
+class ExtensionRestricted(FrontEndErrors):
+    def __init__(self, platter: objects.GoldPlatter, logger: log.Logger = None):
+        super().__init__(
+            embed = Embed(
+                title = "❤️ Extension Restricted!", 
+                description = "Sorry, the extension this command belongs to is restricted to a specific channel/role.",
+                colour = Colours.RED
+            ),
+            message = "The command's extension is restricted.",
+            platter = platter, 
+            logger = logger
+        )
+
+
 class OnlyAuthorCanInvokeRecipe(FrontEndErrors):
     def __init__(self, platter: objects.GoldPlatter, logger: log.Logger = None):
         super().__init__(

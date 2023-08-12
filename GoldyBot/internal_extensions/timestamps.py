@@ -5,7 +5,7 @@ from GoldyBot import (
     get_datetime,
     DatabaseEnums,
     front_end_errors,
-    HumanDatetimeOptions 
+    HumanDatetimeOptions
 )
 
 import pytz
@@ -112,7 +112,7 @@ class Timestamps(GoldyBot.Extension):
 
         try:
             # Convert to chosen timezone.
-            chosen_timezone = pytz.timezone(timezone)
+            chosen_timezone = pytz.timezone(timezone.lower())
             datetime = chosen_timezone.normalize(chosen_timezone.localize(datetime, is_dst=True))
 
             posix_timestamp = int(datetime.timestamp())
@@ -168,23 +168,22 @@ class Timestamps(GoldyBot.Extension):
         if date_format is not None:
             datetime_formats = ["%d/%m/%Y %H:%M", "%d.%m.%Y %H:%M"] if date_format == 0 else ["%Y/%m/%d %H:%M", "%Y.%m.%d %H:%M"]
 
-        timezone = timezone.lower()
         member_data = await platter.author.database
 
         try:
-            pytz.timezone(timezone) # Test timezone.
+            pytz.timezone(timezone.lower()) # Test timezone.
             await member_data.push(DatabaseEnums.MEMBER_GLOBAL_DATA, {"timezone": timezone, "datetime_formats": datetime_formats})
 
             embed = GoldyBot.Embed(
-                title = "⏱️ Timestamp Defaults Set!",
+                title = "💚 Timestamp Defaults Set!",
                 description = f"""
-                - Timezone: ``{timezone}``
-                - Date Format: ``{None if date_format is None else 'D/M/Y' if date_format == 0 else 'Y/M/D'}``
+                - ⏰ [``{timezone}``](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones#{timezone.split('/')[-1].upper()})
+                - 💊 ``{None if date_format is None else 'D/M/Y' if date_format == 0 else 'Y/M/D'}``
                 """,
                 color = GoldyBot.Colours.GREEN
             )
 
-            await platter.send_message(embeds = [embed])
+            await platter.send_message(embeds = [embed], hide = True)
 
         except pytz.UnknownTimeZoneError as e:
             raise front_end_errors.FrontEndErrors(

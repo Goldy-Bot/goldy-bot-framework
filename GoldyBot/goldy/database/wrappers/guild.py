@@ -19,18 +19,14 @@ class GuildDBWrapper(DatabaseWrapper):
 
             "prefix": "!",
 
-            "roles": {
+            "roles": {},
 
-            },
-
-            "channels": {
-
-            },
+            "channels": {},
 
             "extensions": {
                 "allowed": [],
                 "disallowed": [],
-                "restriction" : {}
+                "restrictions" : {}
             }
         }
 
@@ -60,11 +56,11 @@ class GuildDBWrapper(DatabaseWrapper):
     def disallowed_extensions(self) -> List[str]:
         """Returns the disallowed extensions from this guild."""
         return self.get("extensions", "disallowed")
-    
+
     @property
-    def hidden_extensions(self) -> List[str]:
-        """Returns the hidden extensions from this guild."""
-        return self.get("extensions", "hidden")
+    def extension_restrictions(self) -> List[str]:
+        """Returns the extension restrictions from this guild."""
+        return self.get("extensions", "restrictions")
 
     async def push(self, data: dict) -> None:
         self.logger.info("Pushing guild config to the database...")
@@ -87,27 +83,15 @@ class GuildDBWrapper(DatabaseWrapper):
 
         # Add guild to database.
         # -----------------------
-        guild_config = await database.find_one("guild_configs", query = {"_id": self.guild.id})
+        #guild_config = await database.find_one("guild_configs", query = {"_id": self.guild.id})
 
-        if guild_config is None:
-            guild_config = guild_config_template
-            await database.insert("guild_configs", data = guild_config)
+        #if guild_config is None:
+        #    guild_config = guild_config_template
+        #    await database.insert("guild_configs", data = guild_config)
 
-        else:
-            # Check if any keys are missing in the guild config, if any are update the config with the new item.
-            # ---------------------------------------------------------------------------------------------------
-            if not guild_config_template.keys() == guild_config.keys():
-                
-                # If there is an item in the template that isn't in the database add it.
-                for item in guild_config_template:
-
-                    if item not in guild_config:
-                        guild_config[item] = guild_config_template[item]
-                        self.logger.debug(
-                            f"Added key '{item}' to {self.guild.code_name}'s database config because it was missing."
-                        )
-
-                await database.edit("guild_configs", query = {"_id": self.guild.id}, data = guild_config, overwrite = True)
-
+        #else:
+        guild_config = await database.edit(
+            "guild_configs", query = {"_id": self.guild.id}, data = guild_config_template
+        )
 
         self.data = guild_config

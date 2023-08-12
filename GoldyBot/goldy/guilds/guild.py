@@ -60,18 +60,22 @@ class Guild(DictClass):
     async def do_extension_restrictions_pass(self, extension: Extension, platter: objects.GoldPlatter) -> bool:
         """Checks if extension's restrictions pass."""
         guild_config = await self.config
-        extension_restriction = guild_config.get("extension", "restriction", extension.name)
-
-        print(">>", extension_restriction)
+        extension_restriction = guild_config.get("extensions", "restrictions", extension.name)
 
         if extension_restriction is not None:
+            role = guild_config.roles.get(extension_restriction)
             channel = guild_config.channels.get(extension_restriction)
-            #role = guild_config.roles.get(extension_restriction)
 
             if channel is not None and channel == str(platter.data["channel_id"]):
                 return True
 
-            #if role is not None and role == str(platter.data["channel_id"]):
-            #    return True
+            if role is not None:
+                member_data = await platter.author.member_data
+
+                for role_id in member_data["roles"]:
+                    if role == str(role_id):
+                        return True
+
+            return False
 
         return True
