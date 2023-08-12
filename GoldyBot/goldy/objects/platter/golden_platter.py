@@ -56,7 +56,7 @@ class GoldPlatter(Platter):
     async def wait(self) -> None:
         """
         Use this to inform Discord and the member that this command will take longer than usual to respond or that a respond is being cooked up. 🍳🍲
-        
+
         ------------------
 
         Returns
