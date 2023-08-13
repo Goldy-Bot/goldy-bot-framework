@@ -50,7 +50,8 @@ dev = [
     "sphinx-copybutton",
     "pytest",
     "pytest-cov",
-    "ruff"
+    "ruff",
+    "build"
 ]
 
 [project.urls]
