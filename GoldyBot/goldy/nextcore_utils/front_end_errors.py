@@ -51,8 +51,9 @@ class MissingArgument(FrontEndErrors):
                 description = f"""
                 *You missed the argument(s): ``{missing_args_string[:-2]}``*
 
+                **Command Usage:**
                 ```
-                Command Usage -> {platter.guild.config_wrapper.prefix}{platter.invokable.command_usage}
+                {platter.guild.config_wrapper.prefix}{platter.invokable.command_usage}
                 ```
                 """,
                 colour = Colours.AKI_ORANGE
@@ -77,8 +78,9 @@ class InvalidArguments(FrontEndErrors):
                 - This command doesn't take that many arguments.
                 - It doesn't take any arguments at all.
 
+                **Command Usage:**
                 ```
-                Command Usage -> {platter.guild.config_wrapper.prefix}{platter.invokable.command_usage}
+                {platter.guild.config_wrapper.prefix}{platter.invokable.command_usage}
                 ```
                 """,
                 colour = Colours.YELLOW
@@ -137,6 +139,20 @@ class ExtensionNotAllowedInGuild(FrontEndErrors):
                 colour = Colours.AKI_ORANGE
             ),
             message = f"The command's extension is not allowed in the guild '{platter.guild.code_name}', check the guild's config on the database.",
+            platter = platter, 
+            logger = logger
+        )
+
+
+class ExtensionRestricted(FrontEndErrors):
+    def __init__(self, platter: objects.GoldPlatter, logger: log.Logger = None):
+        super().__init__(
+            embed = Embed(
+                title = "❤️ Extension Restricted!", 
+                description = "Sorry, the extension this command belongs to is restricted to a specific channel/role.",
+                colour = Colours.RED
+            ),
+            message = "The command's extension is restricted.",
             platter = platter, 
             logger = logger
         )

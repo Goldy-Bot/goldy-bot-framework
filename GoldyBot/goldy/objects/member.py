@@ -1,15 +1,16 @@
 from __future__ import annotations
-
 from typing import TYPE_CHECKING
-from discord_typings import UserData
-from devgoldyutils import DictClass, Colours
 
-from .. import goldy_bot_logger, LoggerAdapter
-from ..database.wrappers.member import MemberDBWrapper
+from nextcore.http import Route
+from devgoldyutils import DictClass, Colours
 
 if TYPE_CHECKING:
     from .. import Goldy
     from ..guilds import Guild
+    from discord_typings import UserData, GuildMemberData
+
+from .. import goldy_bot_logger, LoggerAdapter
+from ..database.wrappers.member import MemberDBWrapper
 
 logger = LoggerAdapter(goldy_bot_logger, prefix="Member")
 
@@ -19,9 +20,10 @@ class Member(DictClass):
         self.guild = guild
         self.goldy = goldy
 
-        super().__init__(LoggerAdapter(logger, prefix=Colours.GREY.apply(data['username'])))
+        super().__init__(LoggerAdapter(logger, prefix = Colours.GREY.apply(data['username'])))
 
         self.db_wrapper = MemberDBWrapper(self)
+        self.guild_member_data: GuildMemberData = None
 
     def __repr__(self) -> str:
         return f"{self.name}#{self.discriminator}"
@@ -59,3 +61,21 @@ class Member(DictClass):
             await self.db_wrapper.update()
 
         return self.db_wrapper
+
+    @property
+    async def member_data(self) -> GuildMemberData:
+        if self.guild_member_data is None:
+            r = await self.goldy.http_client.request(
+                Route(
+                    "GET",
+                    "/guilds/{guild_id}/members/{user_id}",
+                    guild_id = self.guild.id,
+                    user_id = self.id
+                ),
+                rate_limit_key = self.goldy.nc_authentication.rate_limit_key,
+                headers = self.goldy.nc_authentication.headers,
+            )
+
+            self.guild_member_data = await r.json()
+
+        return self.guild_member_data

@@ -1,6 +1,7 @@
 from __future__ import annotations
-
 from typing import Any, Tuple, overload, List
+
+__all__ = ("cache_lookup",)
 
 @overload
 def cache_lookup(key: str|int, cache: dict) -> Any | None:

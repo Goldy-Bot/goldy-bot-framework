@@ -1,14 +1,18 @@
 from __future__ import annotations
+from typing import List, TYPE_CHECKING
+
+from devgoldyutils import Colours
+
+if TYPE_CHECKING:
+    from pymongo.results import UpdateResult
+    from .. import Database
 
 from ... import LoggerAdapter
 from .... import utils
 
-from typing import List
-from devgoldyutils import Colours
-
 class GoldyDB():
     """A class representing a singular goldy bot database in mongoDB."""
-    def __init__(self, core_database, db_code_name: str) -> None:
+    def __init__(self, core_database: Database, db_code_name: str) -> None:
         self.client = core_database.client
         self.database = self.client[db_code_name]
         
@@ -22,22 +26,24 @@ class GoldyDB():
         await self.database[collection].insert_one(data)
         self.logger.debug(f"Inserted '{data}' into '{collection}.'")
 
-    async def edit(self, collection: str, query, data: dict, overwrite: bool = True) -> None:
+    async def edit(self, collection: str, query, data: dict, overwrite: bool = False) -> dict:
         """Finds and edits a document in this database and collection with the data provided."""
         if overwrite:
-            await self.database[collection].update_one(query, {"$set": data})
+            await self.database[collection].update_one(query, {"$set": data}, upsert = True)
         else:
             document_data = await self.find_one("guild_configs", query)
-            new_data = utils.update_dict(document_data, data) # Override the document's data with the new data.
-            await self.database[collection].update_one(query, {"$set": new_data})
+            data = utils.update_dict(document_data, data) if document_data is not None else data
+            await self.database[collection].update_one(query, {"$set": data}, upsert = True)
+
         self.logger.debug(f"Edited '{query}' with '{data}.'")
+        return await self.find_one(collection, query)
 
     async def remove(self, collection: str, data) -> None:
         """Finds and deletes a copy of this data from a collection in this database."""
         await self.database[collection].delete_one(data)
         self.logger.debug(f"Deleted '{data}' from '{collection}.'")
 
-    async def find(self, collection:  str, query, key: str, max_to_find=50) -> List[dict]:
+    async def find(self, collection:  str, query, key: str, max_to_find = 50) -> List[dict]:
         """Searches for and returns documents with that query in a collection in this database."""
         try:
             document_list = []

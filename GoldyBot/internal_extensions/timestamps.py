@@ -5,7 +5,7 @@ from GoldyBot import (
     get_datetime,
     DatabaseEnums,
     front_end_errors,
-    HumanDatetimeOptions 
+    HumanDatetimeOptions
 )
 
 import pytz
@@ -69,8 +69,11 @@ class Timestamps(GoldyBot.Extension):
                 GoldyBot.SlashOptionChoice("in 3 hours", "R")
             ]
         ),
-        "timezone": GoldyBot.SlashOption(
-            description = "The timezone to use. Goldy Bot defaults to Europe/London timezone.", required = False),
+        "timezone": GoldyBot.SlashOptionAutoComplete(
+            description = "The timezone to use. Goldy Bot defaults to Europe/London timezone.", 
+            recommendations = pytz.all_timezones,
+            required = False
+        ),
         "date_format": GoldyBot.SlashOption(
             description = "The format we should read your date in. The order more specifically.", 
             choices = [
@@ -109,7 +112,7 @@ class Timestamps(GoldyBot.Extension):
 
         try:
             # Convert to chosen timezone.
-            chosen_timezone = pytz.timezone(timezone)
+            chosen_timezone = pytz.timezone(timezone.lower())
             datetime = chosen_timezone.normalize(chosen_timezone.localize(datetime, is_dst=True))
 
             posix_timestamp = int(datetime.timestamp())
@@ -145,8 +148,9 @@ class Timestamps(GoldyBot.Extension):
 
 
     @timestamp.sub_command(description = "Allows you to sets default timezone and date format for /timestamp command.", slash_options = {
-        "timezone" : GoldyBot.SlashOption(
+        "timezone" : GoldyBot.SlashOptionAutoComplete(
             description = "The time zone. Must be like this --> Europe/London, America/New_York, Europe/Stockholm", 
+            recommendations = pytz.all_timezones,
             required = True
         ),
         "date_format": GoldyBot.SlashOption(
@@ -164,23 +168,22 @@ class Timestamps(GoldyBot.Extension):
         if date_format is not None:
             datetime_formats = ["%d/%m/%Y %H:%M", "%d.%m.%Y %H:%M"] if date_format == 0 else ["%Y/%m/%d %H:%M", "%Y.%m.%d %H:%M"]
 
-        timezone = timezone.lower()
         member_data = await platter.author.database
 
         try:
-            pytz.timezone(timezone) # Test timezone.
+            pytz.timezone(timezone.lower()) # Test timezone.
             await member_data.push(DatabaseEnums.MEMBER_GLOBAL_DATA, {"timezone": timezone, "datetime_formats": datetime_formats})
 
             embed = GoldyBot.Embed(
-                title = "⏱️ Timestamp Defaults Set!",
+                title = "💚 Timestamp Defaults Set!",
                 description = f"""
-                - Timezone: ``{timezone}``
-                - Date Format: ``{None if date_format is None else 'D/M/Y' if date_format == 0 else 'Y/M/D'}``
+                - ⏰ [``{timezone}``](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones#{timezone.split('/')[-1].upper()})
+                - 💊 ``{None if date_format is None else 'D/M/Y' if date_format == 0 else 'Y/M/D'}``
                 """,
                 color = GoldyBot.Colours.GREEN
             )
 
-            await platter.send_message(embeds = [embed])
+            await platter.send_message(embeds = [embed], hide = True)
 
         except pytz.UnknownTimeZoneError as e:
             raise front_end_errors.FrontEndErrors(
