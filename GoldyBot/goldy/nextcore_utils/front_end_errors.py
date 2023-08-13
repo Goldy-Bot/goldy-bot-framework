@@ -51,8 +51,9 @@ class MissingArgument(FrontEndErrors):
                 description = f"""
                 *You missed the argument(s): ``{missing_args_string[:-2]}``*
 
+                **Command Usage:**
                 ```
-                Command Usage -> {platter.guild.config_wrapper.prefix}{platter.invokable.command_usage}
+                {platter.guild.config_wrapper.prefix}{platter.invokable.command_usage}
                 ```
                 """,
                 colour = Colours.AKI_ORANGE
@@ -77,8 +78,9 @@ class InvalidArguments(FrontEndErrors):
                 - This command doesn't take that many arguments.
                 - It doesn't take any arguments at all.
 
+                **Command Usage:**
                 ```
-                Command Usage -> {platter.guild.config_wrapper.prefix}{platter.invokable.command_usage}
+                {platter.guild.config_wrapper.prefix}{platter.invokable.command_usage}
                 ```
                 """,
                 colour = Colours.YELLOW
