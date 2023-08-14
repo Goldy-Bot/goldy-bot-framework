@@ -9,8 +9,8 @@ from ... import goldy_bot_logger
 from ..database.wrappers.guild import GuildDBWrapper
 
 if TYPE_CHECKING:
-    from .. import Goldy
     from ... import Extension
+    from .. import Goldy, objects
 
 class Guild(DictClass):
     """A goldy bot guild class."""
@@ -44,7 +44,7 @@ class Guild(DictClass):
         guild_config = await self.config
         disallowed_extensions = [ext.lower() for ext in guild_config.disallowed_extensions]
 
-        if extension.name.lower() in [x.lower() for x in ["Goldy", "GuildAdmin"]]: # These extensions are always allowed.
+        if extension.name.lower() in ["goldy", "guildadmin"]: # These extensions are always allowed.
             return True
 
         if extension.name.lower() in disallowed_extensions:
@@ -54,5 +54,28 @@ class Guild(DictClass):
 
             if disallowed_extensions[0] == "." and extension.name.lower() not in [ext.lower() for ext in guild_config.allowed_extensions]:
                 return False
+
+        return True
+
+    async def do_extension_restrictions_pass(self, extension: Extension, platter: objects.GoldPlatter) -> bool:
+        """Checks if extension's restrictions pass."""
+        guild_config = await self.config
+        extension_restriction = guild_config.get("extensions", "restrictions", extension.name)
+
+        if extension_restriction is not None:
+            role = guild_config.roles.get(extension_restriction)
+            channel = guild_config.channels.get(extension_restriction)
+
+            if channel is not None and channel == str(platter.data["channel_id"]):
+                return True
+
+            if role is not None:
+                member_data = await platter.author.member_data
+
+                for role_id in member_data["roles"]:
+                    if role == str(role_id):
+                        return True
+
+            return False
 
         return True

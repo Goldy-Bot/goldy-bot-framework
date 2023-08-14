@@ -45,9 +45,17 @@ async def wait(platter: GoldPlatter) -> None:
 
         platter._interaction_responded = True
 
-        logger.debug("We told discord to wait a little longer for this response.")
-
     else:
-        ... # TODO: Add support for prefix commands.
+        await goldy.http_client.request(
+            Route(
+                "POST", 
+                "/channels/{channel_id}/typing", 
+                channel_id = platter.data["channel_id"]
+            ),
+            rate_limit_key = goldy.nc_authentication.rate_limit_key,
+            headers = goldy.nc_authentication.headers
+        )
+
+    logger.debug("We told discord to wait a little longer for this response.")
 
     return None

@@ -1,5 +1,7 @@
 from typing import Callable
 
+__all__ = ("is_lambda",)
+
 def is_lambda(_lambda: Callable) -> bool:
     """Returns true if the callable passed into this function is a lambda function."""
     base_lambda = lambda: None
