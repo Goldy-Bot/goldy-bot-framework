@@ -28,6 +28,7 @@ class Command(Invokable):
         required_perms: List[Perms | str] = None, 
         slash_options: Dict[str, ApplicationCommandOptionData] = None, 
         hidden: bool = False, 
+        wait: bool = False,
         pre_register = True
     ):
         self.func = func
@@ -52,6 +53,7 @@ class Command(Invokable):
         else:
             self.__slash_options = slash_options
 
+        self.__wait = wait
         self.__hidden = hidden
 
         self.__params = self.__get_function_parameters()
@@ -174,6 +176,9 @@ class Command(Invokable):
         # I'm using a lambda function here so all the parameter bullshit 
         # can be handled by the child class instead of this method.
         if await self.goldy.permission_system.got_perms(platter):
+            if self.__wait == True:
+                await platter.wait()
+
             self.logger.info(
                 Colours.BLUE.apply(
                     f"Command invoked by '{platter.author.username}#{platter.author.discriminator}'."
