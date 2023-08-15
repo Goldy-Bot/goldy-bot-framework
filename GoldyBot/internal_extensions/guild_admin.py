@@ -44,9 +44,9 @@ class GuildAdmin(GoldyBot.Extension):
             colour = GoldyBot.Colours.BROWN
         )
 
-    admin = GoldyBot.GroupCommand("admin", required_perms = [Perms.GUILD_OWNER], hidden = True)
+    config = GoldyBot.GroupCommand("config", required_perms = [Perms.GUILD_OWNER], hidden = True)
 
-    @admin.sub_command(
+    @config.sub_command(
         description = "🧰💚 A command for enabling a Goldy Bot extension in this guild.",
         slash_options = {
             "extension": GoldyBot.SlashOption(
@@ -88,7 +88,7 @@ class GuildAdmin(GoldyBot.Extension):
 
         await platter.send_message(embeds = [embed], hide = True)
 
-    @admin.sub_command(
+    @config.sub_command(
         description = "🧰❤️ A command for disabling a Goldy Bot extension in this guild.",
         slash_options = {
             "extension": GoldyBot.SlashOption(
@@ -130,7 +130,7 @@ class GuildAdmin(GoldyBot.Extension):
 
         await platter.send_message(embeds = [embed], hide = True)
 
-    @admin.sub_command(
+    @config.sub_command(
         description = "🧰🖤 A command for disabling all Goldy Bot extensions in this guild."
     )
     async def disable_all_extensions(self, platter: GoldyBot.GoldPlatter):
@@ -145,7 +145,7 @@ class GuildAdmin(GoldyBot.Extension):
 
         await platter.send_message(embeds = [self.all_extensions_disabled], hide = True)
 
-    @admin.sub_command(
+    @config.sub_command(
         description = "🧰💚 A command for enabling all Goldy Bot extensions in this guild."
     )
     async def enable_all_extensions(self, platter: GoldyBot.GoldPlatter):

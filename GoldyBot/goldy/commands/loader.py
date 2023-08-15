@@ -84,6 +84,8 @@ class CommandLoader():
     ) -> None:
         created_interaction_cmds: List[ApplicationCommandData] = []
 
+        await self.__delete_unknown_cmds()
+
         # Creating global commands.
         # --------------------------
         if len([guild for guild in self.goldy.guild_manager.guilds if not guild[1].code_name == "test_server"]) >= 1:
@@ -138,9 +140,6 @@ class CommandLoader():
             created_interaction_cmds += await r.json()
             self.logger.debug("Created guild commands for test server.")
 
-
-        await self.__delete_unknown_cmds()
-
         # Registering slash commands with the id given by discord.
         # ----------------------------------------------------------
         for interaction_cmd in created_interaction_cmds:
@@ -159,4 +158,38 @@ class CommandLoader():
         return None
     
     async def __delete_unknown_cmds(self):
-        ...
+        """Deletes the old guild commands that existed from previous goldy bot versions."""
+        for _, guild in self.goldy.guild_manager.guilds:
+            
+            if guild.code_name == "test_server":
+                continue
+
+            r = await self.goldy.http_client.request(
+                Route(
+                    "GET",
+                    "/applications/{application_id}/guilds/{guild_id}/commands",
+                    application_id = self.goldy.application_data["id"],
+                    guild_id = guild.id,
+                ),
+                rate_limit_key = self.goldy.nc_authentication.rate_limit_key,
+                headers = self.goldy.nc_authentication.headers
+            )
+
+            guild_application_cmds = await r.json()
+
+            if len(guild_application_cmds) > 0:
+                r = await self.goldy.http_client.request(
+                    Route(
+                        "PUT",
+                        "/applications/{application_id}/guilds/{guild_id}/commands",
+                        application_id = self.goldy.application_data["id"],
+                        guild_id = guild.id,
+                    ),
+                    rate_limit_key = self.goldy.nc_authentication.rate_limit_key,
+                    headers = self.goldy.nc_authentication.headers,
+                    json = []
+                )
+
+                self.logger.info(
+                    f"Removed guild application commands for the guild '{guild.code_name}'!"
+                )

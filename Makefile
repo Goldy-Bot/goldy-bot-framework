@@ -26,5 +26,5 @@ build-docs:
 pull-submodules:
 	git submodule update --init --recursive
 
-update-pip:
+pip-update:
 	python -m pip install --upgrade pip
