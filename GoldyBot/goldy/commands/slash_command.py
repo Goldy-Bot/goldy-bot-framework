@@ -22,6 +22,7 @@ class SlashCommand(Command):
         required_perms: List[str] = None, 
         slash_options: Dict[str, ApplicationCommandOptionData] = None, 
         hidden: bool = False,
+        wait: bool = False,
         pre_register: bool = True
     ):
         self.__sub_commands: List[SlashCommand] = []
@@ -34,6 +35,7 @@ class SlashCommand(Command):
             required_perms = required_perms, 
             slash_options = slash_options, 
             hidden = hidden,
+            wait = wait,
             pre_register = pre_register
         )
 

@@ -20,6 +20,7 @@ class PrefixCommand(Command):
         description: str = None, 
         required_perms: List[str] = None, 
         hidden: bool = False,
+        wait: bool = False,
         pre_register: bool = True
     ):
         self.__sub_commands: List[PrefixCommand] = []
@@ -31,6 +32,7 @@ class PrefixCommand(Command):
             description = description, 
             required_perms = required_perms, 
             hidden = hidden,
+            wait = wait,
             pre_register = pre_register
         )
 
