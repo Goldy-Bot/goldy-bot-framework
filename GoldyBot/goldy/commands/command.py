@@ -176,7 +176,7 @@ class Command(Invokable):
         # I'm using a lambda function here so all the parameter bullshit 
         # can be handled by the child class instead of this method.
         if await self.goldy.permission_system.got_perms(platter):
-            if self.__wait == True:
+            if self.__wait is True:
                 await platter.wait()
 
             self.logger.info(
