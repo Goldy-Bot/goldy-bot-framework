@@ -126,7 +126,8 @@ class GroupCommand():
         name: str = None, 
         description: str = None, 
         required_perms: List[str]=None, 
-        slash_options: Dict[str, SlashOption] = None
+        slash_options: Dict[str, SlashOption] = None,
+        wait: bool = False
     ):
         """
         Create a sub command in this group command with this decorator.
@@ -208,6 +209,7 @@ class GroupCommand():
                             description,
                             required_perms,
                             slash_options,
+                            wait = wait,
                             pre_register = False
                         )
                     )
@@ -221,6 +223,7 @@ class GroupCommand():
                             name,
                             description,
                             required_perms,
+                            wait = wait,
                             pre_register = False
                         )
                     )

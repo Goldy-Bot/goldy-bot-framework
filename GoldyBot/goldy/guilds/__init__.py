@@ -23,7 +23,7 @@ class GuildManager():
         if self.allowed_guilds == []:
             raise AllowedGuildsNotSpecified(self.logger)
         
-        self.guilds: List[Tuple[str|int, Guild]] = []
+        self.guilds: List[Tuple[str, Guild]] = []
 
     async def setup(self):
         """Adds guilds specified in goldy.json to the database if not already added."""

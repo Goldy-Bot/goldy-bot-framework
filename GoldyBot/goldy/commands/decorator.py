@@ -18,7 +18,8 @@ def command(
     slash_options: Dict[str, SlashOption] = None,
     slash_cmd_only: bool = False, 
     hidden: bool = False,
-    group: Literal[False] = False
+    group: Literal[False] = False,
+    wait: bool = False
 ) -> Callable[..., Callable]:
     ...
 
@@ -29,7 +30,8 @@ def command(
     required_perms: List[str | Perms] = None, 
     slash_cmd_only: bool = False, 
     hidden: bool = False,
-    group: Literal[True] = False
+    group: Literal[True] = False,
+    wait: bool = False
 ) -> Callable[..., GroupCommand]:
     ...
 
@@ -38,9 +40,10 @@ def command(
     description: str = None, 
     required_perms: List[str | Perms] = None, 
     slash_options: Dict[str, SlashOption] = None,
-    slash_cmd_only: bool = False, 
+    slash_cmd_only: bool = False,
     hidden: bool = False,
-    group: bool = False
+    group: bool = False,
+    wait: bool = False
 ):
     """
     Add a command to Goldy Bot with this decorator.
@@ -74,7 +77,8 @@ def command(
                     description = description, 
                     required_perms = required_perms, 
                     slash_options = slash_options,
-                    hidden = hidden
+                    hidden = hidden,
+                    wait = wait
                 ),
                 PrefixCommand(
                     goldy = goldy,
@@ -82,7 +86,8 @@ def command(
                     name = name,
                     description = description,
                     required_perms = required_perms,
-                    hidden = hidden
+                    hidden = hidden,
+                    wait = wait
                 ) if slash_cmd_only is False else None
             )
 
