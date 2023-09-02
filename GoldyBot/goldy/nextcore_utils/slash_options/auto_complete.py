@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import List, TYPE_CHECKING, overload, Callable, Union
+from typing import List, TYPE_CHECKING, overload, Callable, Union, Dict
 from discord_typings import AutocompleteOptionData, AutocompleteInteractionData
 
 from nextcore.http import Route
@@ -14,7 +14,7 @@ if TYPE_CHECKING:
     from ...commands.slash_command import SlashCommand
     from ...extensions import Extension
 
-    AUTO_COMPLETE_CALLBACK = Callable[[Extension, str], List[Union[SlashOptionChoice, str]]]
+    AUTO_COMPLETE_CALLBACK = Callable[[Extension, str, Dict[str, str]], List[Union[SlashOptionChoice, str]]]
 
 class SlashOptionAutoComplete(SlashOption):
     r"""
@@ -109,6 +109,7 @@ class SlashOptionAutoComplete(SlashOption):
         self,
         data: AutocompleteInteractionData,
         current_typing_value: str,
+        params: Dict[str, str],
         command: SlashCommand,
         goldy: Goldy, 
     ) -> None:
@@ -123,7 +124,7 @@ class SlashOptionAutoComplete(SlashOption):
         self.logger.debug(f"We got --> '{current_typing_value}' from {member}")
 
         if self.callback is not None:
-            choices = await self.callback(command.extension, current_typing_value) # Might add a platter for this in the future, idk yet.
+            choices = await self.callback(command.extension, current_typing_value, **params)
 
         else: # If no callback was given then default to recommendations list.
             for choice in self.recommendations: # Some shit fuzzy searching. I'll improve it later :L
