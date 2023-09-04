@@ -18,8 +18,9 @@ from .utils import *
 
 # Recipes
 # --------
-from .goldy.recipes import Recipe
-from .goldy.recipes.buttons.button import Button, ButtonStyle
+from .goldy.recipes import *
+from .goldy.recipes.button import *
+from .goldy.recipes.select_menu import *
 
 # Database
 # ----------

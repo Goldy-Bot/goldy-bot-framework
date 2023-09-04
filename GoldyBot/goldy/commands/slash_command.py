@@ -124,7 +124,7 @@ class SlashCommand(Command):
                 break
 
         await auto_complete_option.send_auto_complete(
-            data, current_typing_value, self, self.goldy, 
+            data, current_typing_value, self.__invoke_data_to_params(data), self, self.goldy, 
         )
 
 
