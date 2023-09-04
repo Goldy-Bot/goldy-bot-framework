@@ -1,7 +1,7 @@
 from __future__ import annotations
 from abc import abstractmethod
-from typing import Callable, Any, List, Dict, TYPE_CHECKING
 from discord_typings import ApplicationCommandOptionData
+from typing import Callable, Any, List, Dict, TYPE_CHECKING, Awaitable
 
 import regex
 from devgoldyutils import LoggerAdapter, Colours
@@ -161,7 +161,7 @@ class Command(Invokable):
         ...
 
     @abstractmethod
-    async def invoke(self, platter: objects.GoldPlatter, lambda_func: Callable) -> None:
+    async def invoke(self, platter: objects.GoldPlatter, lambda_func: Callable[..., Awaitable]) -> None:
         self.logger.debug("Attempting to invoke command...")
 
         if await platter.guild.is_extension_allowed(self.extension) is False:

@@ -6,7 +6,8 @@ from discord_typings import InteractionCreateData, MessageData, ComponentInterac
 
 from .slash_command import SlashCommand
 from .prefix_command import PrefixCommand
-from ..recipes.buttons.button import Button
+from ..recipes.button import Button
+from ..recipes.select_menu import SelectMenu
 from .. import objects
 from ... import LoggerAdapter, goldy_bot_logger, utils
 from ..objects.platter.golden_platter import GoldPlatter
@@ -84,7 +85,7 @@ class CommandListener():
             # --------------------
             elif interaction["type"] == 3:
                 interaction: ComponentInteractionData
-                message_component: Tuple[str, Button] = utils.cache_lookup(interaction["data"]["custom_id"], self.goldy.invokables)
+                message_component: Tuple[str, Button | SelectMenu] = utils.cache_lookup(interaction["data"]["custom_id"], self.goldy.invokables)
 
                 if message_component is not None:
                     gold_platter = GoldPlatter(

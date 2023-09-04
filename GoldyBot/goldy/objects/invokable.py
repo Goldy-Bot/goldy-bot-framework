@@ -6,9 +6,9 @@ from typing import TYPE_CHECKING, Union, Callable, Any
 
 if TYPE_CHECKING:
     from .. import Goldy
-    from .platter import Platter
     from ..recipes import Recipe
     from ..commands.command import Command
+    from .platter.golden_platter import GoldPlatter
 
     INVOKABLE_TYPES = Union[Command, Recipe]
 
@@ -18,7 +18,7 @@ class Invokable(ABC, dict):
         self,
         name: str,
         data: dict,
-        callback: Callable[[Platter], Any],
+        callable: Callable,
         goldy: Goldy,
         logger: logging.Logger,
         pre_register: bool = True
@@ -26,7 +26,7 @@ class Invokable(ABC, dict):
         self.__id: str = None
         self.__name = name
 
-        self.callback = callback
+        self.callable = callable
         self.goldy = goldy
         self.logger = logger
 
@@ -73,5 +73,5 @@ class Invokable(ABC, dict):
         return None
 
     @abstractmethod
-    async def invoke(self, platter: Platter) -> Any:
+    async def invoke(self, platter: GoldPlatter) -> Any:
         ...

@@ -2,10 +2,16 @@ from __future__ import annotations
 
 import os
 from enum import Enum
-from typing import overload, Literal
-from discord_typings import ButtonComponentData
+from typing import overload, TYPE_CHECKING
 
-from .. import Recipe, RECIPE_CALLBACK
+if TYPE_CHECKING:
+    from typing import Any, Literal
+    from discord_typings import ButtonComponentData
+    from ..objects.platter.golden_platter import GoldPlatter
+
+from . import Recipe, RECIPE_CALLBACK
+
+__all__ = ("ButtonStyle", "Button")
 
 class ButtonStyle(Enum):
     PRIMARY = 1
@@ -66,7 +72,7 @@ class Button(Recipe):
         emoji: str = None, 
         author_only: bool = True, 
         custom_id: str = None, 
-        **callback_args: dict
+        **callback_args
     ) -> ButtonComponentData:
         ...
 
@@ -90,7 +96,7 @@ class Button(Recipe):
         emoji: str = None, 
         author_only: bool = True, 
         callback: RECIPE_CALLBACK = None, 
-        **callback_args: dict
+        **callback_args
     ) -> ButtonComponentData:
         """
         Creates a discord button to use in action rows. 😋
@@ -137,3 +143,8 @@ class Button(Recipe):
 
         if not style == ButtonStyle.LINK.value:
             self.register(custom_id)
+
+    async def invoke(self, platter: GoldPlatter) -> Any:
+        return await super().invoke(
+            platter, lambda: self.callback(platter)
+        )
