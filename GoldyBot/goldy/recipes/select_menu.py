@@ -144,7 +144,7 @@ class SelectMenu(Recipe):
 
             utils.choices_value_check(choices)
 
-            data["options"] = choices
+            data["options"] = choices[:24]
 
         if placeholder_text is not None:
             data["placeholder"] = placeholder_text
