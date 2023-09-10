@@ -1,21 +1,22 @@
 from __future__ import annotations
-from abc import abstractmethod
-from discord_typings import ApplicationCommandOptionData
-from typing import Callable, Any, List, Dict, TYPE_CHECKING, Awaitable
-
-import regex
-from devgoldyutils import LoggerAdapter, Colours
-
-from ..extensions import extensions_cache
-from ... import goldy_bot_logger, utils
-from ..objects import Invokable
-from ... import errors
-from ..perms import Perms
-from ..nextcore_utils import front_end_errors
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from ... import Goldy, Extension
     from .. import objects
+    from ..perms import Perms
+    from ... import Goldy, Extension
+    from typing import Any, List, Dict, Awaitable, Callable
+    from discord_typings import ApplicationCommandOptionData
+
+import regex
+from abc import abstractmethod
+from devgoldyutils import LoggerAdapter, Colours
+
+from ... import errors
+from ..objects import Invokable
+from ... import goldy_bot_logger, utils
+from ..extensions import extensions_cache
+from ..nextcore_utils import front_end_errors
 
 class Command(Invokable):
     """Class that all commands in goldy bot inherit from."""
@@ -190,23 +191,7 @@ class Command(Invokable):
         raise front_end_errors.MissingPerms(platter, self.logger)
 
 
-    def __get_function_parameters(self) -> List[str]:
-        """Returns the function parameters of a command respectively."""
-        
-        # Get list of function params.
-        func_params = list(self.func.__code__.co_varnames)
-        
-        # Removes 'self' argument.
-        func_params.pop(0)
 
-        # Removes 'platter' argument.
-        func_params.pop(0)
-
-        # Filters out other variables resulting in just function parameters. It's weird I know.
-        params = func_params[:self.func.__code__.co_argcount - 2]
-
-        return params
-    
     def params_to_options(self) -> List[ApplicationCommandOptionData]:
         """A function that converts slash command parameters to slash command options."""
         options: List[ApplicationCommandOptionData] = []
@@ -237,3 +222,20 @@ class Command(Invokable):
                 })
 
         return options
+
+    def __get_function_parameters(self) -> List[str]:
+        """Returns the function parameters of a command respectively."""
+        
+        # Get list of function params.
+        func_params = list(self.func.__code__.co_varnames)
+        
+        # Removes 'self' argument.
+        func_params.pop(0)
+
+        # Removes 'platter' argument.
+        func_params.pop(0)
+
+        # Filters out other variables resulting in just function parameters. It's weird I know.
+        params = func_params[:self.func.__code__.co_argcount - 2]
+
+        return params
