@@ -4,3 +4,6 @@
 [submodule "GoldyBot/internal_extensions/aghpb_cord"]
 	path = GoldyBot/internal_extensions/aghpb_cord
 	url = https://github.com/THEGOLDENPRO/aghpb_cord
+[submodule "GoldyBot/internal_extensions/fun++"]
+	path = GoldyBot/internal_extensions/fun++
+	url = https://github.com/Goldy-Bot/fun_plus_plus
