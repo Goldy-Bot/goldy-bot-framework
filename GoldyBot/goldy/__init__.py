@@ -57,13 +57,18 @@ class Goldy():
         self.http_client = HTTPClient()
         """Nextcore http client, use this if you would like to perform low level requests."""
 
+        self.config = GoldyConfig()
+        """
+        Class that allows you to retrieve configuration data from the ``goldy.json`` config file. 
+        """
+
         self.shard_manager = ShardManager(
             authentication = self.nc_authentication,
             intents = self.intents,
             http_client = self.http_client,
 
             presence = UpdatePresenceData(
-                activities = [PartialActivityData(name=f"Goldy Bot (v{VERSION})", type=ActivityTypes.PLAYING_GAME.value)],
+                activities = [PartialActivityData(name=f"{self.config.branding_name} (v{VERSION})", type=ActivityTypes.PLAYING_GAME.value)],
                 since = None,
                 status = Status.ONLINE.value,
                 afk = False
@@ -91,12 +96,6 @@ class Goldy():
         """Goldy Bot's class to interface with a Mongo Database asynchronously."""
         self.presence = Presence(self)
         """Class that allows you to control the status, game activity and more of Goldy Bot"""
-        self.config = GoldyConfig()
-        """
-        Class that allows you to retrieve configuration data from the ``goldy.json`` config file. 
-        
-        All properties return None when not found in the config.
-        """
         self.system = System(self)
         """Goldy Bot class used to check how much resources Goldy is utilizing on the host system."""
         self.command_loader = CommandLoader(self)

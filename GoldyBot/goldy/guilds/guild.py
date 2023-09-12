@@ -44,7 +44,7 @@ class Guild(DictClass):
         guild_config = await self.config
         disallowed_extensions = [ext.lower() for ext in guild_config.disallowed_extensions]
 
-        if extension.name.lower() in ["goldy", "guildadmin"]: # These extensions are always allowed.
+        if extension.name.lower() in ["debug", "guildadmin"]: # These extensions are always allowed.
             return True
 
         if extension.name.lower() in disallowed_extensions:
