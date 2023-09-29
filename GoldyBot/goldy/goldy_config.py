@@ -25,6 +25,11 @@ class GoldyConfig(Config):
         return self.get("goldy", "branding", "name", default = "💛 Goldy Bot")
 
     @property
+    def included_extensions(self) -> List[str]:
+        """Returns the extensions that were set to be included by the configuration."""
+        return self.get("goldy", "extensions", "include", default = [])
+
+    @property
     def ignored_extensions(self) -> List[str]:
         """Returns code name of all ignored extensions from ``goldy.json``."""
         return self.get("goldy", "extensions", "ignored_extensions", default = [])

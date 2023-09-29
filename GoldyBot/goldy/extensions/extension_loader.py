@@ -4,6 +4,7 @@ import os
 import sys
 import toml
 import pathlib
+import requests
 import pkg_resources
 from typing import List, overload, TYPE_CHECKING, Dict, Tuple
 import importlib.util
@@ -26,7 +27,8 @@ class ExtensionLoader():
         if self.raise_on_load_error is None:
             self.raise_on_load_error = self.goldy.config.raise_on_extension_loader_error
 
-        self.path_to_extensions_folder:str|None = (lambda x: os.path.abspath(x) if isinstance(x, str) else x)(goldy.config.extension_folder_location)
+        self.extensions_to_include = goldy.config.included_extensions
+        self.path_to_extensions_folder: str | None = (lambda x: os.path.abspath(x) if isinstance(x, str) else x)(goldy.config.extension_folder_location)
 
         self.ignored_extensions = goldy.config.ignored_extensions
         self.late_load_extensions = goldy.config.late_load_extensions + ["guild_admin.py"]
@@ -34,6 +36,50 @@ class ExtensionLoader():
         self.logger = LoggerAdapter(goldy_bot_logger, prefix="ExtensionLoader")
 
         self.__installed_dependencies = {pkg.key for pkg in pkg_resources.working_set}
+
+    def pull(self, extensions: List[str] = None, repo_json_url: str = "https://raw.githubusercontent.com/Goldy-Bot/goldybot.repo/main/repo.json") -> None:
+        """
+        Pulls down the extensions that you specified from a repo into your extensions folder if they don't ready exists.
+        """
+        if extensions is None:
+            extensions = self.extensions_to_include
+
+        extensions_folder_path = self.__find_external_extension_path()
+        
+        self.logger.info("Getting goldy bot extensions repo...")
+        repo_json_response = requests.get(repo_json_url)
+        repo_json: Dict[str, dict] = repo_json_response.json()
+
+        extensions_to_pull: List[tuple] = []
+
+        for extension in extensions:
+
+            for repo_extension in repo_json.values():
+
+                if extension in repo_extension["ids"]:
+                    self.logger.debug(f"Found {extension} in repo.")
+                    extensions_to_pull.append((repo_extension["ids"][0], repo_extension["git_url"]))
+                    break
+
+        if not ".git" in os.listdir("."):
+            self.logger.debug("Root directory is not git repo so I'm making it one.")
+            os.system("git init")
+
+        if not ".gitmodules" in os.listdir("."):
+            self.logger.debug("No '.gitmodules' file in root so I'm creating one.")
+            open(".gitmodules", "w").close()
+
+        for code_name, git_url in extensions_to_pull:
+
+            if os.path.exists(f"{extensions_folder_path}{os.path.sep}{code_name}"):
+                self.logger.debug(f"'{code_name}' already exists so we will not git clone it.")
+                continue
+
+            self.logger.info(f"Git cloning '{code_name}' extension...")
+            # NOTE: Ummm, should we use psutil instead?
+            os.system(
+                f'cd "{extensions_folder_path}" && git submodule add -f {git_url} {code_name}'
+            )
 
     @overload
     def load(self) -> None:
@@ -187,6 +233,20 @@ class ExtensionLoader():
                     self.logger.debug(f"'{dependency}' dependency found.")
 
         return missing_dependencies
+    
+    def __find_external_extension_path(self) -> str:
+        if self.path_to_extensions_folder is not None:
+            return self.path_to_extensions_folder
+
+        # Go look in the root dir.
+        for file in os.listdir("."):
+            if file == "extensions":
+                return os.path.abspath(f"./{file}")
+
+        # NOTE: Idk why the hell I did it like this in the past so instead of changing something that works
+        # and bricking the framework in the process let's just keep it the same but 
+        # raise an informative exception incase things go haywire.
+        raise GoldyBotError("Wait what, where the hell is the extensions folder.")
 
     def __find_all_paths(self) -> List[str]:
         """Searches for all extensions, internal and external then returns their paths."""
@@ -198,14 +258,7 @@ class ExtensionLoader():
         
         # Finding external extensions folder path if none.
         # -------------------------------------------------
-        if self.path_to_extensions_folder is None:
-            # Go look in the root dir.
-            for file in os.listdir("."):
-                if file == "extensions":
-                    external_path = os.path.abspath(f"./{file}")
-                    break
-        else:
-            external_path = self.path_to_extensions_folder
+        external_path = self.__find_external_extension_path()
 
         # Getting all paths of each individual extension.
         # -------------------------------------------------

@@ -5,6 +5,8 @@
             "name": "💛 Goldy Bot"
         },
         "extensions": {
+            "include": [],
+
             "ignored_extensions" : [],
             "late_load_extensions": [],
 

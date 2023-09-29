@@ -34,7 +34,7 @@ def normal():
     except FileExistsError:
         goldy_bot_logger.debug("'.env' already exists so I'm going to delete the one I was about to copy into root.")
         os.remove("token.env")
-    
+
     # Extensions folder.
     # -------------------
     try:
@@ -42,6 +42,8 @@ def normal():
         goldy_bot_logger.debug("Created 'extensions' folder in root!")
     except FileExistsError:
         goldy_bot_logger.debug("The 'extensions' folder already exists so I'm not creating it.")
+
+    os.system("git init")
 
 @setup.command()
 def demo():
