@@ -1,0 +1,3 @@
+[submodule "demo/extensions/mal_cord"]
+	path = demo/extensions/mal_cord
+	url = https://github.com/Goldy-Bot/mal_cord
