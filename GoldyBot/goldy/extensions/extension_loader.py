@@ -61,11 +61,11 @@ class ExtensionLoader():
                     extensions_to_pull.append((repo_extension["ids"][0], repo_extension["git_url"]))
                     break
 
-        if not ".git" in os.listdir("."):
+        if ".git" not in os.listdir("."):
             self.logger.debug("Root directory is not git repo so I'm making it one.")
             os.system("git init")
 
-        if not ".gitmodules" in os.listdir("."):
+        if ".gitmodules" not in os.listdir("."):
             self.logger.debug("No '.gitmodules' file in root so I'm creating one.")
             open(".gitmodules", "w").close()
 
