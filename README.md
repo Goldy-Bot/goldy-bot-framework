@@ -1,6 +1,6 @@
 <div align="center">
 
-  # 💛 Goldy Bot V5
+  # 💛 Goldy Bot V5 Framework
   
   <sub>Yet **another** rewrite of Goldy Bot, my personal discord bot framework.</sub>
 
