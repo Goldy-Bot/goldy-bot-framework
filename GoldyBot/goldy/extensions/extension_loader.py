@@ -56,7 +56,7 @@ class ExtensionLoader():
 
             for repo_extension in repo_json.values():
 
-                if extension in repo_extension["ids"]:
+                if extension.lower() in [x.lower() for x in repo_extension["ids"]]:
                     self.logger.debug(f"Found {extension} in repo.")
                     extensions_to_pull.append((repo_extension["ids"][0], repo_extension["git_url"]))
                     break
