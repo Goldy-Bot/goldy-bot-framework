@@ -209,7 +209,8 @@ class Goldy():
     async def setup(self):
         """Method ran to set up goldy bot."""
         await self.guild_manager.setup()
-        
+
+        self.extension_loader.pull()
         self.extension_loader.load()
         await self.command_loader.load()
         await self.command_listener.start_listening()

@@ -33,7 +33,6 @@ dependencies = [
     "regex",
     "psutil",
     "dateparser",
-    "pytz",
     "toml",
     "colorthief",
     "get-annotations"
