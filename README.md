@@ -2,7 +2,7 @@
 
   # 💛 Goldy Bot Framework
   
-  <sub>Yet **another** rewrite of Goldy Bot, my personal discord bot framework.</sub>
+  <sub>The latest and greatest framework powering the Goldy Bot family.</sub>
 
   [![Pypi Badge](https://img.shields.io/pypi/v/GoldyBot?style=flat)](https://pypi.org/project/GoldyBot/ "We're on pypi!")
   [![Python Badge](https://img.shields.io/pypi/pyversions/GoldyBot?style=flat)](https://pypi.org/project/GoldyBot/ "Supported python versions.")
