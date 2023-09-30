@@ -69,6 +69,11 @@ class ExtensionLoader():
             self.logger.debug("No '.gitmodules' file in root so I'm creating one.")
             open(".gitmodules", "w").close()
 
+        if ".gitattributes" not in os.listdir("."):
+            self.logger.debug("No '.gitattributes' file in root so I'm creating one.")
+            with open(".gitattributes", "w") as file:
+                file.write("# Auto detect text files and perform LF normalization\n* text=auto")
+
         for code_name, git_url in extensions_to_pull:
 
             if os.path.exists(f"{extensions_folder_path}{os.path.sep}{code_name}"):
