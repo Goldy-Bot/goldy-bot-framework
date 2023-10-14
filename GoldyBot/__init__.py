@@ -12,6 +12,7 @@ from .goldy import Goldy, get_goldy_instance
 from .goldy.token import Token
 from .goldy.perms import Perms
 from .goldy.extensions import Extension
+from .goldy.events.decorator import event
 from .goldy.commands.decorator import command
 from .goldy.commands.group_command import GroupCommand
 from .utils import *
