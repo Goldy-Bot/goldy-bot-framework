@@ -1,13 +1,14 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, get_args, Literal, Type
+from typing import TYPE_CHECKING, get_args, Type
 
 if TYPE_CHECKING:
+    from ... import Extension
     from discord_typings.gateway import GenericDispatchEvent
 
 import inspect
 from ... import errors, utils
-from .. import get_goldy_instance
-from ..extensions import extensions_cache, Extension
+from ..extensions import extensions_cache
+from .. import get_goldy_instance, goldy_bot_logger
 
 __all__ = ("event",)
 
@@ -53,10 +54,15 @@ def event(
                     f"'{func.__name__}' event was not specified. Please include either a event name or type hint event parameter with the appropriate discord_typings event."
                 )
 
-            extension_name = str(func).split(" ")[1].split(".")[0]
-            extension: Extension = utils.cache_lookup(extension_name, extensions_cache)
+            goldy_bot_logger.info(f"Registering event '{event_name}' on '{func.__name__}' function...")
 
-            goldy.shard_manager.event_dispatcher.add_listener(lambda x: func(extension, x), event_name)
+            async def event_callback(event):
+                extension_name = str(func).split(" ")[1].split(".")[0]
+                extension = utils.cache_lookup(extension_name, extensions_cache)
+
+                await func(extension, event)
+
+            goldy.shard_manager.event_dispatcher.add_listener(event_callback, event_name)
 
             return func
 

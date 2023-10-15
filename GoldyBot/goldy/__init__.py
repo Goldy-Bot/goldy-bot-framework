@@ -50,9 +50,9 @@ class Goldy():
         # -------------------
         if self.token is None:
             self.token = Token()
-        
+
         self.nc_authentication = BotAuthentication(self.token.discord_token)
-        self.intents = 1 << 9 | 1 << 15
+        self.intents = 1 << 9 | 1 << 15 | 1 << 7 | 1 << 0
 
         self.http_client = HTTPClient()
         """Nextcore http client, use this if you would like to perform low level requests."""

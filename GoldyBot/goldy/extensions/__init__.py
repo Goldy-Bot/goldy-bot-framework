@@ -12,7 +12,7 @@ if TYPE_CHECKING:
     from ..commands.command import Command
     from .extension_metadata import ExtensionMetadata
 
-extensions_cache: List[Tuple[str, object]] = []
+extensions_cache: List[Tuple[str, Extension]] = []
 """
 This cache contains all the extensions that have been loaded and it's memory location to the class.
 """
