@@ -2,11 +2,12 @@ from __future__ import annotations
 
 import logging
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Union, Callable, Any
+from typing import TYPE_CHECKING, Union
 
 if TYPE_CHECKING:
     from .. import Goldy
     from ..recipes import Recipe
+    from typing import Callable, Any
     from ..commands.command import Command
     from .platter.golden_platter import GoldPlatter
 

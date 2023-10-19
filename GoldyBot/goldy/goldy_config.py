@@ -20,14 +20,24 @@ class GoldyConfig(Config):
             )
 
     @property
+    def branding_name(self) -> str:
+        """Returns branding display name like -> 💛 Goldy Bot"""
+        return self.get("goldy", "branding", "name", default = "💛 Goldy Bot")
+
+    @property
+    def included_extensions(self) -> List[str]:
+        """Returns the extensions that were set to be included by the configuration."""
+        return self.get("goldy", "extensions", "include", default = [])
+
+    @property
     def ignored_extensions(self) -> List[str]:
         """Returns code name of all ignored extensions from ``goldy.json``."""
-        return self.get("goldy", "extensions", "ignored_extensions", default=[])
+        return self.get("goldy", "extensions", "ignored_extensions", default = [])
     
     @property
     def late_load_extensions(self) -> List[str]:
         """Returns code name of all late load extensions from ``goldy.json``."""
-        return self.get("goldy", "extensions", "late_load_extensions", default=[])
+        return self.get("goldy", "extensions", "late_load_extensions", default = [])
 
     @property
     def extension_folder_location(self) -> str:
@@ -37,7 +47,7 @@ class GoldyConfig(Config):
     @property
     def raise_on_extension_loader_error(self) -> bool:
         """Returns whether the extension loader should raise on load errors stopping the entire framework or not."""
-        return self.get("goldy", "extensions", "raise_on_load_error", default_value=True)
+        return self.get("goldy", "extensions", "raise_on_load_error", default_value = True)
 
     @property
     def allowed_guilds(self) -> List[Tuple[str, str]]:
@@ -63,9 +73,9 @@ class GoldyConfig(Config):
     def bot_dev(self) -> str:
         """The discord id of the bot developer. If none this will default to me (https://github.com/THEGOLDENPRO)."""
         my_discord_id = "332592361307897856"
-        return (lambda x: my_discord_id if x is None else x)(self.get("goldy", "bot_dev", default_value=my_discord_id))
+        return (lambda x: my_discord_id if x is None else x)(self.get("goldy", "bot_dev", default_value = my_discord_id))
 
     @property
     def ding_on_exit(self) -> bool:
         """Returns whether goldy bot should play a ding sound effect on exit or not."""
-        return self.get("goldy", "ding_on_exit", default_value=False)
+        return self.get("goldy", "ding_on_exit", default_value = False)

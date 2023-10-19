@@ -3,12 +3,14 @@ from GoldyBot import Colours
 
 import nextcore
 
-class Goldy(GoldyBot.Extension):
+# TODO: Revamp the debug command.
+
+class Debug(GoldyBot.Extension):
     def __init__(self):
         super().__init__()
 
-        self.goldy_embed = GoldyBot.Embed(
-            title = "💛 Goldy Bot - Stats",
+        self.debug_embed = GoldyBot.Embed(
+            title = "🖤 Debug",
             fields = [
                 GoldyBot.EmbedField(
                     name = "🗒️ __Stats:__", 
@@ -18,7 +20,6 @@ class Goldy(GoldyBot.Extension):
                     """,
                     inline = False
                 ),
-
                 GoldyBot.EmbedField(
                     name = "📦 __Resources:__", 
                     value = """
@@ -26,35 +27,32 @@ class Goldy(GoldyBot.Extension):
                     - OS: ``{os}``
                     - CPU: ``{cpu}%``
                     - RAM: ``{ram} MB``
-                    - DISK: ``{disk} MB/s``
-
-                    [Made with {heart} By](https://github.com/Goldy-Bot/Goldy-Bot-V5) <@332592361307897856>**
+                    - DISK: ``{disk} MB/s``**
                     """,
                     inline = True
                 ),
-
                 GoldyBot.EmbedField(
                     name = "⚡ __Version:__",
                     value = """
-                    **- GoldyBot: ``{version}``
-                    - Nextcore: ``{nc_version}``
-                    - Python: ``{py_version}``**
+                    **- GoldyBot: [``{version}``](https://github.com/Goldy-Bot/Goldy-Bot-V5)
+                    - Nextcore: [``{nc_version}``](https://github.com/nextsnake/nextcore)
+                    - Python: [``{py_version}``](https://www.python.org/)**
                     """,
                     inline = True
                 )
             ],
-            colour = Colours.YELLOW,
+            footer = GoldyBot.EmbedFooter("TODO: GIVE THIS COMMAND A MAKEOVER!!!! 🤬"),
+            colour = Colours.BLACK,
             thumbnail = GoldyBot.EmbedImage(self.goldy.bot_user.avatar_url)
         )
 
     @GoldyBot.command(
-        name="goldy", 
-        description = "💛 Shows you stats about the current Goldy Bot framework instance.", 
-        required_perms = [GoldyBot.Perms.BOT_DEV], # Umm, should we make this command available to bot admins too.
+        description = "🖤 Command for debugging the goldy bot framework.", 
+        required_perms = [GoldyBot.Perms.BOT_DEV],
         hidden = True
     )
-    async def goldy_cmd(self, platter: GoldyBot.GoldPlatter):
-        embed = self.goldy_embed.copy()
+    async def debug(self, platter: GoldyBot.GoldPlatter):
+        embed = self.debug_embed.copy()
 
         embed.format_fields(
             version = GoldyBot.info.VERSION,
@@ -73,6 +71,4 @@ class Goldy(GoldyBot.Extension):
 
         await platter.send_message(embeds=[embed], reply=True)
 
-
-def load():
-    Goldy()
+load = lambda: Debug()

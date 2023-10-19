@@ -50,7 +50,7 @@ class Presence():
 
         self.shard_manager = self.goldy.shard_manager
 
-    async def change(self, status:Status|str = None, activity:Activity = None, afk:bool = None) -> None:
+    async def change(self, status: Status | str = None, activity: Activity = None, afk: bool = None) -> None:
         """Updates the presence of Goldy Bot. Like e.g ``online, idle, dnd``."""
         self.logger.debug("Changing presence...")
 
@@ -67,7 +67,7 @@ class Presence():
             else:
                 # TODO: Let's remove this.
                 raise InvalidTypeInMethod("status in 'presence.change()' has to be either Status enum or string.")
-        
+
         if activity is not None:
             presence["activities"] = [
                 PartialActivityData(
@@ -76,7 +76,7 @@ class Presence():
                     url=activity.url
                 )
             ]
-                
+  
         if afk is not None:
             presence["afk"] = afk
 

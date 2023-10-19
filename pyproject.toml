@@ -33,9 +33,9 @@ dependencies = [
     "regex",
     "psutil",
     "dateparser",
-    "pytz",
     "toml",
-    "colorthief"
+    "colorthief",
+    "get-annotations"
 ]
 
 dynamic = ["version"]

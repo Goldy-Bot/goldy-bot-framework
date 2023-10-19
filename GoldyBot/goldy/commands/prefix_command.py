@@ -112,6 +112,8 @@ class PrefixCommand(Command):
                         data = data, 
                         author = platter.author,
                         invokable = command,
+                        goldy = command.goldy,
+                        logger = command.logger
                     )
 
                     await command.invoke(platter)
