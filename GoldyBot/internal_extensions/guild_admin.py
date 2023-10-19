@@ -58,29 +58,28 @@ class GuildAdmin(GoldyBot.Extension):
         guild_config = await platter.guild.config
         extension: GoldyBot.Extension = cache_lookup(extension, extensions_cache)[1]
 
-        if extension.name in guild_config.allowed_extensions or guild_config.allowed_extensions == []:
-            if extension.name not in guild_config.disallowed_extensions and not guild_config.disallowed_extensions == ["."]:
-                await platter.send_message(embeds = [self.extension_already_enabled], hide = True)
-                return
+        is_allowed = await platter.guild.is_extension_allowed(extension)
 
-        disallowed = guild_config.disallowed_extensions
-        if extension.name in disallowed:
-            disallowed.remove(extension.name)
+        if is_allowed:
+            await platter.send_message(embeds = [self.extension_already_enabled], hide = True)
+            return
 
-            await guild_config.push({
-                "extensions": {
-                    "disallowed": disallowed
-                }
-            })
-
-        await guild_config.push({
+        data = {
             "extensions": {
-                "allowed": guild_config.allowed_extensions + [extension.name]
+                "allowed": guild_config.allowed_extensions + [extension.name],
+                "disallowed": []
             }
-        })
+        }
+
+        for disallowed_extension in guild_config.disallowed_extensions:
+            if extension.name.lower() == disallowed_extension.lower():
+                continue
+
+            data["extensions"]["disallowed"].append(disallowed_extension)
+
+        await guild_config.push(data)
 
         embed = self.extension_enabled.copy()
-
         embed.format_description(
             extension_name = extension.name,
             extension_url = extension.metadata.url if extension.metadata is not None else info.GITHUB_REPO
@@ -100,29 +99,28 @@ class GuildAdmin(GoldyBot.Extension):
         guild_config = await platter.guild.config
         extension: GoldyBot.Extension = cache_lookup(extension, extensions_cache)[1]
 
-        if extension.name in guild_config.disallowed_extensions or guild_config.disallowed_extensions == ["."]:
-            if extension.name not in guild_config.allowed_extensions:
-                await platter.send_message(embeds = [self.extension_already_disabled], hide = True)
-                return
+        is_allowed = await platter.guild.is_extension_allowed(extension)
 
-        allowed = guild_config.allowed_extensions
-        if extension.name in allowed:
-            allowed.remove(extension.name)
+        if is_allowed is False:
+            await platter.send_message(embeds = [self.extension_already_disabled], hide = True)
+            return
 
-            await guild_config.push({
-                "extensions": {
-                    "allowed": allowed
-                }
-            })
-
-        await guild_config.push({
+        data = {
             "extensions": {
-                "disallowed": guild_config.disallowed_extensions + [extension.name]
+                "disallowed": guild_config.disallowed_extensions + [extension.name],
+                "allowed": []
             }
-        })
+        }
+
+        for allowed_extension in guild_config.allowed_extensions:
+            if extension.name.lower() == allowed_extension.lower():
+                continue
+
+            data["extensions"]["allowed"].append(allowed_extension)
+
+        await guild_config.push(data)
 
         embed = self.extension_disabled.copy()
-
         embed.format_description(
             extension_name = extension.name,
             extension_url = extension.metadata.url if extension.metadata is not None else info.GITHUB_REPO

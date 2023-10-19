@@ -42,7 +42,7 @@ class Guild(DictClass):
     async def is_extension_allowed(self, extension: Extension) -> bool:
         """Returns True/False if this extension is allowed to function in this guild."""
         guild_config = await self.config
-        disallowed_extensions = [ext.lower() for ext in guild_config.disallowed_extensions]
+        disallowed_extensions = [extension.lower() for extension in guild_config.disallowed_extensions]
 
         if extension.name.lower() in ["debug", "guildadmin"]: # These extensions are always allowed.
             return True
@@ -60,7 +60,7 @@ class Guild(DictClass):
     async def do_extension_restrictions_pass(self, extension: Extension, platter: objects.GoldPlatter) -> bool:
         """Checks if extension's restrictions pass."""
         guild_config = await self.config
-        extension_restriction = guild_config.get("extensions", "restrictions", extension.name)
+        extension_restriction = guild_config.get("extensions", "restrictions", extension.name, optional = True)
 
         if extension_restriction is not None:
             role = guild_config.roles.get(extension_restriction)

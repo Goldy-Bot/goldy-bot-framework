@@ -8,7 +8,7 @@ if TYPE_CHECKING:
 
 __all__ = ("cache_lookup",)
 
-def cache_lookup(key: str, cache: Dict[str, Tuple[str, T]] | List[Tuple[str, T]] | Set[Tuple[str, T]], cap_sensitive = True) -> T | None:
+def cache_lookup(key: str, cache: Dict[str, Tuple[str, T]] | List[Tuple[str, T]] | Set[Tuple[str, T]], cap_sensitive = True) -> Tuple[str, T] | None:
     """Finds and returns object using key from any goldy bot cache object."""
 
     if cap_sensitive is False:

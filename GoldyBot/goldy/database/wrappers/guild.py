@@ -75,23 +75,16 @@ class GuildDBWrapper(DatabaseWrapper):
 
         database = self.goldy.database.get_goldy_database(DatabaseEnums.GOLDY_MAIN)
 
-        # Setting up guild config.
-        # -------------------------
-        guild_config_template = self.guild_config_template.copy()
-        guild_config_template["_id"] = self.guild.id
-        guild_config_template["code_name"] = self.guild.code_name
-
         # Add guild to database.
         # -----------------------
-        #guild_config = await database.find_one("guild_configs", query = {"_id": self.guild.id})
+        guild_config = await database.find_one("guild_configs", query = {"_id": self.guild.id})
 
-        #if guild_config is None:
-        #    guild_config = guild_config_template
-        #    await database.insert("guild_configs", data = guild_config)
+        if guild_config is None:
+            guild_config_template = self.guild_config_template.copy()
+            guild_config_template["_id"] = self.guild.id
+            guild_config_template["code_name"] = self.guild.code_name
 
-        #else:
-        guild_config = await database.edit(
-            "guild_configs", query = {"_id": self.guild.id}, data = guild_config_template
-        )
+            guild_config = guild_config_template
+            await database.insert("guild_configs", data = guild_config)
 
         self.data = guild_config

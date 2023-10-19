@@ -6,6 +6,9 @@ if TYPE_CHECKING:
     from typing import List, Union
     from discord_typings import MessageData, InteractionData
 
+    from ... import Goldy
+    from logging import Logger
+
     from ..member import Member
     from ...guilds import Guild
     from ..message import Message
@@ -29,12 +32,21 @@ class GoldPlatter(Platter):
 
     ✨ Behold the golden platter. ✨😁
     """
-    def __init__(self, data: MessageData | InteractionData, author: Member, invokable: GOLD_PLATTER_INVOKABLE_TYPES) -> None:
+    def __init__(
+            self, 
+            data: MessageData | InteractionData, 
+            author: Member, 
+            invokable: GOLD_PLATTER_INVOKABLE_TYPES, 
+            goldy: Goldy, 
+            logger: Logger
+        ) -> None:
         # TODO: We got to somehow test this stuff with pytest because this being error prone is sort of a catastrophe.
         super().__init__(
             data = data, 
             invoker = author, 
-            invokable = invokable
+            invokable = invokable,
+            goldy = goldy,
+            logger = logger
         )
         self.data: MessageData | InteractionData
         self.invokable: GOLD_PLATTER_INVOKABLE_TYPES

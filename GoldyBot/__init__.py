@@ -42,3 +42,7 @@ from .goldy.objects import (
     Message,
     Member
 )
+
+# Events
+# -------
+from .goldy.events.event_types import *

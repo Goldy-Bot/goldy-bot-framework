@@ -68,7 +68,9 @@ class CommandListener():
                         gold_platter = GoldPlatter(
                             data = interaction, 
                             author = author,
-                            invokable = command[1]
+                            invokable = command[1],
+                            goldy = command[1].goldy,
+                            logger = command[1].logger
                         )
 
                         await gold_platter.guild.config_wrapper.update()
@@ -91,7 +93,9 @@ class CommandListener():
                     gold_platter = GoldPlatter(
                         data = interaction, 
                         author = author,
-                        invokable = message_component[1]
+                        invokable = message_component[1],
+                        goldy = message_component[1].goldy,
+                        logger = message_component[1].logger
                     )
 
                     await gold_platter.guild.config_wrapper.update()
@@ -127,6 +131,8 @@ class CommandListener():
                     data = message, 
                     author = objects.Member(message["author"], guild, self.goldy),
                     invokable = command[1],
+                    goldy = command[1].goldy,
+                    logger = command[1].logger
                 )
 
                 await gold_platter.guild.config_wrapper.update()

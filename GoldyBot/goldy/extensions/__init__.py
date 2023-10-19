@@ -90,13 +90,11 @@ class Extension():
     @property
     def is_disabled(self) -> bool:
         """Returns true/false whether the extension is disabled. An extension is considered disabled when all of it's commands are also disabled."""
-        if all([command.is_disabled for command in self.commands]):
+        if all([command.is_disabled for command in self.commands]) and len(self.commands) > 0:
             return True
 
-        # I hope this doesn't fuck with us in the future. :)
-
         return False
-    
+
     def disable(self) -> None:
         """A method to disable this extension."""
         self.logger.info("Disabling all commands in extension...")
@@ -105,7 +103,7 @@ class Extension():
             self.logger.debug(f"Disabled '{command.name}'.")
 
         return None
-    
+
     def enable(self) -> None:
         """A method to enable this extension."""
         self.logger.info("Enabling all commands in extension...")

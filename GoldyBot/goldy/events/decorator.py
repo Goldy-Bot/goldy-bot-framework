@@ -1,14 +1,16 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, get_args, Type
+from typing import TYPE_CHECKING, Type
+from typing_extensions import get_args
 
 if TYPE_CHECKING:
-    from ... import Extension
     from discord_typings.gateway import GenericDispatchEvent
 
 import inspect
 from ... import errors, utils
+from ..objects.member import Member
 from ..extensions import extensions_cache
 from .. import get_goldy_instance, goldy_bot_logger
+from ..objects.platter.golden_platter import GoldPlatter
 
 __all__ = ("event",)
 
@@ -45,7 +47,7 @@ def event(
                 event_param_annotations = get_args(event_param.annotation)
 
                 if len(event_param_annotations) > 0:
-                    event_type: Type[GenericDispatchEvent] = event_param_annotations[0]
+                    event_type: Type[GenericDispatchEvent] = event_param_annotations[1]
                     event_literal = get_args(get_args(event_type)[0])[0]
                     event_name = get_args(event_literal)[0]
 
@@ -58,12 +60,35 @@ def event(
 
             async def event_callback(event):
                 extension_name = str(func).split(" ")[1].split(".")[0]
-                extension = utils.cache_lookup(extension_name, extensions_cache)
+                extension = utils.cache_lookup(extension_name, extensions_cache)[1]
 
-                await func(extension, event)
+                logger = extension.logger
+                guild = goldy.guild_manager.get_guild(event["guild_id"])
+
+                if guild is not None:
+                    guild_config = await guild.config
+                    await guild_config.update()
+
+                    platter = GoldPlatter(
+                        event, 
+                        Member(event["author"], guild, goldy), 
+                        None, 
+                        goldy, 
+                        logger
+                    )
+
+                    if extension.is_disabled:
+                        return False
+
+                    if await platter.guild.is_extension_allowed(extension) is False:
+                        return False
+
+                    if await platter.guild.do_extension_restrictions_pass(extension, platter) is False:
+                        return False
+
+                    await func(extension, event)
 
             goldy.shard_manager.event_dispatcher.add_listener(event_callback, event_name)
-
             return func
 
         return inner(func)
