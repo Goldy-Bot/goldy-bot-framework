@@ -10,6 +10,7 @@ import sys
 import toml
 import pathlib
 import requests
+import subprocess
 import pkg_resources
 import importlib.util
 from packaging import version
@@ -41,18 +42,18 @@ class ExtensionLoader():
 
     def pull(self, extensions: List[str] = None, repo_json_url: str = "https://raw.githubusercontent.com/Goldy-Bot/goldybot.repo/main/repo.json") -> None:
         """
-        Pulls down the extensions that you specified from a repo into your extensions folder if they don't ready exists.
+        Pulls down the extensions that you specified from a repo into your extensions folder if they don't already exist.
         """
         if extensions is None:
             extensions = self.extensions_to_include
 
         extensions_folder_path = self.__find_external_extension_path()
-        
+
         self.logger.info("Getting goldy bot extensions repo...")
         repo_json_response = requests.get(repo_json_url)
         repo_json: Dict[str, dict] = repo_json_response.json()
 
-        extensions_to_pull: List[tuple] = []
+        extensions_to_pull: List[Tuple[str, str]] = []
 
         for extension in extensions:
 
@@ -76,6 +77,33 @@ class ExtensionLoader():
             with open(".gitattributes", "w") as file:
                 file.write("# Auto detect text files and perform LF normalization\n* text=auto")
 
+        # If there is an submodule extension that exists but hasn't been included delete it.
+        git_submodule_output = subprocess.check_output(
+            ["git", "submodule"], encoding = "utf+8"
+        )
+        submodule_extension_paths = [x[1:].split(" ")[1] for x in git_submodule_output.splitlines()]
+
+        if sys.platform == "win32": # IDK WHY THE FUCK THAT COMMAND ABOVE MAKES ME LOOSE COLOUR ON WINDOWS!!! AUGHHHHHHHHHHHH!
+            os.system("color")
+
+        for extension_path in submodule_extension_paths:
+            found = False
+            extension = extension_path.split("/")[-1]
+
+            for code_name, _ in extensions_to_pull:
+
+                if extension == code_name:
+                    found = True
+
+            if not found:
+                self.logger.warning(
+                    f"Removing the '{extension}' submodule extension as you've no longer included it..."
+                )
+
+                os.system(f"git rm {extensions_folder_path}{os.path.sep}{extension} -f")
+                self.logger.debug(f"git submodule '{extension}' removed.")
+
+        # actually pulling submodules
         for code_name, git_url in extensions_to_pull:
 
             if os.path.exists(f"{extensions_folder_path}{os.path.sep}{code_name}"):
