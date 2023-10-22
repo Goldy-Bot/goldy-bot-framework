@@ -66,9 +66,6 @@ def event(
                 guild = goldy.guild_manager.get_guild(event["guild_id"])
 
                 if guild is not None:
-                    guild_config = await guild.config
-                    await guild_config.update()
-
                     platter = GoldPlatter(
                         event, 
                         Member(event["author"], guild, goldy), 

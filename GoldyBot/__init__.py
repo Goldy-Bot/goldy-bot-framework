@@ -3,7 +3,7 @@
 
 Copyright (C) 2023 - Goldy
 """
-from .logging import LoggerAdapter, log, goldy_bot_logger, LOGGER_NAME
+from .logging import log, goldy_bot_logger, LOGGER_NAME
 
 from .info import VERSION, __version__
 from .paths import Paths

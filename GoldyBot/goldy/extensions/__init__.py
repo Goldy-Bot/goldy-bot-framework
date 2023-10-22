@@ -1,11 +1,11 @@
 from __future__ import annotations
 
 import os
-from devgoldyutils import Colours
+from devgoldyutils import Colours, LoggerAdapter
 from typing import Tuple, List, TYPE_CHECKING
 
 from ...goldy import get_goldy_instance
-from ... import goldy_bot_logger, LoggerAdapter
+from ... import goldy_bot_logger
 
 if TYPE_CHECKING:
     from ... import Goldy

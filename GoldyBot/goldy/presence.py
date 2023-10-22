@@ -2,12 +2,12 @@ from __future__ import annotations
 
 from enum import Enum
 from dataclasses import dataclass, field
-from devgoldyutils import Colours
+from devgoldyutils import Colours, LoggerAdapter
 from discord_typings import PartialActivityData
 
 from . import Goldy
 from ..errors import InvalidTypeInMethod
-from .. import LoggerAdapter, goldy_bot_logger
+from .. import goldy_bot_logger
 
 class Status(Enum):
     """Goldy Bot enum class of discord status."""

@@ -5,8 +5,8 @@ import time
 import threading
 import _thread
 from typing import TYPE_CHECKING
-from devgoldyutils import Colours
-from ... import goldy_bot_logger, LoggerAdapter
+from devgoldyutils import Colours, LoggerAdapter
+from ... import goldy_bot_logger
 
 if TYPE_CHECKING:
     from .. import Goldy

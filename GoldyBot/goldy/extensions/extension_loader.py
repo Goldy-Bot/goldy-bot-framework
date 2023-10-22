@@ -14,12 +14,13 @@ import subprocess
 import pkg_resources
 import importlib.util
 from packaging import version
+from devgoldyutils import LoggerAdapter
 
 from ...paths import Paths
 from . import extensions_cache
 from .. import Goldy, GoldyBotError
 from .extension_metadata import ExtensionMetadata
-from ... import goldy_bot_logger, LoggerAdapter, __version__ as framework_version
+from ... import goldy_bot_logger, __version__ as framework_version
 
 class ExtensionLoader():
     """Class that handles extension loading and reloading."""
@@ -255,11 +256,11 @@ class ExtensionLoader():
                 dependency_name = dependency
                 dependency_version = dependency
 
-                for character in [">", "=", "^", "<"]:
+                for character in [">", "=", "^", "<", "@git+"]:
                     dependency_name = dependency_name.split(character)[0]
                     dependency_version = dependency_version.split(character)[-1]
 
-                dependency_version = None if dependency_version == dependency_name else dependency_version
+                dependency_version = None if dependency_version == dependency_name or "http" in dependency_version else dependency_version
 
                 if dependency_name == "GoldyBot": # Skip checking the goldy bot dependency.
 

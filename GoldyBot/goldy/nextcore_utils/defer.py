@@ -2,8 +2,9 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from nextcore.http import Route
+from devgoldyutils import LoggerAdapter
 
-from ... import LoggerAdapter, goldy_bot_logger
+from ... import goldy_bot_logger
 from ..commands import slash_command
 from ..recipes import Recipe
 

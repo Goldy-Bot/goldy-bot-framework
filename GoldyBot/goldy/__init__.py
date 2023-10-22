@@ -13,9 +13,9 @@ from nextcore.gateway import ShardManager
 
 from typing import Dict, Any, TYPE_CHECKING, Tuple, Set
 from discord_typings import UpdatePresenceData, PartialActivityData, ApplicationData
-from devgoldyutils import Colours
+from devgoldyutils import Colours, LoggerAdapter
 
-from .. import LoggerAdapter, goldy_bot_logger
+from .. import goldy_bot_logger
 from ..errors import GoldyBotError
 from ..info import VERSION, COPYRIGHT
 from ..paths import Paths
