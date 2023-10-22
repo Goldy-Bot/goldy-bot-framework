@@ -1,4 +1,9 @@
 from __future__ import annotations
+from typing import TYPE_CHECKING, overload
+
+if TYPE_CHECKING:
+    from . import Extension
+    from typing import List, Dict, Tuple
 
 import os
 import sys
@@ -6,17 +11,14 @@ import toml
 import pathlib
 import requests
 import pkg_resources
-from typing import List, overload, TYPE_CHECKING, Dict, Tuple
 import importlib.util
+from packaging import version
 
-from .. import Goldy, GoldyBotError
-from ... import goldy_bot_logger, LoggerAdapter
 from ...paths import Paths
 from . import extensions_cache
+from .. import Goldy, GoldyBotError
 from .extension_metadata import ExtensionMetadata
-
-if TYPE_CHECKING:
-    from . import Extension
+from ... import goldy_bot_logger, LoggerAdapter, __version__ as framework_version
 
 class ExtensionLoader():
     """Class that handles extension loading and reloading."""
@@ -100,8 +102,6 @@ class ExtensionLoader():
         """Loads each extension in this list of paths. If extension_paths is kept none, goldy bot will search for extensions to load itself."""
         if extension_paths is None:
             extension_paths = self.__find_all_paths()
-
-        # self.check_dependencies() # TODO: Add method that checks dependencies from pyproject.toml and installs them if they are missing.
 
         for path in extension_paths:
             # Specify and get the module.
@@ -224,18 +224,32 @@ class ExtensionLoader():
                 )
 
             for dependency in extension_metadata.dependencies:
-                dependency_with_install_operations = dependency
+                dependency_name = dependency
+                dependency_version = dependency
 
                 for character in [">", "=", "^", "<"]:
-                    dependency = dependency.split(character)[0]
+                    dependency_name = dependency_name.split(character)[0]
+                    dependency_version = dependency_version.split(character)[-1]
 
-                if dependency.lower() not in self.__installed_dependencies:
-                    self.logger.warning(f"Missing dependency '{dependency}'.")
+                dependency_version = None if dependency_version == dependency_name else dependency_version
+
+                if dependency_name == "GoldyBot": # Skip checking the goldy bot dependency.
+
+                    if dependency_version is not None and version.parse(dependency_version) > version.parse(framework_version):
+                        raise GoldyBotError(
+                            f"Extension is expecting a newer version ({dependency_version}) of the Goldy Bot Framework. " \
+                                f"We are currently running '{framework_version}'."
+                        )
+
+                    continue
+
+                if dependency_name.lower() not in self.__installed_dependencies:
+                    self.logger.warning(f"Missing dependency '{dependency_name}'.")
                     missing_dependencies.append(
-                        (dependency, dependency_with_install_operations)
+                        (dependency_name, dependency)
                     )
                 else:
-                    self.logger.debug(f"'{dependency}' dependency found.")
+                    self.logger.debug(f"'{dependency_name}' dependency found.")
 
         return missing_dependencies
     

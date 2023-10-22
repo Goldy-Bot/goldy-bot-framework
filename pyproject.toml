@@ -35,7 +35,8 @@ dependencies = [
     "dateparser",
     "toml",
     "colorthief",
-    "get-annotations"
+    "get-annotations",
+    "packaging"
 ]
 
 dynamic = ["version"]
