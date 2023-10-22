@@ -122,6 +122,22 @@ You may also want to add your discord member id to ``"bot_dev"``, like so: ``"bo
 ```sh
 python run.py
 ```
+and you're done ✨
+
+### Pulling Extensions
+As of Goldy Bot ``v5.0dev12``, extensions are no longer pre-included due to this [issue](https://github.com/Goldy-Bot/Goldy-Bot-Framework/issues/105).
+
+So now if you would like to include them you would need to specify it in the config with ``include`` like so:
+```json
+{
+    "goldy" : {
+        "extensions": {
+            "include": ["mal_cord"]
+        }
+    }
+}
+```
+and you can find the extension code names at the [goldybot.repo](https://github.com/Goldy-Bot/goldybot.repo) github repository.
 
 <br>
 
