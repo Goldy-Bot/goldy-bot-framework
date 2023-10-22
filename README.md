@@ -94,20 +94,27 @@ If your guild/server is not a testing server you may name it whatever you like b
 You may also want to add your discord member id to ``"bot_dev"``, like so: ``"bot_dev": "332592361307897856"``. If you don't you may be unable to run specific bot administration commands within Discord.
 ```json
 {
+    "version": 1,
     "goldy" : {
+        "branding": {
+            "name": "💛 Goldy Bot"
+        },
         "extensions": {
+            "include": [],
+
             "ignored_extensions" : [],
+            "late_load_extensions": [],
 
             "raise_on_load_error" : true,
             "folder_location" : "./extensions"
         },
-
         "allowed_guilds" : {
             "{guild_id_here}" : "test_server"
-        }
-    },
+        },
 
-    "bot_dev": null
+        "bot_dev": null,
+        "ding_on_exit": false
+    }
 }
 ```
 
