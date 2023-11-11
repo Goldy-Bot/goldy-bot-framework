@@ -41,18 +41,29 @@ class ExtensionLoader():
 
         self.__installed_dependencies = {pkg.key for pkg in pkg_resources.working_set}
 
-    def pull(self, extensions: List[str] = None, repo_json_url: str = "https://raw.githubusercontent.com/Goldy-Bot/goldybot.repo/main/repo.json") -> None:
+    def pull(self, extensions: List[str] = None, repos: List[str] = None) -> None:
         """
         Pulls down the extensions that you specified from a repo into your extensions folder if they don't already exist.
         """
         if extensions is None:
             extensions = self.extensions_to_include
 
+        if repos is None:
+            repos = ["https://raw.githubusercontent.com/Goldy-Bot/goldybot.repo/main/repo.json"] + self.goldy.config.extension_repos
+
         extensions_folder_path = self.__find_external_extension_path()
 
         self.logger.info("Getting goldy bot extensions repo...")
-        repo_json_response = requests.get(repo_json_url)
-        repo_json: Dict[str, dict] = repo_json_response.json()
+        repo_json: Dict[str, Dict[str, str]] = {}
+
+        for repo_url in repos:
+            self.logger.debug(f"Making request to repo at '{repo_url}'...")
+            r = requests.get(repo_url)
+
+            if r.ok:
+                repo_json = {**repo_json, **r.json()}
+            else:
+                self.logger.error(f"Failed to get repo! Extensions in that repo will not be pulled! \nResponse: {r}")
 
         extensions_to_pull: List[Tuple[str, str]] = []
 
@@ -60,9 +71,9 @@ class ExtensionLoader():
 
             for repo_extension in repo_json.values():
 
-                if extension.lower() in [x.lower() for x in repo_extension["ids"]]:
+                if extension.lower() == repo_extension["id"]:
                     self.logger.debug(f"Found {extension} in repo.")
-                    extensions_to_pull.append((repo_extension["ids"][0], repo_extension["git_url"]))
+                    extensions_to_pull.append((repo_extension["id"], repo_extension["git_url"]))
                     break
 
         if ".git" not in os.listdir("."):
@@ -79,6 +90,7 @@ class ExtensionLoader():
                 file.write("# Auto detect text files and perform LF normalization\n* text=auto")
 
         # If there is an submodule extension that exists but hasn't been included delete it.
+        # =====================================================================================
         git_submodule_output = subprocess.check_output(
             ["git", "submodule"], encoding = "utf+8"
         )
@@ -105,6 +117,7 @@ class ExtensionLoader():
                 self.logger.debug(f"git submodule '{extension}' removed.")
 
         # actually pulling submodules
+        # =============================
         for code_name, git_url in extensions_to_pull:
 
             if os.path.exists(f"{extensions_folder_path}{os.path.sep}{code_name}"):

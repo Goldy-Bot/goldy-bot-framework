@@ -30,6 +30,11 @@ class GoldyConfig(Config):
         return self.get("goldy", "extensions", "include", default = [])
 
     @property
+    def extension_repos(self) -> List[str]:
+        """Returns the repositories goldy bot should pull from."""
+        return self.get("goldy", "extensions", "repos", default = [])
+
+    @property
     def ignored_extensions(self) -> List[str]:
         """Returns code name of all ignored extensions from ``goldy.json``."""
         return self.get("goldy", "extensions", "ignored_extensions", default = [])
