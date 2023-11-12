@@ -77,6 +77,8 @@ def event(
                     if extension.is_disabled:
                         return False
 
+                    await guild.config_wrapper.update()
+
                     if await guild.is_extension_allowed(extension) is False:
                         return False
 
