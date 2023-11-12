@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 import sys
-import time
-import pygame
 import asyncio
+import playsound
+from pathlib import Path
 from datetime import datetime
 
 from nextcore.http.client import HTTPClient
@@ -247,9 +247,7 @@ class Goldy():
         self.async_loop.stop()
 
         if self.config.ding_on_exit:
-            pygame.mixer.init()
-            pygame.mixer.Sound(Paths.ASSETS + "/ding.mp3").play()
-            time.sleep(0.5)
+            playsound.playsound(Path(Paths.ASSETS + "/ding.wav"), False)
 
 
 # Get goldy instance method.
