@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import sys
+import time
 import asyncio
 import playsound
 from pathlib import Path
@@ -248,6 +249,7 @@ class Goldy():
 
         if self.config.ding_on_exit:
             playsound.playsound(Path(Paths.ASSETS + "/ding.wav"), False)
+            time.sleep(0.5)
 
 
 # Get goldy instance method.
