@@ -77,10 +77,10 @@ def event(
                     if extension.is_disabled:
                         return False
 
-                    if await platter.guild.is_extension_allowed(extension) is False:
+                    if await guild.is_extension_allowed(extension) is False:
                         return False
 
-                    if await platter.guild.do_extension_restrictions_pass(extension, platter) is False:
+                    if await guild.do_extension_restrictions_pass(extension, platter) is False:
                         return False
 
                     await func(extension, event)
