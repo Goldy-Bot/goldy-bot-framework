@@ -158,6 +158,13 @@ class ExtensionLoader():
 
             # Run module and load function.
             try:
+
+                # Fix for https://github.com/Goldy-Bot/Goldy-Bot-Framework/issues/92
+                for module_name in sys.modules.copy():
+                    if module_py.__name__ in module_name:
+                        del sys.modules[module_name]
+                        self.logger.debug(f"Deleted previous import for this extension. >> ({module_name})")
+
                 # For some reason if I don't do this shit blows up. (extensions won't be able to import modules in it's own directories)
                 sys.modules[module_py.__name__] = module_py
 
