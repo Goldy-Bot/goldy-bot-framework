@@ -18,7 +18,9 @@ jobs:
           python-version: ${{ matrix.python-version }}
 
       - name: Preparing Linux environment
-        run: sudo apt-get install python-gst-1.0 gir1.2-gstreamer-1.0 gstreamer1.0-tools gir1.2-gst-plugins-base-1.0 gstreamer1.0-plugins-good gstreamer1.0-plugins-ugly    
+        run: | 
+          sudo apt update
+          sudo apt-get install python-gst-1.0 gir1.2-gstreamer-1.0 gstreamer1.0-tools gir1.2-gst-plugins-base-1.0 gstreamer1.0-plugins-good gstreamer1.0-plugins-ugly    
 
       - name: Install dependencies
         run: |
