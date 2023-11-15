@@ -134,7 +134,7 @@ class ExtensionLoader():
     def load(self) -> None:
         """Loads all extensions goldy bot can find. Basically lets goldy bot search for extensions herself because your a lazy brat."""
         ...
-    
+
     @overload
     def load(self, extension_paths: List[str]) -> None:
         """Loads each extension in this list of paths."""
