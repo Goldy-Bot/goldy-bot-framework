@@ -6,6 +6,7 @@ import asyncio
 import playsound
 from pathlib import Path
 from datetime import datetime
+from audioplayer import AudioPlayer
 
 from nextcore.http.client import HTTPClient
 
@@ -248,8 +249,7 @@ class Goldy():
         self.async_loop.stop()
 
         if self.config.ding_on_exit:
-            playsound.playsound(Path(Paths.ASSETS + "/ding.wav"), False)
-            time.sleep(0.5)
+            AudioPlayer(Paths.ASSETS + "/ding.wav").play(block = True)
 
 
 # Get goldy instance method.

@@ -30,14 +30,14 @@ dependencies = [
     "python-decouple>=3.7",
     "motor",
     "cmd2",
-    "playsound",
     "regex",
     "psutil",
     "dateparser",
     "toml",
     "colorthief",
     "get-annotations",
-    "packaging"
+    "packaging",
+    "audioplayer"
 ]
 
 dynamic = ["version"]
