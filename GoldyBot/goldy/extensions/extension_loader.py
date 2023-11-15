@@ -189,7 +189,7 @@ class ExtensionLoader():
                     error_str = \
                         f"We encountered an error while trying to load the extension at '{'/'.join(path.split(os.path.sep)[-2:])}'! " \
                         f"\nERROR --> {e}"
-                
+
                 if self.raise_on_load_error:
                     raise GoldyBotError(error_str)
                 else:
