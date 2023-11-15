@@ -4,11 +4,11 @@ from click import Context
 
 from . import goldy_bot, goldy_bot_logger
 from ..paths import Paths
-from ..file_templates import FileTemplates
+from .file_templates import FileTemplates
 
-@goldy_bot.group(invoke_without_command=True)
+@goldy_bot.group(invoke_without_command = True)
 @click.pass_context
-def setup(ctx:Context):
+def setup(ctx: Context):
     """Creates a goldy bot environment in the directory your currently in for you to run your bot from."""
     goldy_bot_logger.info("Creating template and environment...")
 
@@ -44,8 +44,3 @@ def normal():
         goldy_bot_logger.debug("The 'extensions' folder already exists so I'm not creating it.")
 
     os.system("git init")
-
-@setup.command()
-def demo():
-    goldy_bot_logger.info("Demo template coming soon...")
-    ...
