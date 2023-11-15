@@ -1,10 +1,7 @@
 from __future__ import annotations
 
 import sys
-import time
 import asyncio
-import playsound
-from pathlib import Path
 from datetime import datetime
 from audioplayer import AudioPlayer
 
