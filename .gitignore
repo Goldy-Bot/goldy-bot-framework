@@ -10,8 +10,3 @@ __pycache__
 .ruff_cache
 
 demo/*
-!demo/run.py
-!demo/cli_demo.py
-
-demo-docker/*
-!demo-docker/.gitkeep
