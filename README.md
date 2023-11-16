@@ -11,7 +11,7 @@
   
 </div>
 
-> **Warning**
+> [!WARNING]
 > 
 > *GoldyBot is in very deep development right now so some utils and code will be incomplete and breaking changes will occur.*
 
@@ -52,11 +52,11 @@ On a similar note goldy bot v5 is currently in an ALWAYS changing state, previou
 
 These instructions assume you have a [MongoDB database](https://www.mongodb.com/), [Git](https://git-scm.com/) and [Python](https://www.python.org/) installed.
 
-> **Warning**
+> [!WARNING]
 > 
 > As of Goldy Bot ``v5.0dev12`` [Git](https://git-scm.com/) is required or else included extensions will **not** function.
 
-> **Note**
+> [!NOTE]
 > 
 > We recommend a clean Mongo database, GoldyBot will connect to your MongoDB database and create stuff the first time you run.
 
