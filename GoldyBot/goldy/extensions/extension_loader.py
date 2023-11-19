@@ -3,7 +3,10 @@ from typing import TYPE_CHECKING, overload
 
 if TYPE_CHECKING:
     from . import Extension
-    from typing import List, Dict, Tuple
+    from typing import List, Dict, Tuple, TypedDict
+
+    EXTENSION_REPO_DATA = TypedDict("EXTENSION_REPO_DATA", {"id": str, "git_url": str})
+    V1_REPO_DATA = TypedDict("V1_REPO_DATA", {"version": int, "extensions": List[EXTENSION_REPO_DATA]})
 
 import os
 import sys
@@ -14,6 +17,7 @@ import subprocess
 import pkg_resources
 import importlib.util
 from packaging import version
+from urllib.parse import urlparse
 from devgoldyutils import LoggerAdapter
 
 from ...paths import Paths
@@ -48,19 +52,25 @@ class ExtensionLoader():
         extensions = self.extensions_to_include
 
         if repos is None:
-            repos = ["https://raw.githubusercontent.com/Goldy-Bot/goldybot.repo/main/repo.json"] + self.goldy.config.extension_repos
+            repos = ["https://github.com/Goldy-Bot/goldybot.repo"] + self.goldy.config.extension_repos
 
         extensions_folder_path = self.__find_external_extension_path()
 
         self.logger.info("Getting goldy bot extensions repo...")
-        repo_json: Dict[str, Dict[str, str]] = {}
+        repo_extensions: List[EXTENSION_REPO_DATA] = []
 
         for repo_url in repos:
+            phrased_url = urlparse(repo_url)
+
+            if "github.com" in phrased_url.netloc:
+                repo_url = "https://raw.githubusercontent.com" + phrased_url.path + "/main/repo.json"
+
             self.logger.debug(f"Making request to repo at '{repo_url}'...")
             r = requests.get(repo_url)
 
             if r.ok:
-                repo_json = {**repo_json, **r.json()}
+                repo_json: V1_REPO_DATA = r.json()
+                repo_extensions += repo_json["extensions"]
             else:
                 self.logger.error(f"Failed to get repo! Extensions in that repo will not be pulled! \nResponse: {r}")
 
@@ -68,7 +78,7 @@ class ExtensionLoader():
 
         for extension in extensions:
 
-            for repo_extension in repo_json.values():
+            for repo_extension in repo_extensions:
 
                 if extension.lower() == repo_extension["id"]:
                     self.logger.debug(f"Found {extension} in repo.")
