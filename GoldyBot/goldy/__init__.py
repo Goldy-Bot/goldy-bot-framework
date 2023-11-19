@@ -3,7 +3,6 @@ from __future__ import annotations
 import sys
 import asyncio
 from datetime import datetime
-from audioplayer import AudioPlayer
 
 from nextcore.http.client import HTTPClient
 
@@ -17,7 +16,6 @@ from devgoldyutils import Colours, LoggerAdapter
 from .. import goldy_bot_logger
 from ..errors import GoldyBotError
 from ..info import VERSION, COPYRIGHT
-from ..paths import Paths
 
 from .token import Token
 
@@ -244,9 +242,6 @@ class Goldy():
     
         self.logger.debug("Closing async_loop...")
         self.async_loop.stop()
-
-        if self.config.ding_on_exit:
-            AudioPlayer(Paths.ASSETS + "/ding.wav").play(block = True)
 
 
 # Get goldy instance method.

@@ -18,7 +18,6 @@
             "{guild_id_here}" : "test_server"
         },
 
-        "bot_dev": null,
-        "ding_on_exit": false
+        "bot_dev": null
     }
 }

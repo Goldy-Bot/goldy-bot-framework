@@ -36,8 +36,7 @@ dependencies = [
     "toml",
     "colorthief",
     "get-annotations",
-    "packaging",
-    "audioplayer"
+    "packaging"
 ]
 
 dynamic = ["version"]

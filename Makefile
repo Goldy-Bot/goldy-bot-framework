@@ -7,9 +7,6 @@ install:
 install-editable:
 	pip install -e . --config-settings editable_mode=compat
 
-run:
-	cd demo && python run.py
-
 test:
 	ruff .
 	cd tests && pytest -v
