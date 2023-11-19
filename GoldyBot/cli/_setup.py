@@ -1,29 +1,16 @@
-from __future__ import annotations
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from click import Context
-
 import os
-import click
 from ..paths import Paths
 from .file_templates import FileTemplates
 
 from . import goldy_bot, goldy_bot_logger
 
-@goldy_bot.group(invoke_without_command = True)
-@click.pass_context
-def setup(ctx: Context):
+__all__ = ("setup",)
+
+@goldy_bot.command()
+def setup():
     """Creates a goldy bot environment in the directory your currently in for you to run your bot from."""
     goldy_bot_logger.info("Creating template and environment...")
 
-    if ctx.invoked_subcommand is not None:
-        pass
-    else:
-        normal.invoke(ctx)
-
-@setup.command()
-def normal():
     file_templates = FileTemplates([
         Paths.GOLDY_JSON_TEMPLATE,
         Paths.RUN_SCRIPT_TEMPLATE,

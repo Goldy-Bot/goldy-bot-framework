@@ -41,12 +41,11 @@ class ExtensionLoader():
 
         self.__installed_dependencies = {pkg.key for pkg in pkg_resources.working_set}
 
-    def pull(self, extensions: List[str] = None, repos: List[str] = None) -> None:
+    def pull(self, repos: List[str] = None) -> None:
         """
         Pulls down the extensions that you specified from a repo into your extensions folder if they don't already exist.
         """
-        if extensions is None:
-            extensions = self.extensions_to_include
+        extensions = self.extensions_to_include
 
         if repos is None:
             repos = ["https://raw.githubusercontent.com/Goldy-Bot/goldybot.repo/main/repo.json"] + self.goldy.config.extension_repos

@@ -33,15 +33,16 @@ cache: Dict[str, Any] = {
 
 class Goldy():
     """The main Goldy Bot class that controls the whole framework and let's you start an instance of Goldy Bot. Also known as the core."""
-    def __init__(self, token:Token = None, raise_on_extension_loader_error = None):
+    def __init__(self, token: Token = None, raise_on_extension_loader_error = None, display_copyright = True):
         self.token = token
         self.logger = LoggerAdapter(goldy_bot_logger, Colours.ORANGE.apply_to_string("Goldy"))
         self.async_loop = asyncio.get_event_loop()
 
         # Boot title and copyright stuff.
-        print(
-            f" {Colours.YELLOW.apply_to_string('Goldy')} {Colours.ORANGE.apply_to_string('Bot')} ({Colours.BLUE.apply_to_string(VERSION)}) - {Colours.PINK_GREY.apply_to_string(COPYRIGHT)}\n"
-        )
+        if display_copyright is True:
+            print(
+                f" {Colours.YELLOW.apply_to_string('Goldy')} {Colours.ORANGE.apply_to_string('Bot')} ({Colours.BLUE.apply_to_string(VERSION)}) - {Colours.PINK_GREY.apply_to_string(COPYRIGHT)}\n"
+            )
 
         # Initializing stuff
         # -------------------
