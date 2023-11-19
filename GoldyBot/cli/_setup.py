@@ -1,10 +1,15 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from click import Context
+
 import os
 import click
-from click import Context
-
-from . import goldy_bot, goldy_bot_logger
 from ..paths import Paths
 from .file_templates import FileTemplates
+
+from . import goldy_bot, goldy_bot_logger
 
 @goldy_bot.group(invoke_without_command = True)
 @click.pass_context
