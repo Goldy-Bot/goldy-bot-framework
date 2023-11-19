@@ -31,7 +31,7 @@ def add(ctx: Context, extensions: Tuple[str]):
 
     goldy_bot_logger.info("Adding the extension(s)...")
 
-    goldy_json_file = open("./goldy.json", mode = "r+")
+    goldy_json_file = open("./goldy.json", mode = "r+", encoding = "utf+8")
     goldy_config = json.load(goldy_json_file)
 
     for extension in extensions:
@@ -42,7 +42,7 @@ def add(ctx: Context, extensions: Tuple[str]):
             goldy_bot_logger.warning(f"'{extension}' is already included.")
 
     goldy_json_file.seek(0)
-    json.dump(goldy_config, goldy_json_file, indent = 4)
+    json.dump(goldy_config, goldy_json_file, indent = 4, ensure_ascii = False)
     goldy_json_file.close()
 
     goldy_bot_logger.info("Edited config.")
