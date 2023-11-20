@@ -66,7 +66,7 @@ class Goldy():
             http_client = self.http_client,
 
             presence = UpdatePresenceData(
-                activities = [PartialActivityData(name=f"{self.config.branding_name} (v{VERSION})", type=ActivityTypes.PLAYING_GAME.value)],
+                activities = [PartialActivityData(name=f"v{VERSION}", type=ActivityTypes.PLAYING_GAME.value)],
                 since = None,
                 status = Status.ONLINE.value,
                 afk = False
