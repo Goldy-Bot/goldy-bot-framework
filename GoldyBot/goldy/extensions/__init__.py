@@ -57,7 +57,7 @@ class Extension():
 
         ]
 
-        self.__loaded_path = os.path.realpath(self.__class__.__module__.split(".")[0]) + ".py"
+        self.__loaded_path = os.path.realpath(self.__class__.__module__.split("__init__.")[0]) + ".py"
         self.__metadata = self.goldy.extension_loader.phrase_pyproject(self.__loaded_path)
 
         if self.name.lower() in [extension.lower() for extension in self.goldy.config.ignored_extensions]:

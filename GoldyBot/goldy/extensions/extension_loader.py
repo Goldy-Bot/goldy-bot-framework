@@ -170,7 +170,18 @@ class ExtensionLoader():
 
                 # Fix for https://github.com/Goldy-Bot/Goldy-Bot-Framework/issues/92
                 for module_name in sys.modules.copy():
-                    if module_py.__name__ in module_name:
+                    if f"{os.sep}extensions" in module_name:
+
+                        if module_py.__name__ in module_name.split(f"{os.sep}extensions")[1]:
+                            del sys.modules[module_name]
+                            self.logger.debug(f"Deleted previous import for this extension. >> ({module_name})")
+
+                    elif f"{os.sep}internal_extensions" in module_name:
+                        if module_py.__name__ in module_name.split(f"{os.sep}internal_extensions")[1]:
+                            del sys.modules[module_name]
+                            self.logger.debug(f"Deleted previous import for this extension. >> ({module_name})")
+
+                    elif module_py.__name__ in module_name:
                         del sys.modules[module_name]
                         self.logger.debug(f"Deleted previous import for this extension. >> ({module_name})")
 

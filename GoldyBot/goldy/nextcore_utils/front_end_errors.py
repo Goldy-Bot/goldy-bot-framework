@@ -23,7 +23,7 @@ class FrontEndErrors(errors.GoldyBotError):
             delete_after = 8,
             logger: log.Logger = None
         ):
-        from  ..commands import slash_command
+        from ..commands import slash_command
 
         platter.goldy.async_loop.create_task(
             platter.send_message(
