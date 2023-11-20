@@ -72,7 +72,7 @@ Create a directory of your choice anywhere, then open a terminal in that directo
 ```sh
 # Windows/Linux
 
-goldybot setup normal
+goldybot setup
 ```
 
 3. **Run goldy!** ⚡
