@@ -5,3 +5,4 @@ from ._dict import *
 from .strings import *
 from .human_datetime import *
 from .value_check import *
+from .url import *

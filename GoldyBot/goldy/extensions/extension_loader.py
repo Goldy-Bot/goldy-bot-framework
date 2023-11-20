@@ -20,6 +20,7 @@ from packaging import version
 from urllib.parse import urlparse
 from devgoldyutils import LoggerAdapter
 
+from ... import utils
 from ...paths import Paths
 from . import extensions_cache
 from .. import Goldy, GoldyBotError
@@ -63,7 +64,7 @@ class ExtensionLoader():
             phrased_url = urlparse(repo_url)
 
             if "github.com" in phrased_url.netloc:
-                repo_url = "https://raw.githubusercontent.com" + phrased_url.path + "/main/repo.json"
+                repo_url = utils.get_github_file(phrased_url, "main", "repo.json")
 
             self.logger.debug(f"Making request to repo at '{repo_url}'...")
             r = requests.get(repo_url)
