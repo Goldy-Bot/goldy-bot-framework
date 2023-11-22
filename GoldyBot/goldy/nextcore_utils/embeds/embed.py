@@ -3,6 +3,7 @@ from typing import List
 from discord_typings import EmbedData, EmbedFieldData, EmbedImageData, EmbedFooterData, EmbedAuthorData
 
 import copy
+import random
 from ..colours import Colours
 from .... import utils
 
@@ -206,6 +207,17 @@ class Embed(dict):
 
         for index, field in enumerate(data["fields"]):
             data["fields"][index]["value"] = field["value"].format(**keys)
+
+        self.update(data)
+
+    def set_random_footer(self, messages: List[str]) -> None:
+        """
+        Method that will randomly choose to display one of those messages in the footer; it can also choose to not display anything.
+        """
+        data: EmbedData = dict(self)
+
+        if random.randint(0, 4) == 0:
+            data["footer"] = {"text": random.choice(messages)}
 
         self.update(data)
 
