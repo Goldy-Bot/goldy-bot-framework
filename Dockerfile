@@ -7,6 +7,7 @@ COPY pyproject.toml .
 COPY docker_stuff .
 
 RUN pip install .
+RUN apt-get update && apt-get install -y git
 
 ENV DOCKER true
 
