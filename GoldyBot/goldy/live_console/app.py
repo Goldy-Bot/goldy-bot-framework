@@ -1,10 +1,10 @@
 from __future__ import annotations
 
 import cmd2
-from typing import TYPE_CHECKING, Tuple
+from typing import TYPE_CHECKING
 
-from ... import log, utils
-from ..extensions import extensions_cache, Extension
+from ... import log
+#from ..extensions import extensions_cache, Extension
 
 if TYPE_CHECKING:
     from ... import Goldy
