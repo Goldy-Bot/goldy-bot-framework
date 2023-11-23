@@ -23,7 +23,7 @@ class FrontEndErrors(errors.GoldyBotError):
             delete_after = 8,
             logger: log.Logger = None
         ):
-        from  ..commands import slash_command
+        from ..commands import prefix_command
 
         platter.goldy.async_loop.create_task(
             platter.send_message(
@@ -31,8 +31,8 @@ class FrontEndErrors(errors.GoldyBotError):
                     embed
                 ],
                 reply = True, 
-                delete_after = None if isinstance(platter.invokable, slash_command.SlashCommand) else delete_after,
-                flags = 1 << 6 if isinstance(platter.invokable, slash_command.SlashCommand) else None
+                delete_after = delete_after if isinstance(platter.invokable, prefix_command.PrefixCommand) or platter._interaction_responded else None,
+                hide = True
             )
         )
 

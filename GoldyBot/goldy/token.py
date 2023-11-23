@@ -4,9 +4,9 @@ import os
 from dataclasses import dataclass, field
 from typing import Tuple
 from decouple import AutoConfig
-from devgoldyutils import Colours
+from devgoldyutils import Colours, LoggerAdapter
 
-from .. import goldy_bot_logger, LoggerAdapter
+from .. import goldy_bot_logger
 from ..paths import Paths
 from ..errors import GoldyBotError
 

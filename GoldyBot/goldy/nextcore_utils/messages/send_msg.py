@@ -276,7 +276,7 @@ async def send_msg(
         else:
             # Perform normal message response.
             # ----------------------------------
-            if hide and delete_after is not None:
+            if hide and delete_after is None:
                 delete_after = 3
 
             if reply:

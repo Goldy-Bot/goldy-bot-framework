@@ -1,5 +1,5 @@
 import logging as log
-from devgoldyutils import Colours, add_custom_handler, LoggerAdapter
+from devgoldyutils import Colours, add_custom_handler
 
 LOGGER_NAME = f"{Colours.YELLOW.value}Goldy {Colours.ORANGE.value}Bot{Colours.RESET_COLOUR.value}"
 

@@ -1,10 +1,36 @@
 from __future__ import annotations
 from typing import List
-from discord_typings import EmbedData, EmbedFieldData, EmbedImageData, EmbedFooterData
+from discord_typings import EmbedData, EmbedFieldData, EmbedImageData, EmbedFooterData, EmbedAuthorData
 
 import copy
+import random
 from ..colours import Colours
 from .... import utils
+
+__all__ = ("EmbedAuthor", "EmbedFooter", "EmbedImage", "EmbedField", "Embed")
+
+class EmbedAuthor(dict):
+    """A class used to create an embed's author."""
+    def __init__(self, name: str, url: str = None, icon_url: str = None, proxy_icon_url: str = None, **extra) -> EmbedFooterData:
+        """
+        Creates an embed author.
+        """
+        data: EmbedAuthorData = {}
+
+        data["name"] = name
+
+        if url is not None:
+            data["url"] = url
+
+        if icon_url is not None:
+            data["icon_url"] = icon_url
+
+        if proxy_icon_url is not None:
+            data["proxy_icon_url"] = proxy_icon_url
+
+        data.update(extra)
+
+        super().__init__(data)
 
 class EmbedFooter(dict):
     """A class used to create an embed's footer."""
@@ -100,6 +126,7 @@ class Embed(dict):
         fields: List[EmbedField] = None, 
         color: Colours | int = None, 
         colour: Colours | int = None, 
+        author: EmbedAuthor = None,
         footer: EmbedFooter = None,
         image: EmbedImage = None,
         thumbnail: EmbedImage = None,
@@ -135,6 +162,9 @@ class Embed(dict):
                 colour = colour.value
             
             data["color"] = colour
+
+        if author is not None:
+            data["author"] = author
 
         if footer is not None:
             data["footer"] = footer
@@ -177,6 +207,17 @@ class Embed(dict):
 
         for index, field in enumerate(data["fields"]):
             data["fields"][index]["value"] = field["value"].format(**keys)
+
+        self.update(data)
+
+    def set_random_footer(self, messages: List[str]) -> None:
+        """
+        Method that will randomly choose to display one of those messages in the footer; it can also choose to not display anything.
+        """
+        data: EmbedData = dict(self)
+
+        if random.randint(0, 4) == 0:
+            data["footer"] = {"text": random.choice(messages)}
 
         self.update(data)
 

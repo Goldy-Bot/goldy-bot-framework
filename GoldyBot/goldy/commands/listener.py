@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from typing import Tuple, TYPE_CHECKING
-from devgoldyutils import Colours
+from devgoldyutils import Colours, LoggerAdapter
 from discord_typings import InteractionCreateData, MessageData, ComponentInteractionData
 
 from .slash_command import SlashCommand
@@ -9,7 +9,7 @@ from .prefix_command import PrefixCommand
 from ..recipes.button import Button
 from ..recipes.select_menu import SelectMenu
 from .. import objects
-from ... import LoggerAdapter, goldy_bot_logger, utils
+from ... import goldy_bot_logger, utils
 from ..objects.platter.golden_platter import GoldPlatter
 
 if TYPE_CHECKING:
@@ -68,7 +68,9 @@ class CommandListener():
                         gold_platter = GoldPlatter(
                             data = interaction, 
                             author = author,
-                            invokable = command[1]
+                            invokable = command[1],
+                            goldy = command[1].goldy,
+                            logger = command[1].logger
                         )
 
                         await gold_platter.guild.config_wrapper.update()
@@ -91,7 +93,9 @@ class CommandListener():
                     gold_platter = GoldPlatter(
                         data = interaction, 
                         author = author,
-                        invokable = message_component[1]
+                        invokable = message_component[1],
+                        goldy = message_component[1].goldy,
+                        logger = message_component[1].logger
                     )
 
                     await gold_platter.guild.config_wrapper.update()
@@ -127,6 +131,8 @@ class CommandListener():
                     data = message, 
                     author = objects.Member(message["author"], guild, self.goldy),
                     invokable = command[1],
+                    goldy = command[1].goldy,
+                    logger = command[1].logger
                 )
 
                 await gold_platter.guild.config_wrapper.update()

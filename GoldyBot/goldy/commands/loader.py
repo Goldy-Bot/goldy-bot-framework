@@ -3,11 +3,12 @@ from typing import List, overload, Tuple
 from discord_typings import ApplicationCommandPayload, ApplicationCommandData
 
 from nextcore.http import Route
+from devgoldyutils import LoggerAdapter
 
 from .. import Goldy
 from . import slash_command
 from .command import Command
-from ... import goldy_bot_logger, LoggerAdapter
+from ... import goldy_bot_logger
 
 class CommandLoader():
     """Class that handles command loading."""

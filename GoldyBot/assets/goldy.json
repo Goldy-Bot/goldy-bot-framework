@@ -1,20 +1,23 @@
 {
     "version": 1,
-
     "goldy" : {
+        "branding": {
+            "name": "💛 Goldy Bot"
+        },
         "extensions": {
+            "repos": [],
+            "include": [],
+
             "ignored_extensions" : [],
             "late_load_extensions": [],
 
             "raise_on_load_error" : true,
             "folder_location" : "./extensions"
         },
-
         "allowed_guilds" : {
             "{guild_id_here}" : "test_server"
         },
 
-        "bot_dev": null,
-        "ding_on_exit": false
+        "bot_dev": null
     }
 }

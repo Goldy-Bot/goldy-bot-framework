@@ -3,9 +3,9 @@ from dataclasses import dataclass, field
 
 from typing import TYPE_CHECKING
 from discord_typings import MessageData
-from devgoldyutils import DictDataclass
+from devgoldyutils import DictDataclass, LoggerAdapter
 
-from ... import goldy_bot_logger, LoggerAdapter
+from ... import goldy_bot_logger
 from .member import Member
 
 if TYPE_CHECKING:

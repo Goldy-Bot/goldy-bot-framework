@@ -1,21 +1,31 @@
 from __future__ import annotations
+from typing import TYPE_CHECKING, overload
+
+if TYPE_CHECKING:
+    from . import Extension
+    from typing import List, Dict, Tuple, TypedDict
+
+    EXTENSION_REPO_DATA = TypedDict("EXTENSION_REPO_DATA", {"id": str, "git_url": str})
+    V1_REPO_DATA = TypedDict("V1_REPO_DATA", {"version": int, "extensions": List[EXTENSION_REPO_DATA]})
 
 import os
 import sys
 import toml
 import pathlib
+import requests
+import subprocess
 import pkg_resources
-from typing import List, overload, TYPE_CHECKING, Dict, Tuple
 import importlib.util
+from packaging import version
+from urllib.parse import urlparse
+from devgoldyutils import LoggerAdapter
 
-from .. import Goldy, GoldyBotError
-from ... import goldy_bot_logger, LoggerAdapter
+from ... import utils
 from ...paths import Paths
 from . import extensions_cache
+from .. import Goldy, GoldyBotError
 from .extension_metadata import ExtensionMetadata
-
-if TYPE_CHECKING:
-    from . import Extension
+from ... import goldy_bot_logger, __version__ as framework_version
 
 class ExtensionLoader():
     """Class that handles extension loading and reloading."""
@@ -26,7 +36,8 @@ class ExtensionLoader():
         if self.raise_on_load_error is None:
             self.raise_on_load_error = self.goldy.config.raise_on_extension_loader_error
 
-        self.path_to_extensions_folder:str|None = (lambda x: os.path.abspath(x) if isinstance(x, str) else x)(goldy.config.extension_folder_location)
+        self.extensions_to_include = goldy.config.included_extensions
+        self.path_to_extensions_folder: str | None = (lambda x: os.path.abspath(x) if isinstance(x, str) else x)(goldy.config.extension_folder_location)
 
         self.ignored_extensions = goldy.config.ignored_extensions
         self.late_load_extensions = goldy.config.late_load_extensions + ["guild_admin.py"]
@@ -35,11 +46,105 @@ class ExtensionLoader():
 
         self.__installed_dependencies = {pkg.key for pkg in pkg_resources.working_set}
 
+    def pull(self, repos: List[str] = None) -> None:
+        """
+        Pulls down the extensions that you specified from a repo into your extensions folder if they don't already exist.
+        """
+        extensions = self.extensions_to_include
+
+        if repos is None:
+            repos = ["https://github.com/Goldy-Bot/goldybot.repo"] + self.goldy.config.extension_repos
+
+        extensions_folder_path = self.__find_external_extension_path()
+
+        self.logger.info("Getting goldy bot extensions repo...")
+        repo_extensions: List[EXTENSION_REPO_DATA] = []
+
+        for repo_url in repos:
+            phrased_url = urlparse(repo_url)
+
+            if "github.com" in phrased_url.netloc:
+                repo_url = utils.get_github_file(phrased_url, "main", "repo.json")
+
+            self.logger.debug(f"Making request to repo at '{repo_url}'...")
+            r = requests.get(repo_url)
+
+            if r.ok:
+                repo_json: V1_REPO_DATA = r.json()
+                repo_extensions += repo_json["extensions"]
+            else:
+                self.logger.error(f"Failed to get repo! Extensions in that repo will not be pulled! \nResponse: {r}")
+
+        extensions_to_pull: List[Tuple[str, str]] = []
+
+        for extension in extensions:
+
+            for repo_extension in repo_extensions:
+
+                if extension.lower() == repo_extension["id"]:
+                    self.logger.debug(f"Found {extension} in repo.")
+                    extensions_to_pull.append((repo_extension["id"], repo_extension["git_url"]))
+                    break
+
+        if ".git" not in os.listdir("."):
+            self.logger.debug("Root directory is not git repo so I'm making it one.")
+            os.system("git init")
+
+        if ".gitmodules" not in os.listdir("."):
+            self.logger.debug("No '.gitmodules' file in root so I'm creating one.")
+            open(".gitmodules", "w").close()
+
+        if ".gitattributes" not in os.listdir("."):
+            self.logger.debug("No '.gitattributes' file in root so I'm creating one.")
+            with open(".gitattributes", "w") as file:
+                file.write("# Auto detect text files and perform LF normalization\n* text=auto")
+
+        # If there is an submodule extension that exists but hasn't been included delete it.
+        # =====================================================================================
+        git_submodule_output = subprocess.check_output(
+            ["git", "submodule"], encoding = "utf+8"
+        )
+        submodule_extension_paths = [x[1:].split(" ")[1] for x in git_submodule_output.splitlines()]
+
+        if sys.platform == "win32": # IDK WHY THE FUCK THAT COMMAND ABOVE MAKES ME LOOSE COLOUR ON WINDOWS!!! AUGHHHHHHHHHHHH!
+            os.system("color")
+
+        for extension_path in submodule_extension_paths:
+            found = False
+            extension = extension_path.split("/")[-1]
+
+            for code_name, _ in extensions_to_pull:
+
+                if extension == code_name:
+                    found = True
+
+            if not found:
+                self.logger.warning(
+                    f"Removing the '{extension}' submodule extension as you've no longer included it..."
+                )
+
+                os.system(f"git rm {extensions_folder_path}{os.path.sep}{extension} -f")
+                self.logger.debug(f"git submodule '{extension}' removed.")
+
+        # actually pulling submodules
+        # =============================
+        for code_name, git_url in extensions_to_pull:
+
+            if os.path.exists(f"{extensions_folder_path}{os.path.sep}{code_name}"):
+                self.logger.debug(f"'{code_name}' already exists so we will not git clone it.")
+                continue
+
+            self.logger.info(f"Git cloning '{code_name}' extension...")
+            # NOTE: Ummm, should we use psutil instead?
+            os.system(
+                f'cd "{extensions_folder_path}" && git submodule add -f {git_url} {code_name}'
+            )
+
     @overload
     def load(self) -> None:
         """Loads all extensions goldy bot can find. Basically lets goldy bot search for extensions herself because your a lazy brat."""
         ...
-    
+
     @overload
     def load(self, extension_paths: List[str]) -> None:
         """Loads each extension in this list of paths."""
@@ -49,8 +154,6 @@ class ExtensionLoader():
         """Loads each extension in this list of paths. If extension_paths is kept none, goldy bot will search for extensions to load itself."""
         if extension_paths is None:
             extension_paths = self.__find_all_paths()
-
-        # self.check_dependencies() # TODO: Add method that checks dependencies from pyproject.toml and installs them if they are missing.
 
         for path in extension_paths:
             # Specify and get the module.
@@ -65,6 +168,24 @@ class ExtensionLoader():
 
             # Run module and load function.
             try:
+
+                # Fix for https://github.com/Goldy-Bot/Goldy-Bot-Framework/issues/92
+                for module_name in sys.modules.copy():
+                    if f"{os.sep}extensions" in module_name:
+
+                        if module_py.__name__ in module_name.split(f"{os.sep}extensions")[1]:
+                            del sys.modules[module_name]
+                            self.logger.debug(f"Deleted previous import for this extension. >> ({module_name})")
+
+                    elif f"{os.sep}internal_extensions" in module_name:
+                        if module_py.__name__ in module_name.split(f"{os.sep}internal_extensions")[1]:
+                            del sys.modules[module_name]
+                            self.logger.debug(f"Deleted previous import for this extension. >> ({module_name})")
+
+                    elif module_py.__name__ in module_name:
+                        del sys.modules[module_name]
+                        self.logger.debug(f"Deleted previous import for this extension. >> ({module_name})")
+
                 # For some reason if I don't do this shit blows up. (extensions won't be able to import modules in it's own directories)
                 sys.modules[module_py.__name__] = module_py
 
@@ -89,7 +210,7 @@ class ExtensionLoader():
                     error_str = \
                         f"We encountered an error while trying to load the extension at '{'/'.join(path.split(os.path.sep)[-2:])}'! " \
                         f"\nERROR --> {e}"
-                
+
                 if self.raise_on_load_error:
                     raise GoldyBotError(error_str)
                 else:
@@ -173,20 +294,48 @@ class ExtensionLoader():
                 )
 
             for dependency in extension_metadata.dependencies:
-                dependency_with_install_operations = dependency
+                dependency_name = dependency
+                dependency_version = dependency
 
-                for character in [">", "=", "^", "<"]:
-                    dependency = dependency.split(character)[0]
+                for character in [">", "=", "^", "<", "@git+"]:
+                    dependency_name = dependency_name.split(character)[0]
+                    dependency_version = dependency_version.split(character)[-1]
 
-                if dependency.lower() not in self.__installed_dependencies:
-                    self.logger.warning(f"Missing dependency '{dependency}'.")
+                dependency_version = None if dependency_version == dependency_name or "http" in dependency_version else dependency_version
+
+                if dependency_name == "GoldyBot": # Skip checking the goldy bot dependency.
+
+                    if dependency_version is not None and version.parse(dependency_version) > version.parse(framework_version):
+                        raise GoldyBotError(
+                            f"Extension is expecting a newer version ({dependency_version}) of the Goldy Bot Framework. " \
+                                f"We are currently running '{framework_version}'."
+                        )
+
+                    continue
+
+                if dependency_name.lower() not in self.__installed_dependencies:
+                    self.logger.warning(f"Missing dependency '{dependency_name}'.")
                     missing_dependencies.append(
-                        (dependency, dependency_with_install_operations)
+                        (dependency_name, dependency)
                     )
                 else:
-                    self.logger.debug(f"'{dependency}' dependency found.")
+                    self.logger.debug(f"'{dependency_name}' dependency found.")
 
         return missing_dependencies
+    
+    def __find_external_extension_path(self) -> str:
+        if self.path_to_extensions_folder is not None:
+            return self.path_to_extensions_folder
+
+        # Go look in the root dir.
+        for file in os.listdir("."):
+            if file == "extensions":
+                return os.path.abspath(f"./{file}")
+
+        # NOTE: Idk why the hell I did it like this in the past so instead of changing something that works
+        # and bricking the framework in the process let's just keep it the same but 
+        # raise an informative exception incase things go haywire.
+        raise GoldyBotError("Wait what, where the hell is the extensions folder.")
 
     def __find_all_paths(self) -> List[str]:
         """Searches for all extensions, internal and external then returns their paths."""
@@ -198,14 +347,7 @@ class ExtensionLoader():
         
         # Finding external extensions folder path if none.
         # -------------------------------------------------
-        if self.path_to_extensions_folder is None:
-            # Go look in the root dir.
-            for file in os.listdir("."):
-                if file == "extensions":
-                    external_path = os.path.abspath(f"./{file}")
-                    break
-        else:
-            external_path = self.path_to_extensions_folder
+        external_path = self.__find_external_extension_path()
 
         # Getting all paths of each individual extension.
         # -------------------------------------------------

@@ -1,8 +1,6 @@
 from __future__ import annotations
 
 import sys
-import time
-import pygame
 import asyncio
 from datetime import datetime
 
@@ -13,12 +11,11 @@ from nextcore.gateway import ShardManager
 
 from typing import Dict, Any, TYPE_CHECKING, Tuple, Set
 from discord_typings import UpdatePresenceData, PartialActivityData, ApplicationData
-from devgoldyutils import Colours
+from devgoldyutils import Colours, LoggerAdapter
 
-from .. import LoggerAdapter, goldy_bot_logger
+from .. import goldy_bot_logger
 from ..errors import GoldyBotError
 from ..info import VERSION, COPYRIGHT
-from ..paths import Paths
 
 from .token import Token
 
@@ -36,26 +33,32 @@ cache: Dict[str, Any] = {
 
 class Goldy():
     """The main Goldy Bot class that controls the whole framework and let's you start an instance of Goldy Bot. Also known as the core."""
-    def __init__(self, token:Token = None, raise_on_extension_loader_error = None):
+    def __init__(self, token: Token = None, raise_on_extension_loader_error = None, display_copyright = True):
         self.token = token
         self.logger = LoggerAdapter(goldy_bot_logger, Colours.ORANGE.apply_to_string("Goldy"))
         self.async_loop = asyncio.get_event_loop()
 
         # Boot title and copyright stuff.
-        print(
-            f" {Colours.YELLOW.apply_to_string('Goldy')} {Colours.ORANGE.apply_to_string('Bot')} ({Colours.BLUE.apply_to_string(VERSION)}) - {Colours.PINK_GREY.apply_to_string(COPYRIGHT)}\n"
-        )
+        if display_copyright is True:
+            print(
+                f" {Colours.YELLOW.apply_to_string('Goldy')} {Colours.ORANGE.apply_to_string('Bot')} ({Colours.BLUE.apply_to_string(VERSION)}) - {Colours.PINK_GREY.apply_to_string(COPYRIGHT)}\n"
+            )
 
         # Initializing stuff
         # -------------------
         if self.token is None:
             self.token = Token()
-        
+
         self.nc_authentication = BotAuthentication(self.token.discord_token)
-        self.intents = 1 << 9 | 1 << 15
+        self.intents = 1 << 9 | 1 << 15 | 1 << 7 | 1 << 0
 
         self.http_client = HTTPClient()
         """Nextcore http client, use this if you would like to perform low level requests."""
+
+        self.config = GoldyConfig()
+        """
+        Class that allows you to retrieve configuration data from the ``goldy.json`` config file. 
+        """
 
         self.shard_manager = ShardManager(
             authentication = self.nc_authentication,
@@ -63,7 +66,7 @@ class Goldy():
             http_client = self.http_client,
 
             presence = UpdatePresenceData(
-                activities = [PartialActivityData(name=f"Goldy Bot (v{VERSION})", type=ActivityTypes.PLAYING_GAME.value)],
+                activities = [PartialActivityData(name=f"v{VERSION}", type=ActivityTypes.PLAYING_GAME.value)],
                 since = None,
                 status = Status.ONLINE.value,
                 afk = False
@@ -91,12 +94,6 @@ class Goldy():
         """Goldy Bot's class to interface with a Mongo Database asynchronously."""
         self.presence = Presence(self)
         """Class that allows you to control the status, game activity and more of Goldy Bot"""
-        self.config = GoldyConfig()
-        """
-        Class that allows you to retrieve configuration data from the ``goldy.json`` config file. 
-        
-        All properties return None when not found in the config.
-        """
         self.system = System(self)
         """Goldy Bot class used to check how much resources Goldy is utilizing on the host system."""
         self.command_loader = CommandLoader(self)
@@ -210,7 +207,8 @@ class Goldy():
     async def setup(self):
         """Method ran to set up goldy bot."""
         await self.guild_manager.setup()
-        
+
+        self.extension_loader.pull()
         self.extension_loader.load()
         await self.command_loader.load()
         await self.command_listener.start_listening()
@@ -245,11 +243,6 @@ class Goldy():
     
         self.logger.debug("Closing async_loop...")
         self.async_loop.stop()
-
-        if self.config.ding_on_exit:
-            pygame.mixer.init()
-            pygame.mixer.Sound(Paths.ASSETS + "/ding.mp3").play()
-            time.sleep(0.5)
 
 
 # Get goldy instance method.

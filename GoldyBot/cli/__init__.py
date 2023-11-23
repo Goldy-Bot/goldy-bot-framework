@@ -1,3 +1,4 @@
 from .__main__ import *
 
-from ._setup import setup
+from ._setup import *
+from .extensions import *

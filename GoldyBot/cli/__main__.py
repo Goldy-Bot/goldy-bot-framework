@@ -5,9 +5,9 @@ from .. import VERSION, goldy_bot_logger
 G = Colours.YELLOW.apply_to_string
 O = Colours.ORANGE.apply_to_string
 
-@click.group(invoke_without_command=True)
+@click.group(invoke_without_command = True)
 @click.pass_context
-def goldy_bot(ctx:click.Context):
+def goldy_bot(ctx: click.Context):
 
     if ctx.invoked_subcommand is None:
 

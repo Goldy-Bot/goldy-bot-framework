@@ -9,6 +9,7 @@ if TYPE_CHECKING:
     from ... import Extension
     from ..nextcore_utils.slash_options.auto_complete import SlashOptionAutoComplete
 
+from ... import errors
 from .command import Command
 from ..objects import GoldPlatter
 
@@ -26,6 +27,17 @@ class SlashCommand(Command):
         pre_register: bool = True
     ):
         self.__sub_commands: List[SlashCommand] = []
+
+        if name is None: # I need this here for the below code.
+            name = func.__name__
+
+        # Raise an error if there's another slash command sharing the same name.
+        if name in [
+            pre_invokable.name for pre_invokable in goldy.pre_invokables if isinstance(pre_invokable, SlashCommand)
+        ]:
+            raise errors.GoldyBotError(
+                f"The command '{name}' can't be pre-registered as another slash command with the same name exists."
+            )
 
         super().__init__(
             goldy = goldy, 
@@ -146,6 +158,8 @@ class SlashCommand(Command):
                         data = data, 
                         author = platter.author,
                         invokable = command,
+                        goldy = command.goldy,
+                        logger = command.logger
                     )
                     platter._interaction_responded = interaction_responded
 

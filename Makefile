@@ -2,10 +2,10 @@ build:
 	python -m build
 
 install:
-	pip install .
+	pip install . -U
 
-run:
-	cd demo && python run.py
+install-editable:
+	pip install -e . --config-settings editable_mode=compat
 
 test:
 	ruff .

@@ -14,6 +14,8 @@ def update_dict(d1: dict, d2: dict):
             if isinstance(d1_copy[key], dict):
                 #d1_copy[key].update(d2[key])
                 d1_copy[key] = update_dict(d1_copy[key], d2[key])
+            else:
+                d1_copy[key] = d2[key]
 
         else:
             d1_copy[key] = d2[key]
