@@ -20,25 +20,29 @@ class LiveConsoleApp(cmd2.Cmd):
         # ---------------------
         self.goldy.config.__init__()
 
+        self.logger.warning(
+            "Extension reloading has been disabled since 5.0dev12! Check out this git issue for more: " \
+            "https://github.com/Goldy-Bot/Goldy-Bot-Framework/issues/92#issuecomment-1824946224"
+        )
         # Reload extensions...
         # ----------------------
-        extension = None
-        if not extension_name == "":
-            extension: Tuple[str, Extension] | None = utils.cache_lookup(extension_name, extensions_cache, False)
+        # extension = None
+        # if not extension_name == "":
+        #     extension: Tuple[str, Extension] | None = utils.cache_lookup(extension_name, extensions_cache, False)
 
-            if extension is None:
-                self.logger.error(f"The extension '{extension_name}' was not found.")
-                return False
-            else:
-                self.logger.info(f"Found '{extension[1].name}'.")
+        #     if extension is None:
+        #         self.logger.error(f"The extension '{extension_name}' was not found.")
+        #         return False
+        #     else:
+        #         self.logger.info(f"Found '{extension[1].name}'.")
 
-        self.logger.info("Reloading extension(s)...")
-        self.logger.warning("This may take a minute to begin...")
-        self.goldy.async_loop.create_task(
-            self.goldy.extension_loader.reload(
-                (lambda x: [x[1]] if x is not None else None)(extension)
-            )
-        )
+        # self.logger.info("Reloading extension(s)...")
+        # self.logger.warning("This may take a minute to begin...")
+        # self.goldy.async_loop.create_task(
+        #     self.goldy.extension_loader.reload(
+        #         (lambda x: [x[1]] if x is not None else None)(extension)
+        #     )
+        # )
 
         # Rerun guilds setup...
         # ----------------------
