@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from enum import Enum
 from typing import List, Literal
+from devgoldyutils import short_str
 from discord_typings import ApplicationCommandOptionData
 from discord_typings.interactions.commands import StrCommandOptionChoiceData, IntCommandOptionChoiceData
 
@@ -25,7 +26,7 @@ class SlashOptionChoice(dict):
         """
         data: StrCommandOptionChoiceData | IntCommandOptionChoiceData = {}
 
-        data["name"] = name
+        data["name"] = short_str(name, 99)
         data["value"] = value
 
         data.update(extra)
