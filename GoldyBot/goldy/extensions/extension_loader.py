@@ -101,9 +101,15 @@ class ExtensionLoader():
 
         # If there is an submodule extension that exists but hasn't been included delete it.
         # =====================================================================================
-        git_submodule_output = subprocess.check_output(
-            ["git", "submodule"], encoding = "utf+8"
-        )
+        if self.goldy.system.in_docker:
+            subprocess.run(
+                ["git", "config", "--global", "--add", "safe.directory", "/app/goldy"]
+            )
+
+            self.logger.debug("Set root path to git's safe directory as you are running under docker.")
+
+        git_submodule_output = subprocess.check_output(["git", "submodule"], encoding = "utf+8")
+
         submodule_extension_paths = [x[1:].split(" ")[1] for x in git_submodule_output.splitlines()]
 
         if sys.platform == "win32": # IDK WHY THE FUCK THAT COMMAND ABOVE MAKES ME LOOSE COLOUR ON WINDOWS!!! AUGHHHHHHHHHHHH!
