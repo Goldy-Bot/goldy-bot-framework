@@ -6,8 +6,8 @@ COPY GoldyBot ./GoldyBot
 COPY pyproject.toml .
 COPY docker_stuff .
 
+RUN apt-get update && apt-get install -y git gcc python3-dev
 RUN pip install .
-RUN apt-get update && apt-get install -y git
 
 ENV DOCKER true
 
