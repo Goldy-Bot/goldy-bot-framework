@@ -1,5 +1,5 @@
 build
-GoldyBot.egg-info
+*.egg-info
 dist
 env
 docs/_build
