@@ -5,3 +5,4 @@ Copyright (C) 2023 - 2024 Goldy
 """
 
 from .goldy import *
+from .database import *
