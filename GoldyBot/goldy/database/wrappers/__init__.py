@@ -9,7 +9,6 @@ from .. import DatabaseEnums
 
 if TYPE_CHECKING:
     from ... import Goldy
-    from ...guilds import Guild
 
 class DatabaseWrapper(DictClass, ABC):
     """✨ A useful interface class to build a database wrapper for easy of access to database data like member data, guild data and more."""

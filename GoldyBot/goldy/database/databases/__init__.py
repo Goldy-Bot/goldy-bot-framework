@@ -4,7 +4,6 @@ from typing import List, TYPE_CHECKING
 from devgoldyutils import Colours
 
 if TYPE_CHECKING:
-    from pymongo.results import UpdateResult
     from .. import Database
 
 from ... import LoggerAdapter

@@ -13,10 +13,20 @@ __all__ = (
 )
 
 class Goldy():
-    """The class containing all the framework's core components; pretty much the core of Goldy Bot."""
+    """
+    The core class that wraps nextcore's shard manager and client. The framework's core class.
+    """
     def __init__(
         self, 
         http_client: HTTPClient,
         shard_manager: ShardManager
     ) -> None:
-        self.database: Optional[Database] = None
+        self.http_client = http_client
+        self.shard_manager = shard_manager
+
+        self.__database: Optional[Database] = None
+
+    @property
+    def database(self) -> Database:
+        """An instance of the framework's mongo database."""
+        ...

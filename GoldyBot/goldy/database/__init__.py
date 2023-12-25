@@ -33,7 +33,7 @@ class Database():
 
         # Initializing MongoDB database.
         try:
-            self.client: pymongo.MongoClient = motor.motor_asyncio.AsyncIOMotorClient(self.database_url, serverSelectionTimeoutMS=2000)
+            self.client = motor.motor_asyncio.AsyncIOMotorClient(self.database_url, serverSelectionTimeoutMS=2000)
             self.async_loop.run_until_complete(self.client.server_info())
             self.logger.info("AsyncIOMotorClient " + Colours.GREEN.apply_to_string("Connected!"))
         except ServerSelectionTimeoutError as e:

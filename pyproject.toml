@@ -68,7 +68,7 @@ requires = ["setuptools", "setuptools-scm"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
-packages = ["GoldyBot"]
+packages = ["GoldyBot", "goldy_bot"]
 
 [project.scripts]
 goldybot = "GoldyBot.cli.__main__:goldy_bot"
