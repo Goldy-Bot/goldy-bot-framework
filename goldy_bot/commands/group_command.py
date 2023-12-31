@@ -6,7 +6,8 @@ if TYPE_CHECKING:
 
     from GoldyBot import SlashOption
 
-    from ..commands import Command
+    from .command import Command
+    from ..platter import Platter
 
 from devgoldyutils import LoggerAdapter
 
