@@ -1,7 +1,7 @@
 """
 💛 Goldy Bot V5 - Rewrite of Goldy Bot V4
 
-Copyright (C) 2023 - Goldy
+Copyright (C) 2023 Goldy
 """
 from .logging import log, goldy_bot_logger, LOGGER_NAME
 
