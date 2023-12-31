@@ -1,8 +1,13 @@
 """
-💛 Goldy Bot V5.1 - 🥞 Pancake
+💛 Goldy Bot v5.1 - 🥞 Pancake
+
+This is the interface to the new goldy bot API, named pancake but also known as v5.1.
 
 Copyright (C) 2023 - 2024 Goldy
 """
 
 from .goldy import *
 from .database import *
+from .config import *
+
+__version__ = "5.1dev1"

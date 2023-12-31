@@ -27,6 +27,8 @@ class Database():
     The Goldy Bot 🥞 Pancake class for managing the database.
     """
     def __init__(self, url: str):
+        self.url = url
+
         self._client = AsyncIOMotorClient(url, serverSelectionTimeoutMS = 2000)
 
         self.logger = LoggerAdapter(goldy_bot_logger, prefix = "DatabaseManager")

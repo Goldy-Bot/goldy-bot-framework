@@ -8,6 +8,7 @@ if TYPE_CHECKING:
     from nextcore.gateway import ShardManager
 
     from .database import Database
+    from .config import Config
 
 from datetime import datetime
 from devgoldyutils import LoggerAdapter, Colours
@@ -29,13 +30,15 @@ class Goldy(LegacyWrapper):
         self, 
         http_client: HTTPClient,
         shard_manager: ShardManager,
-        database: Database
+        database: Database,
+        config: Config
     ) -> None:
         self.http_client = http_client
         self.shard_manager = shard_manager
 
         self.database = database
         """An instance of the framework's mongo database."""
+        self.config = config
 
         self.boot_datetime: Optional[datetime] = None
         """The time and date the framework spun up."""
@@ -73,12 +76,26 @@ class Goldy(LegacyWrapper):
 
         # TODO: Add these to the main framework classes.
         # await self.pre_setup() 
-        # await self.setup()
+        await self._legacy_setup()
 
         # Raise a error and exit whenever a critical error occurs.
-        error = await self.shard_manager.dispatcher.wait_for(lambda: True, "critical")
+        error = await self.shard_manager.dispatcher.wait_for(lambda reason: True, "critical")
 
-        self.logger.warn(Colours.YELLOW.apply_to_string("Goldy Bot is shutting down..."))
-        self.logger.info(Colours.BLUE.apply_to_string(f"Reason: {error[0]}"))
+        self.logger.info(Colours.BLUE.apply_to_string(
+            f"Nextcore gateway has closed for the reason '{error[0]}'.")
+        )
 
-        # await self.__close()
+    async def stop(self, reason: Optional[str] = None) -> None:
+        """Stops Goldy Bot Pancake."""
+        reason = reason or "goldy.stop() was executed. (No reason was given)"
+
+        await self.shard_manager.dispatcher.dispatch(
+            "critical", reason
+        )
+
+        await self._clean_up()
+
+    async def _clean_up(self) -> None:
+        """Cleans up the framework by closing clients and more."""
+        await self.http_client.close()
+        await self.shard_manager.close()

@@ -2,6 +2,15 @@
 💛 Goldy Bot V5 - Rewrite of Goldy Bot V4
 
 Copyright (C) 2023 Goldy
+
+------------------------------------------
+
+### DEPRECATED!!!! DO NOT USE THIS IN v5.1! Use the pancake API instead.
+
+The pancake API is under the new ``goldy_bot`` namespace.
+```python
+import goldy_bot
+```
 """
 from .logging import log, goldy_bot_logger, LOGGER_NAME
 
