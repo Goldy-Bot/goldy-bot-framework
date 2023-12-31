@@ -12,7 +12,7 @@ from pymongo.errors import ServerSelectionTimeoutError
 from GoldyBot.logging import goldy_bot_logger
 
 __all__ = (
-    "DatabaseManager",
+    "Database",
 )
 
 # TODO: Move to where the database manager will be initialized.
@@ -22,7 +22,7 @@ __all__ = (
 #     cast = str
 # )
 
-class DatabaseManager():
+class Database():
     """
     The Goldy Bot 🥞 Pancake class for managing the database.
     """
@@ -31,7 +31,7 @@ class DatabaseManager():
 
         self.logger = LoggerAdapter(goldy_bot_logger, prefix = "DatabaseManager")
 
-    async def is_connection_ok(self) -> bool:
+    async def _is_connection_ok(self) -> bool:
         try:
             await self._client.server_info()
             self.logger.info("AsyncIOMotorClient " + Colours.GREEN.apply_to_string("Connected!"))
@@ -53,6 +53,3 @@ class DatabaseManager():
     def get_database(self, database_name: DatabaseEnums) -> AgnosticDatabase:
         """Returns a :py:meth:`~motor.core.AgnosticDatabase` database connection."""
         return self._client[database_name.value]
-
-    # This alias is for database wrappers.
-    get_goldy_database = get_database
