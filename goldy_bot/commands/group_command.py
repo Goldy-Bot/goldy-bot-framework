@@ -75,23 +75,23 @@ class GroupCommand():
         description: str = None, 
         command: Optional[Command] = None
     ):
-        self.name = name
-        self.description = description
-
         self._master_command = command
+
+        if self._master_command is None:
+            self._master_command = Command( 
+                function = lambda x, y: self.__dummy__(),
+                name = name,
+                description = description
+            )
 
         self.logger = LoggerAdapter(goldy_bot_logger, prefix = "GroupCommand")
 
     def master_command(self):
         def decorate(func):
             def inner(func: Callable) -> None:
-                self._master_command = Command( # TODO: Complete this.
-                    func = func, 
-                    name = self.name, 
-                    description = self.description
-                )
+                self._master_command.function = func
 
-                self.logger.debug(f"'{func.__name__}' was made a master command function.")
+                self.logger.debug(f"The function '{func.__name__}' was made a master command.")
 
             return inner(func)
 
@@ -174,7 +174,7 @@ class GroupCommand():
             def inner(func: Callable) -> Callable[[Platter], Any]:
                 self._master_command.add_subcommand(
                     Command(
-                        func = func,
+                        function = func,
                         name = name,
                         description = description,
                         slash_options = slash_options,
@@ -187,3 +187,6 @@ class GroupCommand():
             return inner(func)
 
         return decorate
+
+    async def __dummy__(self):
+        ...

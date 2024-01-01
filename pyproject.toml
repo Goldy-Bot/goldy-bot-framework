@@ -36,7 +36,8 @@ dependencies = [
     "toml",
     "colorthief",
     "get-annotations",
-    "packaging"
+    "packaging",
+    "typer[all]"
 ]
 
 dynamic = ["version"]
@@ -71,5 +72,4 @@ build-backend = "setuptools.build_meta"
 packages = ["GoldyBot", "goldy_bot"]
 
 [project.scripts]
-goldybot = "GoldyBot.cli.__main__:goldy_bot"
-goldy_bot = "GoldyBot.cli.__main__:goldy_bot"
+goldy-bot = "goldy_bot.__main__:app"

@@ -7,22 +7,22 @@ if TYPE_CHECKING:
     from nextcore.http import HTTPClient
     from nextcore.gateway import ShardManager
 
-    from .database import Database
-    from .config import Config
+    from ..database import Database
+    from ..config import Config
 
 from datetime import datetime
 from devgoldyutils import LoggerAdapter, Colours
 from nextcore.http import UnauthorizedError
 
-from . import errors
-from .wrappers import LegacyWrapper
-from .logger import goldy_bot_logger
+from .. import errors
+from .wrappers import LegacyWrapper, ExtensionsWrapper
+from ..logger import goldy_bot_logger
 
 __all__ = (
     "Goldy",
 )
 
-class Goldy(LegacyWrapper):
+class Goldy(LegacyWrapper, ExtensionsWrapper):
     """
     The core class that wraps nextcore's shard manager and client. The framework's core class.
     """

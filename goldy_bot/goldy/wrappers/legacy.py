@@ -24,9 +24,9 @@ from GoldyBot.goldy import (
 )
 from GoldyBot.logging import goldy_bot_logger as legacy_gbot_logger
 
+import goldy_bot
 from .wrapper import Wrapper
-from ..logger import goldy_bot_logger
-from .. import __version__
+from ...logger import goldy_bot_logger
 
 __all__ = (
     "LegacyWrapper",
@@ -71,7 +71,7 @@ class LegacyWrapper(Wrapper):
 
         # Hijack old logger to present it self as the legacy goldy bot api.
         legacy_gbot_logger.name = Colours.GREY.apply("Legacy API")
-        GoldyBot.info.VERSION = __version__
+        GoldyBot.info.VERSION = goldy_bot.__version__
         super().__init__(goldy)
 
     async def _legacy_setup(self) -> None:
