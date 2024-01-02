@@ -25,7 +25,6 @@ from GoldyBot.goldy import (
 from GoldyBot.logging import goldy_bot_logger as legacy_gbot_logger
 
 import goldy_bot
-from .wrapper import Wrapper
 from ...logger import goldy_bot_logger
 
 __all__ = (
@@ -64,22 +63,17 @@ class GoldyConfigTranslationLayer(LegacyGoldyConfig):
                 f"{test_guild_id}": "test_server"
             }
 
-class LegacyWrapper(Wrapper):
+class LegacyWrapper():
     """Wraps some attributes from the legacy goldy class for the new 🥞 pancake one."""
-    def __init__(self, goldy: Goldy) -> None:
-        self.__goldy = goldy
-
-        # Hijack old logger to present it self as the legacy goldy bot api.
-        legacy_gbot_logger.name = Colours.GREY.apply("Legacy API")
+    def __init__(self) -> None:
         GoldyBot.info.VERSION = goldy_bot.__version__
-        super().__init__(goldy)
 
-    async def _legacy_setup(self) -> None:
+    async def _legacy_setup(self: Goldy) -> None:
         """Legacy support method. Do not use!"""
 
         def __legacy_init_interceptor(goldy_self: LegacyGoldy):
-            bot_authentication = self.__goldy.shard_manager.authentication
-            database_url = self.__goldy.database.url
+            bot_authentication = self.shard_manager.authentication
+            database_url = self.database.url
 
             goldy_self.token = Token(bot_authentication.token, database_url)
             goldy_self.logger = LoggerAdapter(legacy_gbot_logger, Colours.ORANGE.apply_to_string("Goldy"))
@@ -88,10 +82,10 @@ class LegacyWrapper(Wrapper):
             goldy_self.nc_authentication = bot_authentication
             goldy_self.intents = 1 << 9 | 1 << 15 | 1 << 7 | 1 << 0
 
-            goldy_self.http_client = self.__goldy.http_client
-            goldy_self.shard_manager = self.__goldy.shard_manager
+            goldy_self.http_client = self.http_client
+            goldy_self.shard_manager = self.shard_manager
 
-            goldy_self.start_up_time = self.__goldy.boot_datetime
+            goldy_self.start_up_time = self.boot_datetime
 
             goldy_self.pre_invokables = set()
             goldy_self.invokables = set()
@@ -104,7 +98,7 @@ class LegacyWrapper(Wrapper):
             def __legacy_database_interceptor(db_self: LegacyDatabase):
                 db_self.goldy = goldy_self
                 db_self.logger = LoggerAdapter(legacy_gbot_logger, prefix = "Database")
-                db_self.client = self.__goldy.database._client
+                db_self.client = self.database._client
 
             LegacyDatabase.__init__ = __legacy_database_interceptor
 

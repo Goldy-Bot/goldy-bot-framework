@@ -1,7 +1,7 @@
 import logging as log
 from devgoldyutils import Colours, add_custom_handler
 
-LOGGER_NAME = f"{Colours.YELLOW.value}Goldy {Colours.ORANGE.value}Bot{Colours.RESET_COLOUR.value}"
+LOGGER_NAME = Colours.GREY.apply("Legacy API")
 
 goldy_bot_logger = add_custom_handler(log.getLogger(LOGGER_NAME), level=log.DEBUG)
 """

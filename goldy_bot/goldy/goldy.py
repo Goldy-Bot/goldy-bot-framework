@@ -45,7 +45,7 @@ class Goldy(LegacyWrapper, ExtensionsWrapper):
 
         self.logger = LoggerAdapter(goldy_bot_logger, Colours.ORANGE.apply("Goldy"))
 
-        super().__init__(self)
+        super().__init__()
 
     async def start(self) -> None:
         """Starts Goldy Bot 🥞 Pancake."""
@@ -74,8 +74,7 @@ class Goldy(LegacyWrapper, ExtensionsWrapper):
             event_name = "READY"
         )
 
-        # TODO: Add these to the main framework classes.
-        # await self.pre_setup() 
+        await self.__setup()
         await self._legacy_setup()
 
         # Raise a error and exit whenever a critical error occurs.
@@ -84,6 +83,9 @@ class Goldy(LegacyWrapper, ExtensionsWrapper):
         self.logger.info(Colours.BLUE.apply_to_string(
             f"Nextcore gateway has closed for the reason '{error[0]}'.")
         )
+
+    async def __setup(self) -> None:
+        self._load_extensions()
 
     async def stop(self, reason: Optional[str] = None) -> None:
         """Stops Goldy Bot Pancake."""

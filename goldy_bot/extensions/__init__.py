@@ -1,2 +1,2 @@
-from .manager import *
+from .loader import *
 from .extension import *

@@ -20,16 +20,16 @@ class Extension():
     def __init__(self, name: str) -> None:
         self.name = name
 
-        self.__classes: List[object] = []
-        self.__commands: Dict[str, List[Command]] = {}
+        self._classes: List[object] = []
+        self._commands: Dict[str, List[Command]] = {}
 
         self.logger = LoggerAdapter(goldy_bot_logger, prefix = "Extension")
 
     def mount(self, *cls: object) -> None:
-        """Method to mount a class to an extension to be used by the commands."""
+        """Method to mount any classes you are using in your extension."""
 
         for _class in cls:
-            self.__classes.append(_class)
+            self._classes.append(_class)
 
             self.logger.debug(
                 f"Mounted class '{_class.__name__}' to extension '{self.name}'."
@@ -95,10 +95,10 @@ class Extension():
 
                 class_name = command.function.__qualname__.split(".")[0]
 
-                if class_name not in self.__commands:
-                    self.__commands[class_name] = []
+                if class_name not in self._commands:
+                    self._commands[class_name] = []
 
-                self.__commands[class_name].append(command)
+                self._commands[class_name].append(command)
 
                 return GroupCommand(command = command) if group else func
 
