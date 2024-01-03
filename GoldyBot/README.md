@@ -1,8 +1,8 @@
 # THIS IS DEPRECATED!
 ## Everything under this module/library is deprecated! 
-This lib will no longer be used, it exists purely to help with backwards compatibility during the transitioning phase to the [🥞 pancake API](). Soon this lib will be completely removed.
+This lib will no longer be used, it exists purely to help with backwards compatibility during the transitioning phase to the 🥞 [pancake API](https://github.com/Goldy-Bot/Goldy-Bot-Framework/tree/v5.1dev1/goldy_bot). Soon this lib will be completely removed.
 
-### If you want source code visit the [``goldy_bot``]() module instead.
+### If you want source code visit the [``goldy_bot``](https://github.com/Goldy-Bot/Goldy-Bot-Framework/tree/v5.1dev1/goldy_bot) module instead.
 
 > [!NOTE]
 > For development use the pancake API instead.
