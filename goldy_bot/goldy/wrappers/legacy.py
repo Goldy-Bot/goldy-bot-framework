@@ -68,8 +68,11 @@ class LegacyWrapper():
     def __init__(self) -> None:
         GoldyBot.info.VERSION = goldy_bot.__version__
 
-    async def _legacy_setup(self: Goldy) -> None:
-        """Legacy support method. Do not use!"""
+        self.__legacy_goldy: LegacyGoldy = None
+
+        super().__init__()
+
+    def _initialize_legacy_goldy(self: Goldy):
 
         def __legacy_init_interceptor(goldy_self: LegacyGoldy):
             bot_authentication = self.shard_manager.authentication
@@ -102,6 +105,10 @@ class LegacyWrapper():
 
             LegacyDatabase.__init__ = __legacy_database_interceptor
 
+            # Emptying the load and pull method as it should no longer be used.
+            LegacyExtensionLoader.load = lambda x: None
+            LegacyExtensionLoader.pull = lambda x: None
+
             goldy_self.config = GoldyConfigTranslationLayer(self)
             goldy_self.database = LegacyDatabase()
             goldy_self.presence = LegacyPresence(goldy_self)
@@ -114,8 +121,10 @@ class LegacyWrapper():
 
         LegacyGoldy.__init__ = __legacy_init_interceptor
 
-        legacy_goldy = LegacyGoldy()
+        self.__legacy_goldy = LegacyGoldy()
 
-        await legacy_goldy.pre_setup()
-        await legacy_goldy.setup()
+    async def _legacy_setup(self: Goldy) -> None:
+        """Legacy support method. Do not use!"""
+        await self.__legacy_goldy.pre_setup()
+        await self.__legacy_goldy.setup()
 

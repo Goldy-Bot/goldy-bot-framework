@@ -13,6 +13,8 @@ __all__ = (
     "Config",
 )
 
+DEFAULT_REPOS = ["https://github.com/Goldy-Bot/goldybot.repo"]
+
 @dataclass
 class Config():
     """Class that provides interface for the goldy.toml file."""
@@ -20,6 +22,7 @@ class Config():
     data: ConfigData = field(repr = False, default = None)
 
     branding_name: str = field(init = False)
+    branding_emoji: str = field(init = False)
     included_extensions: List[str] = field(init = False)
     """Returns the extensions that were set to be included by the goldy.toml configuration."""
     repos: List[str] = field(init = False)
@@ -51,8 +54,9 @@ class Config():
         development_data = self.data.get("development", {})
 
         self.branding_name = branding_data.get("name", "GoldyBot")
+        self.branding_emoji = branding_data.get("emoticon", "🥞")
         self.included_extensions = extensions_data.get("include", [])
-        self.repos = extensions_data.get("repos", [])
+        self.repos = extensions_data.get("repos", []) + DEFAULT_REPOS
         self.ignored_extensions = extensions_data.get("ignore", [])
         self.extensions_directory = extensions_load_data.get("directory", "./extensions")
         self.extensions_raise_on_load_error = extensions_load_data.get("raise_on_error", True)

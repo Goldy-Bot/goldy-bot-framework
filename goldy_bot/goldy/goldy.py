@@ -10,19 +10,24 @@ if TYPE_CHECKING:
     from ..database import Database
     from ..config import Config
 
+from pathlib import Path
 from datetime import datetime
 from devgoldyutils import LoggerAdapter, Colours
 from nextcore.http import UnauthorizedError
 
 from .. import errors
-from .wrappers import LegacyWrapper, ExtensionsWrapper
+from .wrappers import (
+    LegacyWrapper, 
+    DockerWrapper, 
+    ExtensionsWrapper
+)
 from ..logger import goldy_bot_logger
 
 __all__ = (
     "Goldy",
 )
 
-class Goldy(LegacyWrapper, ExtensionsWrapper):
+class Goldy(LegacyWrapper, DockerWrapper, ExtensionsWrapper):
     """
     The core class that wraps nextcore's shard manager and client. The framework's core class.
     """
@@ -74,7 +79,6 @@ class Goldy(LegacyWrapper, ExtensionsWrapper):
             event_name = "READY"
         )
 
-        await self.__setup()
         await self._legacy_setup()
 
         # Raise a error and exit whenever a critical error occurs.
@@ -84,8 +88,42 @@ class Goldy(LegacyWrapper, ExtensionsWrapper):
             f"Nextcore gateway has closed for the reason '{error[0]}'.")
         )
 
-    async def __setup(self) -> None:
-        self._load_extensions()
+    def setup(self, legacy: bool = False) -> None:
+        """
+        Does the setup for you if you would not like to handle it yourself. 
+        Pulling extensions, loading extensions, loading commands and etc.
+        """
+        self.logger.info("Running goldy bot setup...")
+
+        if legacy is True:
+            self._initialize_legacy_goldy()
+
+        extensions_dir = Path(self.config.extensions_directory)
+        included_extensions = self.config.included_extensions
+
+        # Removing unwanted extensions.
+        self._remove_excluded_extensions(
+            extensions_dir, included_extensions
+        )
+
+        # Getting git ready.
+        self.logger.info("Setting up git...")
+        self._git_setup()
+
+        # Pull included extensions with git.
+        self.logger.info("Pulling extensions...")
+        for extension in included_extensions:
+            self.pull_extension(extension, extensions_dir)
+
+        # Loading extensions.
+        self.logger.info("Loading extensions...")
+        for path in extensions_dir.iterdir():
+            extension = self.load_extension(path, legacy = legacy)
+
+            if extension is not None:
+                self.logger.info(f"The extension '{extension.name}' has been loaded!")
+
+                self.add_extension(extension)
 
     async def stop(self, reason: Optional[str] = None) -> None:
         """Stops Goldy Bot Pancake."""

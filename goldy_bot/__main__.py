@@ -26,12 +26,12 @@ __all__ = (
 
 INSTALL_SETUP_LINK = "https://github.com/Goldy-Bot/Goldy-Bot-Framework?tab=readme-ov-file#-installset-up---normal"
 
-app = typer.Typer()
+app = typer.Typer(pretty_exceptions_show_locals = False)
 env_config = AutoConfig(os.getcwd())
 
 @app.command()
 def start(
-    debug: bool = typer.Option(None, help = "Enable extra logging details."),
+    debug: bool = typer.Option(None, help = "Enable extra logging details. THIS WILL SHOW YOUR BOT TOKEN!"),
     token: Optional[str] = typer.Option(None, help = "Your discord bot token."),
     database_url: Optional[str] = typer.Option(None, help = "Your mongoDB database connection url.")
 ):
@@ -39,6 +39,7 @@ def start(
 
     if debug is not None:
         goldy_bot_logger.setLevel(logging.DEBUG)
+        app.pretty_exceptions_show_locals = True
 
     if database_url is None:
         database_url = env_config("MONGODB_URL", None)
@@ -72,6 +73,8 @@ def start(
         database = database, 
         config = config
     )
+
+    goldy.setup(legacy = True)
 
     asyncio.run(goldy.start())
 
