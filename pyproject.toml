@@ -24,7 +24,7 @@ dependencies = [
     "requests",
     "importlib-metadata; python_version<'3.8'",
     "setuptools>=68.2.2",
-    "devgoldyutils>=2.5",
+    "devgoldyutils>=2.5.8",
     "nextcore[speed]>=2.0.1",
     "click>=8.1.3",
     "python-decouple>=3.7",
@@ -37,7 +37,8 @@ dependencies = [
     "colorthief",
     "get-annotations",
     "packaging",
-    "typer[all]"
+    "typer[all]",
+    "snakeviz"
 ]
 
 dynamic = ["version"]
@@ -72,4 +73,4 @@ build-backend = "setuptools.build_meta"
 packages = ["GoldyBot", "goldy_bot"]
 
 [project.scripts]
-goldy-bot = "goldy_bot.__main__:app"
+goldy-bot = "goldy_bot.cli:app"

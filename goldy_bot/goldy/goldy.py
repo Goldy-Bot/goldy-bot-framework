@@ -7,8 +7,8 @@ if TYPE_CHECKING:
     from nextcore.http import HTTPClient
     from nextcore.gateway import ShardManager
 
-    from ..database import Database
     from ..config import Config
+    from ..database import Database
 
 from pathlib import Path
 from datetime import datetime
@@ -19,7 +19,8 @@ from .. import errors
 from .wrappers import (
     LegacyWrapper, 
     DockerWrapper, 
-    ExtensionsWrapper
+    ExtensionsWrapper,
+    RepoWrapper
 )
 from ..logger import goldy_bot_logger
 
@@ -27,7 +28,12 @@ __all__ = (
     "Goldy",
 )
 
-class Goldy(LegacyWrapper, DockerWrapper, ExtensionsWrapper):
+class Goldy(
+    LegacyWrapper, 
+    DockerWrapper, 
+    ExtensionsWrapper,
+    RepoWrapper
+):
     """
     The core class that wraps nextcore's shard manager and client. The framework's core class.
     """
@@ -102,7 +108,7 @@ class Goldy(LegacyWrapper, DockerWrapper, ExtensionsWrapper):
         included_extensions = self.config.included_extensions
 
         # Removing unwanted extensions.
-        self._remove_excluded_extensions(
+        self._remove_unwanted_extensions(
             extensions_dir, included_extensions
         )
 

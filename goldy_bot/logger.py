@@ -7,7 +7,7 @@ __all__ = (
 
 goldy_bot_logger = add_custom_handler(
     log.getLogger(f"{Colours.YELLOW.value}Goldy {Colours.ORANGE.value}Bot{Colours.RESET_COLOUR.value}"), 
-    level = log.DEBUG
+    level = log.INFO
 )
 """
 The logger object for Goldy Bot 🥞 Pancake.

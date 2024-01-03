@@ -1,5 +1,8 @@
 from __future__ import annotations
-from typing import Optional
+from typing import Optional, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from typing import Tuple
 
 import os
 import typer
@@ -32,7 +35,7 @@ env_config = AutoConfig(os.getcwd())
 @app.command()
 def start(
     debug: bool = typer.Option(None, help = "Enable extra logging details. THIS WILL SHOW YOUR BOT TOKEN!"),
-    token: Optional[str] = typer.Option(None, help = "Your discord bot token."),
+    bot_token: Optional[str] = typer.Option(None, help = "Your discord bot token."),
     database_url: Optional[str] = typer.Option(None, help = "Your mongoDB database connection url.")
 ):
     typer.echo(Colours.ORANGE.apply("Starting..."))
@@ -41,20 +44,9 @@ def start(
         goldy_bot_logger.setLevel(logging.DEBUG)
         app.pretty_exceptions_show_locals = True
 
-    if database_url is None:
-        database_url = env_config("MONGODB_URL", None)
+    bot_token, database_url = _get_token(bot_token, database_url)
 
-    if token is None:
-        token = env_config("DISCORD_TOKEN", None)
-
-    if token is None or database_url is None:
-        raise GoldyBotError(
-            "Either discord token or mongoDB url is missing.\n"
-            "Please enter them in their respective environment variables: DISCORD_TOKEN, MONGODB_URL\n" \
-            f"{Colours.RESET}Learn more at {INSTALL_SETUP_LINK}"
-        )
-
-    auth = BotAuthentication(token)
+    auth = BotAuthentication(bot_token)
 
     client = HTTPClient()
 
@@ -78,6 +70,20 @@ def start(
 
     asyncio.run(goldy.start())
 
-@app.command()
-def test():
-    typer.echo("Omg you tested it!")
+
+def _get_token(bot_token: Optional[str], database_url: Optional[str]) -> Tuple[str, str]:
+
+    if bot_token is None:
+        bot_token = env_config("DISCORD_TOKEN", None)
+
+    if database_url is None:
+        database_url = env_config("MONGODB_URL", None)
+
+    if bot_token is None or database_url is None:
+        raise GoldyBotError(
+            "Either the discord bot token or mongoDB url is missing.\n"
+            "Please enter them in their respective environment variables: DISCORD_TOKEN, MONGODB_URL\n" \
+            f"{Colours.RESET}Learn more at {INSTALL_SETUP_LINK}"
+        )
+
+    return bot_token, database_url

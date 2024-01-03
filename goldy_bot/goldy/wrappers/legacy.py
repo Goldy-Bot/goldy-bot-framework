@@ -66,6 +66,7 @@ class GoldyConfigTranslationLayer(LegacyGoldyConfig):
 class LegacyWrapper():
     """Wraps some attributes from the legacy goldy class for the new 🥞 pancake one."""
     def __init__(self) -> None:
+        legacy_gbot_logger.setLevel(goldy_bot_logger.level)
         GoldyBot.info.VERSION = goldy_bot.__version__
 
         self.__legacy_goldy: LegacyGoldy = None

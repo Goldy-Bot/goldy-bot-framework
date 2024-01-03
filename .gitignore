@@ -8,5 +8,6 @@ __pycache__
 .coverage
 .vscode
 .ruff_cache
+.env
 
 demo/*
