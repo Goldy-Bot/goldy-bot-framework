@@ -15,13 +15,6 @@ __all__ = (
     "Database",
 )
 
-# TODO: Move to where the database manager will be initialized.
-# MONGODB_URL = config(
-#     "MONGODB_URL", 
-#     default = "mongodb://localhost:27017", 
-#     cast = str
-# )
-
 class Database():
     """
     The Goldy Bot 🥞 Pancake class for managing the database.
