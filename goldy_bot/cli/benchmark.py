@@ -10,22 +10,25 @@ from goldy_bot import (
     Config, 
     GOLDY_INTENTS
 )
+from devgoldyutils import LoggerAdapter, Colours
 
 from nextcore.gateway import ShardManager
 from nextcore.http import BotAuthentication, HTTPClient
 
-from .__main__ import app, _get_token
+from .__main__ import app, get_token
 
 __all__ = (
     "bench_start_up",
 )
+
+logger = LoggerAdapter(app.logger, prefix = Colours.ORANGE.apply("bench_start_up"))
 
 @app.command()
 def bench_start_up(
     bot_token: Optional[str] = typer.Option(None, help = "Your discord bot token."),
     database_url: Optional[str] = typer.Option(None, help = "Your mongoDB database connection url.")
 ):
-    bot_token, database_url = _get_token(bot_token, database_url)
+    bot_token, database_url = get_token(bot_token, database_url)
 
     with Profile() as profile:
         auth = BotAuthentication(bot_token)
