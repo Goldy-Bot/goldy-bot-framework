@@ -85,7 +85,7 @@ class Goldy(
             event_name = "READY"
         )
 
-        await self._legacy_setup()
+        await self._legacy_setup() # TODO: does this have to be done here?
 
         # Raise a error and exit whenever a critical error occurs.
         error = await self.shard_manager.dispatcher.wait_for(lambda reason: True, "critical")

@@ -78,7 +78,7 @@ class ExtensionsWrapper():
 
         extension = load_function(self) if load_function.__code__.co_argcount > 0 else load_function()
 
-        if legacy is True:
+        if legacy is True: # when running in legacy mode extension can be none.
             self.logger.debug("Called the extension load function successfully!")
         else:
             self.logger.debug(f"Called the '{extension.name}' extension load function successfully!")
