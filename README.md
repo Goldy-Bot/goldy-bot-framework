@@ -24,10 +24,10 @@ Goldy bot is my custom framework built from the ground up to meet my discord bot
 I implement what I need when I need it as I want to keep things to a minimum. The point of this project is to have a framework/library that's tuned towards my needs, so I can reduce the overhead for myself while developing discord bots. With that said you may dislike the way certain things are implemented, so I highly recommend you seek an API wrapper like [nextcord](https://github.com/nextcord/nextcord) or [discord.py](https://github.com/Rapptz/discord.py) for your discord development needs.
 
 ## Table of Contents
-- [⚒️ Normal Setup](#-installset-up---normal)
+- [⚗️ Normal Setup](#-installset-up---normal)
 - [🐬 Docker Setup](#-installset-up---docker)
 
-## ⚒️ *Install/Set Up* - ``Normal``
+## ⚗️ *Install/Set Up* - ``Normal``
 
 These instructions assume you have a [MongoDB database](https://www.mongodb.com/), [Git](https://git-scm.com/) and [Python](https://www.python.org/) installed.
 
@@ -51,11 +51,10 @@ Create a directory of your choice anywhere, then open a terminal in that directo
 ```sh
 # Windows/Linux
 
-goldybot setup
+goldy-bot setup
 ```
 
 3. **Run goldy!** ⚡
-
 Make sure to enter your Discord BOT token and MongoDB database URL in the ``.env`` file generated in your folder.
 ```env
 DISCORD_TOKEN="DISCORD BOT TOKEN HERE"
@@ -63,43 +62,37 @@ MONGODB_URL="MONGO DATABASE URL HERE"
 ```
 
 ### JSON Configuration
+Also, make sure to add your discord guild to ``test_guild_id`` in ``goldy.toml`` if you are testing or developing. Slash Commands will update quicker, as they will be registered as guild commands instead of global commands. Check out [discord's explanation](https://discord.com/developers/docs/interactions/application-commands#registering-a-command) of global and guild commands for more clarification. Although during production be sure to remove it.
 
-Also, make sure to add your discord guild to ``allowed_guilds`` in ``goldy.json``.
+You may also want to add your discord member ID to ``developer_id``, like so: ``developer_id = "332592361307897856"``. If you don't you will be unable to run framework debug commands.
+```toml
+version = 2
 
-You may change ``"test_server"`` BUT **ONLY** if it's not a server you're going to be developing and testing on. The code name ``test_server`` is already reserved for you to use as a development environment to test your commands. Slash Commands will reload/update quicker in the ``test_server`` as they will be registered as guild commands instead of global commands. Check out [discord's explanation](https://discord.com/developers/docs/interactions/application-commands#registering-a-command) of global and guild commands for more clarification. 
+[branding]
+name = "Goldy Bot"
+emoticon = "🥞"
 
-If your guild/server is not a testing server you may name it whatever you like but just remember this will be the code_name of the guild within goldy bot and you'll use this code_name to reference it later.
+[extensions]
+repos = []
+include = [] # Find extension code names at https://github.com/Goldy-Bot/goldybot.repo
+ignore = [] # e.g. include = ["music.sharing"] <-- {extension}.{module/command}
 
-You may also want to add your discord member id to ``"bot_dev"``, like so: ``"bot_dev": "332592361307897856"``. If you don't you may be unable to run specific bot administration commands within Discord.
-```json
-{
-    "version": 1,
-    "goldy" : {
-        "branding": {
-            "name": "💛 Goldy Bot"
-        },
-        "extensions": {
-            "include": [],
+[extensions.load]
+directory = "./extensions"
+raise_on_error = true
 
-            "ignored_extensions" : [],
-            "late_load_extensions": [],
+# It's extreamly reccomended you include a test guild id 
+# if you are testing/developing, otherwise global commands will be 
+# loaded instead of guild commands resulting in commands taking FOREVER to load.
 
-            "raise_on_load_error" : true,
-            "folder_location" : "./extensions"
-        },
-        "allowed_guilds" : {
-            "{guild_id_here}" : "test_server"
-        },
-
-        "bot_dev": null,
-        "ding_on_exit": false
-    }
-}
+# [development]
+# test_guild_id = ""
+# developer_id = ""
 ```
 
-**Now you may run GoldyBot! 🌠✨**
+**Now you may run goldy bot! 🌠✨**
 ```sh
-python run.py
+goldy-bot start
 ```
 and you're done ✨
 
@@ -107,18 +100,12 @@ and you're done ✨
 As of Goldy Bot ``v5.0dev12``, extensions are no longer pre-included due to this [issue](https://github.com/Goldy-Bot/Goldy-Bot-Framework/issues/105).
 
 So now if you would like to include them you would need to specify it in the config with ``include`` like so:
-```json
-{
-    "goldy" : {
-        "extensions": {
-            "include": ["mal_cord"]
-        }
-    }
-}
+```toml
+[extensions]
+repos = []
+include = ["mal_cord"]
 ```
 and you can find the extension code names at the [goldybot.repo](https://github.com/Goldy-Bot/goldybot.repo) github repository.
-
-<br>
 
 ## 🐬 *Install/Set Up* - ``Docker``
 
@@ -154,11 +141,3 @@ Now run docker compose once again and goldy should be running after the MongoDB 
 ```sh
 docker compose up
 ```
-
-<br>
-
-<div align="center">
-
-  **© Copyright (C) 2023 Goldy (Under the [GPL-3.0 License](LICENSE))**
-
-</div>
