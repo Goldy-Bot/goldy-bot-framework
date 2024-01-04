@@ -2,6 +2,8 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
+    from typing import Optional
+
     from goldy_bot.goldy import Goldy
 
 import asyncio
@@ -69,11 +71,12 @@ class LegacyWrapper():
         legacy_gbot_logger.setLevel(goldy_bot_logger.level)
         GoldyBot.info.VERSION = goldy_bot.__version__
 
-        self.__legacy_goldy: LegacyGoldy = None
+        self.__legacy_goldy: Optional[LegacyGoldy] = None
 
         super().__init__()
 
     def _initialize_legacy_goldy(self: Goldy):
+        """Do not use this method! Initializes legacy API goldy class."""
 
         def __legacy_init_interceptor(goldy_self: LegacyGoldy):
             bot_authentication = self.shard_manager.authentication
@@ -125,7 +128,8 @@ class LegacyWrapper():
         self.__legacy_goldy = LegacyGoldy()
 
     async def _legacy_setup(self: Goldy) -> None:
-        """Legacy support method. Do not use!"""
-        await self.__legacy_goldy.pre_setup()
-        await self.__legacy_goldy.setup()
+        """Do not use this method! Runs legacy API setup routine."""
+        if self.__legacy_goldy is not None:
+            await self.__legacy_goldy.pre_setup()
+            await self.__legacy_goldy.setup()
 
