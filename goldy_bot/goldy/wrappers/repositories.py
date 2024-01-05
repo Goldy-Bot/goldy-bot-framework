@@ -18,10 +18,10 @@ from urllib.parse import urlparse
 from devgoldyutils import shorter_path
 
 __all__ = (
-    "RepoWrapper",
+    "Repo",
 )
 
-class RepoWrapper():
+class Repo():
     def __init__(self: Goldy | Self) -> None:
         self.__repo_data: Optional[Tuple[List[str], Dict[str, ExtensionRepoData]]] = None
 

@@ -2,9 +2,12 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from typing import Optional
+    from typing import Optional, List, Tuple
+    from discord_typings import ApplicationCommandPayload, ApplicationCommandData
 
     from goldy_bot.goldy import Goldy
+
+    from GoldyBot.goldy.commands import slash_command
 
 import asyncio
 from devgoldyutils import Colours, LoggerAdapter
@@ -31,7 +34,7 @@ import goldy_bot
 from ...logger import goldy_bot_logger
 
 __all__ = (
-    "LegacyWrapper",
+    "Legacy",
 )
 
 # NOTE: All the stuff you are seeing here is for pre-pancake legacy support. DO NOT TOUCH ANY OF THIS from the pancake API!
@@ -66,7 +69,7 @@ class GoldyConfigTranslationLayer(LegacyGoldyConfig):
                 f"{test_guild_id}": "test_server"
             }
 
-class LegacyWrapper():
+class Legacy():
     """Wraps some attributes from the legacy goldy class for the new 🥞 pancake one."""
     def __init__(self) -> None:
         legacy_gbot_logger.setLevel(goldy_bot_logger.level)
@@ -110,6 +113,64 @@ class LegacyWrapper():
 
             LegacyDatabase.__init__ = __legacy_database_interceptor
 
+            async def __batch_create_interactions(
+                cmd_loader_self: LegacyCommandLoader, 
+                slash_commands_to_register: List[slash_command.SlashCommand], 
+                slash_command_payloads: List[ApplicationCommandPayload], 
+                testing_server: Tuple[str, str] | None
+            ) -> None:
+                created_interaction_cmds: List[ApplicationCommandData] = []
+
+                # Creating global commands.
+                # --------------------------
+                if testing_server is None:
+                    created_interaction_cmds += await self.create_application_commands(
+                        slash_command_payloads
+                    )
+
+                    cmd_loader_self.logger.debug("Created global commands.")
+
+                # Creating guild commands for testing server.
+                # --------------------------------------------
+                else:
+                    # Adding test warning to all slash commands for the test server.
+                    for payload in slash_command_payloads:
+                        test_description = "⚒️ THIS IS A TEST COMMAND REGISTERED JUST FOR THIS GUILD"
+                        
+                        # Setting test description to all first layer sub commands.
+                        for option in payload["options"]:
+                            if not option["type"] == 1:
+                                continue
+
+                            option["description"] = test_description
+
+                        payload["description"] = test_description
+
+                    created_interaction_cmds += await self.create_application_commands(
+                        slash_command_payloads, guild_id = testing_server[0]
+                    )
+
+                    cmd_loader_self.logger.debug("Created guild commands for test server.")
+
+                # Registering slash commands with the id given by discord.
+                # ----------------------------------------------------------
+                for interaction_cmd in created_interaction_cmds:
+
+                    for command in slash_commands_to_register:
+
+                        if command.name == interaction_cmd["name"]:
+
+                            if interaction_cmd.get("guild_id") is not None:
+                                command.register(f"{interaction_cmd.get('guild_id')}:{interaction_cmd['id']}")
+                            else:
+                                command.register(f"{interaction_cmd['id']}")
+
+                            break
+
+                return None
+
+            LegacyCommandLoader._CommandLoader__batch_create_interactions = __batch_create_interactions
+
             # Emptying the load and pull method as it should no longer be used.
             LegacyExtensionLoader.load = lambda x: None
             LegacyExtensionLoader.pull = lambda x: None
@@ -137,4 +198,3 @@ class LegacyWrapper():
             self.__legacy_goldy.bot_user = LegacyMember(bot_user_data, None, self.__legacy_goldy)
 
             await self.__legacy_goldy.setup()
-

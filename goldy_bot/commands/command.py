@@ -69,7 +69,7 @@ class Command():
             }
         )
 
-        self.logger.info(f"Registered '{command.name}' as subcommand for '{self.name}'.")
+        self.logger.info(f"Added subcommand '{command.name}' to '{self.name}'.")
 
     # Honestly this was all just stolen from pre-pancake (legacy).
     def __options_parser(

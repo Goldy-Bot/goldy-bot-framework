@@ -1,10 +1,10 @@
 import os
 
 __all__ = (
-    "DockerWrapper",
+    "Docker",
 )
 
-class DockerWrapper():
+class Docker():
     def __init__(self) -> None:
         super().__init__()
 

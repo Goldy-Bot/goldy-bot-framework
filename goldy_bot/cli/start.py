@@ -27,10 +27,21 @@ logger = LoggerAdapter(app.logger, prefix = Colours.ORANGE.apply("start"))
 
 @app.command()
 def start(
-    debug: bool = typer.Option(False, help = "Enable extra logging details. THIS WILL SHOW YOUR BOT TOKEN!"),
-    cache: bool = typer.Option(True, help = "Whether goldy bot should cache or not. If set to false, the cache will be cleared before setup.", ),
-    bot_token: Optional[str] = typer.Option(None, help = "Your discord bot token."),
-    database_url: Optional[str] = typer.Option(None, help = "Your mongoDB database connection url.")
+    debug: bool = typer.Option(
+        False, help = "Enable extra logging details. THIS WILL SHOW YOUR BOT TOKEN!"
+    ),
+    cache: bool = typer.Option(
+        True, help = "Whether goldy bot should cache or not. If set to false, the cache will be cleared before setup."
+    ),
+    legacy: bool = typer.Option(
+        True, help = "Launches goldy bot pancake setup in legacy mode to support older extensions that are still using the old legacy API."
+    ),
+    bot_token: Optional[str] = typer.Option(
+        None, help = "Your discord bot token."
+    ),
+    database_url: Optional[str] = typer.Option(
+        None, help = "Your mongoDB database connection url."
+    )
 ):
     """Convenient cli command to start up the goldy bot framework in this current working directory."""
     logger.info(Colours.ORANGE.apply("Awakening her..."))
@@ -65,7 +76,7 @@ def start(
         goldy.clear_cache()
 
     async def main():
-        await goldy.setup(legacy = True)
+        await goldy.setup(legacy)
         await goldy.start()
 
     asyncio.run(main())

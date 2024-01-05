@@ -18,7 +18,7 @@ MAIN_REPOS = ["https://github.com/Goldy-Bot/goldybot.repo"]
 @dataclass
 class Config():
     """Class that provides interface for the goldy.toml file."""
-    path: str
+    path: Optional[str]
     data: ConfigData = field(repr = False, default = None)
 
     branding_name: str = field(init = False)

@@ -19,12 +19,7 @@ from nextcore.http import UnauthorizedError
 
 from .. import errors
 from .wrappers import (
-    LegacyWrapper, 
-    DockerWrapper, 
-    ExtensionsWrapper,
-    RepoWrapper,
-    CacheWrapper,
-    DiscordWrapper
+    DiscordWrapper, FrameworkWrapper
 )
 from ..logger import goldy_bot_logger
 
@@ -33,12 +28,7 @@ __all__ = (
 )
 
 class Goldy(
-    LegacyWrapper, 
-    CacheWrapper,
-    DockerWrapper, 
-    ExtensionsWrapper,
-    RepoWrapper,
-    DiscordWrapper
+    FrameworkWrapper, DiscordWrapper
 ):
     """
     The core class that wraps nextcore's shard manager and client. The framework's core class.
@@ -145,7 +135,7 @@ class Goldy(
         await self.client.setup()
 
         # Registering commands.
-        await self._register_commands()
+        await self._sync_commands()
 
     async def stop(self, reason: Optional[str] = None) -> None:
         """Stops Goldy Bot Pancake."""

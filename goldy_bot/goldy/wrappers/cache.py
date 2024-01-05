@@ -15,10 +15,10 @@ import json
 from pathlib import Path
 
 __all__ = (
-    "CacheWrapper",
+    "Cache",
 )
 
-class CacheWrapper():
+class Cache():
     """Goldy bot's caching system."""
     def __init__(self) -> None:
         self._cache_file = Path(".goldy_cache.owo")
