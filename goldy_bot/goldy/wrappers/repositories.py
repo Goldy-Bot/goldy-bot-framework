@@ -3,6 +3,7 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from typing import List, Optional, Tuple, Dict
+    from typing_extensions import Self
 
     from ..goldy import Goldy
     from ...typings import RepoData, ExtensionRepoData
@@ -21,12 +22,12 @@ __all__ = (
 )
 
 class RepoWrapper():
-    def __init__(self) -> None:
-        self.__repo_data: Tuple[List[str], Dict[str, ExtensionRepoData]] = None
+    def __init__(self: Goldy | Self) -> None:
+        self.__repo_data: Optional[Tuple[List[str], Dict[str, ExtensionRepoData]]] = None
 
         super().__init__()
 
-    def pull_extension(self: Goldy | RepoWrapper, extension_name: str, destination_folder: Path, repos: Optional[List[str]] = None) -> None:
+    def pull_extension(self: Goldy | Self, extension_name: str, destination_folder: Path, repos: Optional[List[str]] = None) -> None:
         """
         Pulls down the extension that you specified from the official goldy bot repo into the destination folder if it doesn't already exist.
         """
@@ -66,7 +67,7 @@ class RepoWrapper():
 
         return True
 
-    def _remove_unwanted_extensions(self: Goldy, extension_path: Path, included_extensions: List[str]) -> None:
+    def _remove_unwanted_extensions(self: Goldy | Self, extension_path: Path, included_extensions: List[str]) -> None:
         """Removes extensions in the path that are not present in the included list."""
         self.logger.info("Removing unwanted extensions...")
 
@@ -112,10 +113,10 @@ class RepoWrapper():
                 ["git", "config", "--global", "--add", "safe.directory", "/app/goldy"]
             )
 
-    def __get_repo_data(self: Goldy | RepoData, repos: List[str]) -> Dict[str, ExtensionRepoData]:
+    def __get_repo_data(self: Goldy | Self, repos: List[str]) -> Dict[str, ExtensionRepoData]:
         """Method to retrieve data from goldy bot repositories. Supports GitHub urls and caches data."""
-        repos.reverse() # I reverse it so whatever repo you add after 
-        # the main repo the extensions there are sure to override the main repo.
+        if self.__repo_data is None:
+            self.__repo_data = self.get_cache("repo_data")
 
         if self.__repo_data is None or not repos == self.__repo_data[0]:
             merged_extensions: Dict[str, ExtensionRepoData] = {}
@@ -147,11 +148,13 @@ class RepoWrapper():
                         f"Failed to get this repo! Extensions in that repo will not be pulled! \nResponse: {r}"
                     )
 
-            self.__repo_data = (repos, merged_extensions)
+            self.__repo_data = self.set_cache(
+                "repo_data", (repos, merged_extensions)
+            )
 
         return self.__repo_data[1]
 
-    def __is_extension_git_submodule(self: Goldy | RepoWrapper, extension_name: str) -> bool:
+    def __is_extension_git_submodule(self: Goldy, extension_name: str) -> bool:
         """Stats whether a git submodule for this extension exists."""
         submodule_extension_paths = []
 

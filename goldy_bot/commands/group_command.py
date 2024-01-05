@@ -6,11 +6,11 @@ if TYPE_CHECKING:
 
     from GoldyBot import SlashOption
 
-    from .command import Command
     from ..platter import Platter
 
 from devgoldyutils import LoggerAdapter
 
+from .command import Command
 from ..logger import goldy_bot_logger
 
 __all__ = (

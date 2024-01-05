@@ -22,7 +22,8 @@ from GoldyBot.goldy import (
     CommandListener as LegacyCommandListener, 
     ExtensionLoader as LegacyExtensionLoader, 
     GuildManager as LegacyGuildManager, 
-    PermissionSystem as LegacyPermissionSystem
+    PermissionSystem as LegacyPermissionSystem,
+    Member as LegacyMember
 )
 from GoldyBot.logging import goldy_bot_logger as legacy_gbot_logger
 
@@ -89,7 +90,7 @@ class LegacyWrapper():
             goldy_self.nc_authentication = bot_authentication
             goldy_self.intents = 1 << 9 | 1 << 15 | 1 << 7 | 1 << 0
 
-            goldy_self.http_client = self.http_client
+            goldy_self.http_client = self.client
             goldy_self.shard_manager = self.shard_manager
 
             goldy_self.start_up_time = self.boot_datetime
@@ -130,6 +131,10 @@ class LegacyWrapper():
     async def _legacy_setup(self: Goldy) -> None:
         """Do not use this method! Runs legacy API setup routine."""
         if self.__legacy_goldy is not None:
-            await self.__legacy_goldy.pre_setup()
+            bot_user_data = await self.get_bot_user_data(bucket_priority = 1)
+
+            self.__legacy_goldy.application_data = await self.get_application_data()
+            self.__legacy_goldy.bot_user = LegacyMember(bot_user_data, None, self.__legacy_goldy)
+
             await self.__legacy_goldy.setup()
 

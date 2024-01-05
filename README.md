@@ -75,13 +75,13 @@ emoticon = "🥞"
 [extensions]
 repos = []
 include = [] # Find extension code names at https://github.com/Goldy-Bot/goldybot.repo
-ignore = [] # e.g. include = ["music.sharing"] <-- {extension}.{module/command}
+ignore = [] # e.g. ignore = ["music.sharing"] <-- {extension}.{module/command}
 
 [extensions.load]
 directory = "./extensions"
 raise_on_error = true
 
-# It's extreamly reccomended you include a test guild id 
+# It's extremely recommended you include a test guild id 
 # if you are testing/developing, otherwise global commands will be 
 # loaded instead of guild commands resulting in commands taking FOREVER to load.
 

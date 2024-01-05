@@ -27,14 +27,15 @@ logger = LoggerAdapter(app.logger, prefix = Colours.ORANGE.apply("start"))
 
 @app.command()
 def start(
-    debug: bool = typer.Option(None, help = "Enable extra logging details. THIS WILL SHOW YOUR BOT TOKEN!"),
+    debug: bool = typer.Option(False, help = "Enable extra logging details. THIS WILL SHOW YOUR BOT TOKEN!"),
+    cache: bool = typer.Option(True, help = "Whether goldy bot should cache or not. If set to false, the cache will be cleared before setup.", ),
     bot_token: Optional[str] = typer.Option(None, help = "Your discord bot token."),
     database_url: Optional[str] = typer.Option(None, help = "Your mongoDB database connection url.")
 ):
     """Convenient cli command to start up the goldy bot framework in this current working directory."""
     logger.info(Colours.ORANGE.apply("Awakening her..."))
 
-    if debug is not None:
+    if debug is True:
         goldy_bot_logger.setLevel(logging.DEBUG)
         app.pretty_exceptions_show_locals = True
 
@@ -60,6 +61,11 @@ def start(
         config = config
     )
 
-    goldy.setup(legacy = True)
+    if cache is False:
+        goldy.clear_cache()
 
-    asyncio.run(goldy.start())
+    async def main():
+        await goldy.setup(legacy = True)
+        await goldy.start()
+
+    asyncio.run(main())

@@ -5,8 +5,8 @@ if TYPE_CHECKING:
     from typing import List, Optional, Tuple
 
     from ..goldy import Goldy
-    from ...extensions import Extension
     from ...typings import ExtensionLoadFuncT, ExtensionMetadataData
+    from ...commands import Command
 
 import sys
 import toml
@@ -14,7 +14,10 @@ import importlib.util
 from pathlib import Path
 from devgoldyutils import shorter_path
 
+from nextcore.http import Route
+
 from ...errors import GoldyBotError
+from ...extensions import Extension
 
 __all__ = (
     "ExtensionsWrapper",
@@ -28,7 +31,7 @@ class ExtensionsWrapper():
         super().__init__()
 
     def add_extension(self: Goldy, extension: Extension) -> None:
-        """Method to add an extension to the framework."""
+        """Adds an extension to goldy bot's internal state."""
         self.extensions.append(extension)
 
         self.logger.info(
@@ -79,11 +82,56 @@ class ExtensionsWrapper():
         extension = load_function(self) if load_function.__code__.co_argcount > 0 else load_function()
 
         if legacy is True: # when running in legacy mode extension can be none.
+
+            if not isinstance(extension, Extension):
+                extension = None # some legacy extensions are using lambda expressions so they tend to return a class instead of None.
+
             self.logger.debug("Called the extension load function successfully!")
         else:
             self.logger.debug(f"Called the '{extension.name}' extension load function successfully!")
 
         return extension
+
+    async def _register_commands(self: Goldy) -> None:
+        """Registers all the commands from each extension in goldy bot's internal state."""
+        commands_to_register: List[Command] = []
+
+        for extension in self.extensions:
+
+            for commands in extension._commands.values():
+                commands_to_register.extend(commands)
+
+        payload_batch = [command.payload for command in commands_to_register]
+
+        test_guild_id = self.config.test_guild_id
+        app_data = await self.get_application_data()
+
+        if test_guild_id is not None:
+            self.logger.info("Registering guild commands...")
+            await self.client.request(
+                Route(
+                    "PUT", 
+                    "/applications/{application_id}/guilds/{guild_id}/commands",
+                    application_id = app_data["id"],
+                    guild_id = test_guild_id
+                ),
+                json = payload_batch,
+                **self.key_and_headers
+            )
+
+        else:
+            self.logger.info("Registering global commands...")
+            await self.client.request(
+                Route(
+                    "PUT", 
+                    "/applications/{application_id}/commands",
+                    application_id = app_data["id"]
+                ),
+                json = payload_batch,
+                **self.key_and_headers
+            )
+
+        self.logger.info("Commands have been registered with discord!")
 
     def _get_extension_metadata(self: Goldy, extension_path: Path) -> Optional[ExtensionMetadataData]:
         root_path = extension_path.parent

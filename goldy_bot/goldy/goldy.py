@@ -2,13 +2,15 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from typing import Optional
+    from typing import Optional, TypedDict, Dict
 
     from nextcore.http import HTTPClient
     from nextcore.gateway import ShardManager
 
     from ..config import Config
     from ..database import Database
+
+    KeyAndHeaders = TypedDict("KeyAndHeaders", {"rate_limit_key": str, "headers": Dict[str, str]})
 
 from pathlib import Path
 from datetime import datetime
@@ -20,7 +22,9 @@ from .wrappers import (
     LegacyWrapper, 
     DockerWrapper, 
     ExtensionsWrapper,
-    RepoWrapper
+    RepoWrapper,
+    CacheWrapper,
+    DiscordWrapper
 )
 from ..logger import goldy_bot_logger
 
@@ -30,9 +34,11 @@ __all__ = (
 
 class Goldy(
     LegacyWrapper, 
+    CacheWrapper,
     DockerWrapper, 
     ExtensionsWrapper,
-    RepoWrapper
+    RepoWrapper,
+    DiscordWrapper
 ):
     """
     The core class that wraps nextcore's shard manager and client. The framework's core class.
@@ -44,8 +50,8 @@ class Goldy(
         database: Database,
         config: Config
     ) -> None:
-        self.http_client = http_client
-        self.shard_manager = shard_manager
+        self.client: HTTPClient = http_client
+        self.shard_manager: ShardManager = shard_manager
 
         self.database = database
         """An instance of the framework's mongo database."""
@@ -54,6 +60,12 @@ class Goldy(
         self.boot_datetime: Optional[datetime] = None
         """The time and date the framework spun up."""
 
+        self.key_and_headers: KeyAndHeaders = {
+            "rate_limit_key": self.shard_manager.authentication.rate_limit_key, 
+            "headers": self.shard_manager.authentication.headers
+        }
+        """Shorthand attribute you can use to pass rate limit keys and headers to ``nextcore.http.HTTPClient.request()``."""
+
         self.logger = LoggerAdapter(goldy_bot_logger, Colours.ORANGE.apply("Goldy"))
 
         super().__init__()
@@ -61,8 +73,6 @@ class Goldy(
     async def start(self) -> None:
         """Starts Goldy Bot 🥞 Pancake."""
         self.boot_datetime = datetime.now()
-
-        await self.http_client.setup()
 
         try:
             await self.shard_manager.connect()
@@ -94,10 +104,10 @@ class Goldy(
             f"Nextcore gateway has closed for the reason '{error[0]}'.")
         )
 
-    def setup(self, legacy: bool = False) -> None:
+    async def setup(self, legacy: bool = False) -> None:
         """
         Does the setup for you if you would not like to handle it yourself. 
-        Pulling extensions, loading extensions, loading commands and etc.
+        Pulling extensions, loading extensions, registering commands and etc.
         """
         self.logger.info("Running goldy bot setup...")
 
@@ -131,6 +141,12 @@ class Goldy(
 
                 self.add_extension(extension)
 
+        # Setting up nextcore client.
+        await self.client.setup()
+
+        # Registering commands.
+        await self._register_commands()
+
     async def stop(self, reason: Optional[str] = None) -> None:
         """Stops Goldy Bot Pancake."""
         reason = reason or "goldy.stop() was executed. (No reason was given)"
@@ -143,5 +159,5 @@ class Goldy(
 
     async def _clean_up(self) -> None:
         """Cleans up the framework by closing clients and more."""
-        await self.http_client.close()
+        await self.client.close()
         await self.shard_manager.close()
