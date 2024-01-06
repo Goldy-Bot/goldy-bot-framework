@@ -13,9 +13,16 @@ if TYPE_CHECKING:
 
 import json
 from pathlib import Path
+from devgoldyutils import Colours, LoggerAdapter
+
+from ...logger import goldy_bot_logger
 
 __all__ = (
     "Cache",
+)
+
+logger = LoggerAdapter(
+    goldy_bot_logger, prefix = Colours.BLUE.apply("Cache")
 )
 
 class Cache():

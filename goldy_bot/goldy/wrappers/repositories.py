@@ -15,10 +15,16 @@ import requests
 import subprocess
 from pathlib import Path
 from urllib.parse import urlparse
-from devgoldyutils import shorter_path
+from devgoldyutils import shorter_path, LoggerAdapter, Colours
+
+from ...logger import goldy_bot_logger
 
 __all__ = (
     "Repo",
+)
+
+logger = LoggerAdapter(
+    goldy_bot_logger, prefix = Colours.PINK_GREY.apply("Repo")
 )
 
 class Repo():
@@ -38,27 +44,27 @@ class Repo():
 
         if not destination_folder.exists():
             destination_folder.mkdir()
-            self.logger.debug(
+            logger.debug(
                 f"Created destination folder '{destination_folder}' as it didn't exist for pulling."
             )
 
-        self.logger.info(f"Pulling extension '{extension_name}' to '{destination_folder}'...")
+        logger.info(f"Pulling extension '{extension_name}' to '{destination_folder}'...")
 
         repo_extensions = self.__get_repo_data(repos)
         extension_path = destination_folder.joinpath(extension_name)
 
         if extension_name not in repo_extensions:
-            self.logger.error(f"Could not find the extension '{extension_name}' in these repositories!")
+            logger.error(f"Could not find the extension '{extension_name}' in these repositories!")
             return False
 
-        self.logger.debug(f"Found '{extension_name}' extension in repo.")
+        logger.debug(f"Found '{extension_name}' extension in repo.")
 
         if extension_path.exists():
-            self.logger.debug(f"'{extension_name}' already exists so we will not git clone it.") 
+            logger.debug(f"'{extension_name}' already exists so we will not git clone it.") 
             # TODO: Should we have this git pull new commits instead?
             return True
 
-        self.logger.info(f"Adding '{extension_name}' extension as git sub module...")
+        logger.info(f"Adding '{extension_name}' extension as git sub module...")
         git_url = repo_extensions[extension_name]["git_url"]
 
         subprocess.check_call(
@@ -69,46 +75,46 @@ class Repo():
 
     def _remove_unwanted_extensions(self: Goldy | Self, extension_path: Path, included_extensions: List[str]) -> None:
         """Removes extensions in the path that are not present in the included list."""
-        self.logger.info("Removing unwanted extensions...")
+        logger.info("Removing unwanted extensions...")
 
         for path in extension_path.iterdir():
             shortened_path = shorter_path(path)
 
             if path.is_file() or path.name in included_extensions:
-                self.logger.debug(f"'{shortened_path}' is safe from removal.")
+                logger.debug(f"'{shortened_path}' is safe from removal.")
                 continue
 
             is_submodule = self.__is_extension_git_submodule(path.name)
 
             if not is_submodule:
-                self.logger.debug(f"'{shortened_path}' is safe from removal as it is not a valid git submodule.")
+                logger.debug(f"'{shortened_path}' is safe from removal as it is not a valid git submodule.")
                 continue
 
-            self.logger.warning(
+            logger.warning(
                 f"Removing the extension at '{shortened_path}' as it's not included."
             )
 
             subprocess.call(["git", "rm", f"{path}", "-f"])
 
-            self.logger.info(f"The extension at '{shortened_path}' was removed.")
+            logger.info(f"The extension at '{shortened_path}' was removed.")
 
     def _git_setup(self: Goldy) -> None:
         """Makes sure git is ready for goldy bot operations."""
         if ".git" not in os.listdir("."):
-            self.logger.debug("Root directory is not a git repository so I'm making it one...")
+            logger.debug("Root directory is not a git repository so I'm making it one...")
             os.system("git init")
 
         if ".gitmodules" not in os.listdir("."):
-            self.logger.debug("No '.gitmodules' file in root so I'm creating one...")
+            logger.debug("No '.gitmodules' file in root so I'm creating one...")
             open(".gitmodules", "w").close()
 
         if ".gitattributes" not in os.listdir("."):
-            self.logger.debug("No '.gitattributes' file in root so I'm creating one...")
+            logger.debug("No '.gitattributes' file in root so I'm creating one...")
             with open(".gitattributes", "w") as file:
                 file.write("# Auto detect text files and perform LF normalization\n* text=auto")
 
         if self.in_docker:
-            self.logger.debug("Setting root path to git's safe directory as you are running under docker...")
+            logger.debug("Setting root path to git's safe directory as you are running under docker...")
             subprocess.run(
                 ["git", "config", "--global", "--add", "safe.directory", "/app/goldy"]
             )
@@ -127,7 +133,7 @@ class Repo():
                 if "github.com" in phrased_url.netloc:
                     repo_url = "https://raw.githubusercontent.com" + phrased_url.path + "/main/repo.toml"
 
-                self.logger.debug(f"Making request to repo at '{repo_url}'...")
+                logger.debug(f"Making request to repo at '{repo_url}'...")
                 r = requests.get(repo_url)
 
                 if r.ok:
@@ -144,7 +150,7 @@ class Repo():
 
                     merged_extensions.update(repo_data_copy["extensions"])
                 else:
-                    self.logger.error(
+                    logger.error(
                         f"Failed to get this repo! Extensions in that repo will not be pulled! \nResponse: {r}"
                     )
 
@@ -164,7 +170,7 @@ class Repo():
         except subprocess.CalledProcessError as e:
 
             if e.returncode == 128:
-                self.logger.warning(
+                logger.warning(
                     "Git detects that .gitsubmodules has been tampered with. " \
                         "Please do not mess with this file as it will break the management of goldy bot extensions."
                 )

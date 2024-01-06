@@ -2,11 +2,9 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from typing import Type, Callable, Optional
+    from typing import Callable, Optional
 
     from logging import Logger
-
-    from goldy_bot import Config
 
 from GoldyBot.errors import GoldyBotError
 
