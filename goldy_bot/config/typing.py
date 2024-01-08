@@ -15,6 +15,7 @@ BrandingData = TypedDict(
 ExtensionsLoadData = TypedDict(
     "ExtensionsLoadData", {
         "directory": str,
+        "legacy_mode": bool,
         "raise_on_error": bool
     }
 )

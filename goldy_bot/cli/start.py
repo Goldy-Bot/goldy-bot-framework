@@ -33,8 +33,8 @@ def start(
     cache: bool = typer.Option(
         True, help = "Whether goldy bot should cache or not. If set to false, the cache will be cleared before setup."
     ),
-    legacy: bool = typer.Option(
-        True, help = "Launches goldy bot pancake setup in legacy mode to support older extensions that are still using the old legacy API."
+    legacy: Optional[bool] = typer.Option(
+        None, help = "Launches goldy bot pancake setup in legacy mode to support older extensions that are still using the old legacy API."
     ),
     bot_token: Optional[str] = typer.Option(
         None, help = "Your discord bot token."
@@ -50,6 +50,11 @@ def start(
         goldy_bot_logger.setLevel(logging.DEBUG)
         app.pretty_exceptions_show_locals = True
 
+    config = Config("./goldy.toml")
+
+    if legacy is None:
+        legacy = config.legacy_mode
+
     bot_token, database_url = get_token(bot_token, database_url)
 
     auth = BotAuthentication(bot_token)
@@ -63,7 +68,6 @@ def start(
     )
 
     database = Database(database_url)
-    config = Config("./goldy.toml")
 
     goldy = Goldy(
         http_client = client, 
