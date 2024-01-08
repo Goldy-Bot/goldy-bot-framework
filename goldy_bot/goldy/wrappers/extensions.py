@@ -8,11 +8,13 @@ if TYPE_CHECKING:
     from ...typings import ExtensionLoadFuncT, ExtensionMetadataData
     from ...commands import Command
 
+    from ...typings import GoldySelfT
+
 import sys
 import toml
 import importlib.util
 from pathlib import Path
-from devgoldyutils import shorter_path, LoggerAdapter
+from devgoldyutils import shorter_path, LoggerAdapter, Colours
 
 from ...errors import raise_or_error
 from ...extensions import Extension
@@ -33,7 +35,7 @@ class Extensions():
 
         super().__init__()
 
-    def add_extension(self: Goldy, extension: Extension) -> None:
+    def add_extension(self: GoldySelfT, extension: Extension) -> None:
         """Adds an extension to goldy bot's internal state."""
         self.extensions.append(extension)
 
@@ -41,7 +43,7 @@ class Extensions():
             f"The extension '{extension.name}' has been added!"
         )
 
-    def load_extension(self: Goldy, extension_path: Path, legacy: bool = False) -> Optional[Extension]:
+    def load_extension(self: GoldySelfT, extension_path: Path, legacy: bool = False) -> Optional[Extension]:
         """Loads an extension from that path and returns it."""
         extension: Extension = None
 
@@ -113,7 +115,7 @@ class Extensions():
 
         return extension
 
-    async def _sync_commands(self: Goldy) -> None:
+    async def _sync_commands(self: GoldySelfT) -> None:
         """
         Registers all the commands from each extension in goldy bot's internal state with discord if not registered already.
         Also removes commands from discord that are no longer registered within the framework.
@@ -127,14 +129,16 @@ class Extensions():
 
         test_guild_id = self.config.test_guild_id
 
-        await self.create_application_commands(
+        registered_commands = await self.create_application_commands(
             payload = [command.payload for command in commands_to_register], 
             guild_id = test_guild_id
         )
 
-        logger.info("Commands have been registered with discord!")
+        logger.info(
+            Colours.GREEN.apply(str(len(registered_commands))) + " commands have been registered with discord!"
+        )
 
-    def _get_extension_metadata(self: Goldy, extension_path: Path) -> Optional[ExtensionMetadataData]:
+    def _get_extension_metadata(self: GoldySelfT, extension_path: Path) -> Optional[ExtensionMetadataData]:
         root_path = extension_path.parent
 
         if "pyproject.toml" not in root_path.iterdir():
@@ -156,7 +160,7 @@ class Extensions():
 
         return extension_path
 
-    def __check_extension_legibility(self: Goldy, extension_path: Path) -> Tuple[bool, Optional[str]]:
+    def __check_extension_legibility(self: GoldySelfT, extension_path: Path) -> Tuple[bool, Optional[str]]:
         # TODO: Make sure all pancake extensions that aren't just a file have a pyproject.toml file with the goldy bot version set.
         # TODO: If extension is depending a newer framework version raise exception, if it's pre-pancake give the user a warning that pre-pancake is deprecated.
         logger.debug(f"Checking legibility of the extension at '{shorter_path(extension_path)}'...")

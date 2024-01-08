@@ -2,12 +2,13 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from typing import List, Optional
+    from typing import List, Optional, Union
     from typing_extensions import Self
 
     from discord_typings import ApplicationCommandPayload, ApplicationCommandData
 
-    from ...goldy import Goldy
+    from ....typings import GoldyT
+
 
 from nextcore.http import Route
 
@@ -21,12 +22,17 @@ class Interaction():
         super().__init__()
 
     async def create_application_commands(
-        self: Goldy | Self, 
+        self: GoldyT, 
         payload: List[ApplicationCommandPayload], 
         guild_id: Optional[str] = None,
-        force: bool = False,
-        **kwargs
+        force: bool = False
     ) -> List[ApplicationCommandData]:
+        """
+        Method that registers application commands with discord respecting already registered commands within the framework.
+
+        If ``guild_id`` is set a guild application command will be registered instead.
+        If ``force`` is set to True previously registered commands will be wiped as standard behavior when making the request to discord yourself.
+        """
         created_commands: List[ApplicationCommandData] = []
 
         if payload == [] and force is False:
@@ -75,7 +81,7 @@ class Interaction():
         return created_commands
 
     async def get_application_commands(
-        self: Goldy | Self, 
+        self: GoldyT, 
         guild_id: Optional[str] = None,
         **kwargs
     ) -> List[ApplicationCommandData]:

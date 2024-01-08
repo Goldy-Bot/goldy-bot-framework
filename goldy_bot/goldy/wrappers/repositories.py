@@ -48,7 +48,7 @@ class Repo():
                 f"Created destination folder '{destination_folder}' as it didn't exist for pulling."
             )
 
-        logger.info(f"Pulling extension '{extension_name}' to '{destination_folder}'...")
+        logger.debug(f"Attempting to pull extension '{extension_name}' to '{destination_folder}'...")
 
         repo_extensions = self.__get_repo_data(repos)
         extension_path = destination_folder.joinpath(extension_name)

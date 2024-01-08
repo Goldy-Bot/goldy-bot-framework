@@ -116,7 +116,8 @@ class SlashOptionAutoComplete(SlashOption):
             **kwargs
         )
 
-"""
+# TODO: Finish this.
+""" 
     async def send_auto_complete(
         self,
         data: AutocompleteInteractionData,
