@@ -3,9 +3,9 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from typing import List
+    from typing_extensions import Self
 
     from ...commands import Command
-
     from ...typings import GoldySelfT
 
 from devgoldyutils import LoggerAdapter, Colours
@@ -25,7 +25,7 @@ class Commands():
     def __init__(self) -> None:
         super().__init__()
 
-    async def _sync_commands(self: GoldySelfT) -> None:
+    async def _sync_commands(self: GoldySelfT[Self]) -> None:
         """
         Registers all the commands from each extension in goldy bot's internal state with discord if not registered already.
         Also removes commands from discord that are no longer registered within the framework.

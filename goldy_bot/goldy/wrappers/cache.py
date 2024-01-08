@@ -7,7 +7,8 @@ if TYPE_CHECKING:
 
     from io import TextIOWrapper
 
-    from goldy_bot import Goldy
+    from ..goldy import Goldy
+    from ...typings import GoldySelfT
 
     T = TypeVar("T", Any)
 
@@ -55,7 +56,7 @@ class Cache():
         self.logger.info("Deleting cache file...")
         self._cache_file.unlink(True)
 
-    def __get_cache_file(self: Goldy | Self, mode: str) -> TextIOWrapper:
+    def __get_cache_file(self: GoldySelfT[Self], mode: str) -> TextIOWrapper:
 
         if not self._cache_file.exists():
             self.logger.debug("Cache file didn't exist so I'm creating one...")

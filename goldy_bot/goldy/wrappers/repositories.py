@@ -6,7 +6,7 @@ if TYPE_CHECKING:
     from typing_extensions import Self
 
     from ..goldy import Goldy
-    from ...typings import RepoData, ExtensionRepoData
+    from ...typings import RepoData, ExtensionRepoData, GoldySelfT
 
 import os
 import sys
@@ -28,12 +28,12 @@ logger = LoggerAdapter(
 )
 
 class Repo():
-    def __init__(self: Goldy | Self) -> None:
+    def __init__(self: GoldySelfT[Self]) -> None:
         self.__repo_data: Optional[Tuple[List[str], Dict[str, ExtensionRepoData]]] = None
 
         super().__init__()
 
-    def pull_extension(self: Goldy | Self, extension_name: str, destination_folder: Path, repos: Optional[List[str]] = None) -> None:
+    def pull_extension(self: GoldySelfT[Self], extension_name: str, destination_folder: Path, repos: Optional[List[str]] = None) -> None:
         """
         Pulls down the extension that you specified from the official goldy bot repo into the destination folder if it doesn't already exist.
         """
@@ -73,7 +73,7 @@ class Repo():
 
         return True
 
-    def _remove_unwanted_extensions(self: Goldy | Self, extension_path: Path, included_extensions: List[str]) -> None:
+    def _remove_unwanted_extensions(self: GoldySelfT[Self], extension_path: Path, included_extensions: List[str]) -> None:
         """Removes extensions in the path that are not present in the included list."""
         logger.info("Removing unwanted extensions...")
 
@@ -119,7 +119,7 @@ class Repo():
                 ["git", "config", "--global", "--add", "safe.directory", "/app/goldy"]
             )
 
-    def __get_repo_data(self: Goldy | Self, repos: List[str]) -> Dict[str, ExtensionRepoData]:
+    def __get_repo_data(self: GoldySelfT[Self], repos: List[str]) -> Dict[str, ExtensionRepoData]:
         """Method to retrieve data from goldy bot repositories. Supports GitHub urls and caches data."""
         if self.__repo_data is None:
             self.__repo_data = self.get_cache("repo_data")

@@ -7,7 +7,7 @@ if TYPE_CHECKING:
 
     from discord_typings import ApplicationData
 
-    from ...goldy import Goldy
+    from ....typings import GoldySelfT
 
 from nextcore.http import Route
 
@@ -21,7 +21,7 @@ class Application():
 
         super().__init__()
 
-    async def get_application_data(self: Goldy | Self, **kwargs) -> ApplicationData:
+    async def get_application_data(self: GoldySelfT[Self], **kwargs) -> ApplicationData:
         if self.__application_data is None:
             self.__application_data = self.get_cache("application_data")
 

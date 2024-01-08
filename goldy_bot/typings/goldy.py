@@ -1,5 +1,4 @@
-from typing import Union
-from typing_extensions import Self
+from typing import Union, TypeVar
 
 from ..goldy import Goldy
 
@@ -7,4 +6,6 @@ __all__ = (
     "GoldySelfT",
 )
 
-GoldySelfT = Union[Goldy, Self]
+T = TypeVar("T")
+
+GoldySelfT = Union[Goldy, T]

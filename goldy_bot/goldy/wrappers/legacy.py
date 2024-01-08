@@ -3,9 +3,11 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from typing import Optional, List, Tuple
+    from typing_extensions import Self
     from discord_typings import ApplicationCommandPayload, ApplicationCommandData
 
-    from goldy_bot.goldy import Goldy
+    from ..goldy import Goldy
+    from ...typings import GoldySelfT
 
     from GoldyBot.goldy.commands import slash_command
 
@@ -79,7 +81,7 @@ class Legacy():
 
         super().__init__()
 
-    def _initialize_legacy_goldy(self: Goldy):
+    def _initialize_legacy_goldy(self: GoldySelfT[Self]):
         """Do not use this method! Initializes legacy API goldy class."""
 
         def __legacy_init_interceptor(goldy_self: LegacyGoldy):
@@ -189,7 +191,7 @@ class Legacy():
 
         self.__legacy_goldy = LegacyGoldy()
 
-    async def _legacy_setup(self: Goldy) -> None:
+    async def _legacy_setup(self: GoldySelfT[Self]) -> None:
         """Do not use this method! Runs legacy API setup routine."""
         if self.__legacy_goldy is not None:
             bot_user_data = await self.get_bot_user_data(bucket_priority = 1)

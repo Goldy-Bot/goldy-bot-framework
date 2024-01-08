@@ -3,18 +3,15 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from typing import List, Optional, Tuple
+    from typing_extensions import Self
 
-    from ..goldy import Goldy
-    from ...typings import ExtensionLoadFuncT, ExtensionMetadataData
-    from ...commands import Command
-
-    from ...typings import GoldySelfT
+    from ...typings import ExtensionLoadFuncT, ExtensionMetadataData, GoldySelfT
 
 import sys
 import toml
 import importlib.util
 from pathlib import Path
-from devgoldyutils import shorter_path, LoggerAdapter, Colours
+from devgoldyutils import shorter_path, LoggerAdapter
 
 from ...errors import raise_or_error
 from ...extensions import Extension
@@ -35,7 +32,7 @@ class Extensions():
 
         super().__init__()
 
-    def add_extension(self: GoldySelfT, extension: Extension) -> None:
+    def add_extension(self: GoldySelfT[Self], extension: Extension) -> None:
         """Adds an extension to goldy bot's internal state."""
         self.extensions.append(extension)
 
@@ -43,7 +40,7 @@ class Extensions():
             f"The extension '{extension.name}' has been added!"
         )
 
-    def load_extension(self: GoldySelfT, extension_path: Path, legacy: bool = False) -> Optional[Extension]:
+    def load_extension(self: GoldySelfT[Self], extension_path: Path, legacy: bool = False) -> Optional[Extension]:
         """Loads an extension from that path and returns it."""
         extension: Extension = None
 
@@ -115,7 +112,7 @@ class Extensions():
 
         return extension
 
-    def _get_extension_metadata(self: GoldySelfT, extension_path: Path) -> Optional[ExtensionMetadataData]:
+    def _get_extension_metadata(self: GoldySelfT[Self], extension_path: Path) -> Optional[ExtensionMetadataData]:
         root_path = extension_path.parent
 
         if "pyproject.toml" not in root_path.iterdir():
@@ -137,7 +134,7 @@ class Extensions():
 
         return extension_path
 
-    def __check_extension_legibility(self: GoldySelfT, extension_path: Path) -> Tuple[bool, Optional[str]]:
+    def __check_extension_legibility(self: GoldySelfT[Self], extension_path: Path) -> Tuple[bool, Optional[str]]:
         # TODO: Make sure all pancake extensions that aren't just a file have a pyproject.toml file with the goldy bot version set.
         # TODO: If extension is depending a newer framework version raise exception, if it's pre-pancake give the user a warning that pre-pancake is deprecated.
         logger.debug(f"Checking legibility of the extension at '{shorter_path(extension_path)}'...")
