@@ -2,12 +2,11 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from typing import List, Optional, Union
-    from typing_extensions import Self
+    from typing import List, Optional
 
     from discord_typings import ApplicationCommandPayload, ApplicationCommandData
 
-    from ....typings import GoldyT
+    from ....typings import GoldySelfT
 
 
 from nextcore.http import Route
@@ -22,7 +21,7 @@ class Interaction():
         super().__init__()
 
     async def create_application_commands(
-        self: GoldyT, 
+        self: GoldySelfT, 
         payload: List[ApplicationCommandPayload], 
         guild_id: Optional[str] = None,
         force: bool = False
@@ -81,7 +80,7 @@ class Interaction():
         return created_commands
 
     async def get_application_commands(
-        self: GoldyT, 
+        self: GoldySelfT, 
         guild_id: Optional[str] = None,
         **kwargs
     ) -> List[ApplicationCommandData]:
