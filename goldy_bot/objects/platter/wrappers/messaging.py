@@ -13,15 +13,17 @@ if TYPE_CHECKING:
 
     from GoldyBot import Embed, Recipe, File
 
-    from ...goldy import Goldy
+    from ....goldy import Goldy
 
+import asyncio
 from aiohttp import FormData
 from nextcore.http import Route
 from nextcore.common import json_dumps
 from devgoldyutils import LoggerAdapter
 
+from ...message import Message
 from .wrapper import PlatterWrapper
-from ...logger import goldy_bot_logger
+from ....logger import goldy_bot_logger
 
 __all__ = (
     "MessagingWrapper",
@@ -36,15 +38,15 @@ class MessagingWrapper(PlatterWrapper):
         super().__init__(data, goldy)
 
     async def send_message(
-        self,
+        self, 
         text: Optional[str] = None, 
         embeds: Optional[List[Embed]] = None, 
         recipes: Optional[List[Recipe]] = None, 
         files: Optional[List[File]] = None, 
-        delete_after: Optional[float] = None,
-        hide: bool = False,
+        delete_after: Optional[float] = None, 
+        hide: bool = False, 
         **kwargs
-    ) -> None: # TODO: Make this return a message object.
+    ) -> Message:
 
         form_data = FormData()
         payload: InteractionMessageCallbackData = {}
@@ -102,7 +104,8 @@ class MessagingWrapper(PlatterWrapper):
                 )
             )
 
-            await self.goldy.http_client.request(
+            # TODO: Move this into a goldy class discord wrapper.
+            await self.goldy.client.request( 
                 Route(
                     "POST", 
                     "/interactions/{interaction_id}/{interaction_token}/callback", 
@@ -116,17 +119,7 @@ class MessagingWrapper(PlatterWrapper):
             self._interaction_responded = True
 
             # Get and return message data of original interaction response. 
-            r = await self.goldy.http_client.request(
-                Route(
-                    "GET", 
-                    "/webhooks/{application_id}/{interaction_token}/messages/@original", 
-                    application_id = self.goldy.application_data["id"], 
-                    interaction_token = self.data["token"]
-                ),
-                rate_limit_key = self.goldy.shard_manager.authentication.rate_limit_key
-            )
-
-            message_data = await r.json()
+            message_data = await self.goldy.get_interaction_message(self.data["token"])
 
             self.logger.debug("Interaction callback message was sent.")
 
@@ -139,7 +132,8 @@ class MessagingWrapper(PlatterWrapper):
                 "payload_json", json_dumps(payload)
             )
 
-            r = await self.goldy.http_client.request(
+            # TODO: Move this into a goldy class discord wrapper.
+            r = await self.goldy.client.request(
                 Route(
                     "POST", 
                     "/webhooks/{application_id}/{interaction_token}", 
@@ -154,16 +148,17 @@ class MessagingWrapper(PlatterWrapper):
 
             self.logger.debug("Interaction follow up message was sent.")
 
-        """
-        message = objects.Message(message_data, object.guild, goldy)
+        message = Message(message_data, self.goldy)
 
-        # TODO: Find a way to also delete the author's prefix command message.
         if delete_after is not None:
-            utils.delay(
-                coro = message.delete(f"delete_after was set to {delete_after} seconds"), 
-                seconds = delete_after, 
-                goldy = goldy
-            )
+            loop = asyncio.get_event_loop()
+
+            async def delete_after_task():
+                await asyncio.sleep(delete_after)
+                await message.delete(
+                    f"Automatic deletion set for {delete_after} seconds by 'delete_after' argument."
+                )
+
+            loop.create_task(delete_after_task())
 
         return message
-        """

@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from ...goldy import Goldy
+    from ....goldy import Goldy
 
     from discord_typings import InteractionData
 

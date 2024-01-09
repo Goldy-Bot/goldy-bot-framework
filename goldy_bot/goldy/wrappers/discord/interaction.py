@@ -5,7 +5,11 @@ if TYPE_CHECKING:
     from typing import List, Optional
     from typing_extensions import Self
 
-    from discord_typings import ApplicationCommandPayload, ApplicationCommandData
+    from discord_typings import (
+        ApplicationCommandPayload, 
+        ApplicationCommandData, 
+        MessageData
+    )
 
     from ....typings import GoldySelfT
 
@@ -111,6 +115,23 @@ class Interaction():
                 application_id = app_data["id"]
             ),
             **self.key_and_headers
+        )
+
+        data = await r.json()
+        return data
+
+    async def get_interaction_message(self: GoldySelfT[Self], interaction_token: str) -> MessageData:
+        """Get's the message data of the original interaction response."""
+        app_data = await self.get_application_data()
+
+        r = await self.client.request(
+            Route(
+                "GET", 
+                "/webhooks/{application_id}/{interaction_token}/messages/@original", 
+                application_id = app_data["id"], 
+                interaction_token = interaction_token
+            ),
+            rate_limit_key = self.key_and_headers["rate_limit_key"]
         )
 
         data = await r.json()

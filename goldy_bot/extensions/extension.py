@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, overload
 
 if TYPE_CHECKING:
-    from typing import List, Dict, Optional, Literal, Callable
+    from typing import List, Dict, Optional, Literal, Callable, Type
 
     from GoldyBot.goldy.nextcore_utils.slash_options.slash_option import SlashOption
 
@@ -25,11 +25,10 @@ class Extension():
 
         self.logger = LoggerAdapter(goldy_bot_logger, prefix = "Extension")
 
-    def mount(self, *cls: object) -> None:
+    def mount(self, *cls: Type[object]) -> None:
         """Method to mount any classes you are using in your extension."""
-
         for _class in cls:
-            self._classes.append(_class)
+            self._classes.append(_class()) # TODO: Initialize class here
 
             self.logger.debug(
                 f"Mounted class '{_class.__name__}' to extension '{self.name}'."

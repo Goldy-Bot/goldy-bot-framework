@@ -11,7 +11,7 @@ from .config import *
 from .commands import *
 from .database import *
 from .extensions import *
-from .platter import *
+from .objects import *
 from .errors import *
 from .intents import *
 

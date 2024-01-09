@@ -22,6 +22,7 @@ from .wrappers import (
     DiscordWrapper, FrameworkWrapper
 )
 from ..logger import goldy_bot_logger
+from ..commands import CommandType
 
 __all__ = (
     "Goldy",
@@ -85,7 +86,7 @@ class Goldy(
             event_name = "READY"
         )
 
-        await self._legacy_setup() # TODO: does this have to be done here?
+        await self._legacy_setup()
 
         # Raise a error and exit whenever a critical error occurs.
         error = await self.shard_manager.dispatcher.wait_for(lambda reason: True, "critical")
@@ -136,6 +137,14 @@ class Goldy(
 
         # Registering commands.
         await self._sync_commands()
+
+        # Set command listener.
+        self.shard_manager.event_dispatcher.add_listener(
+            lambda x: self.invoke_command(
+                x["data"]["name"], CommandType(x["data"]["type"]), x
+            ),
+            event_name = "INTERACTION_CREATE"
+        )
 
     async def stop(self, reason: Optional[str] = None) -> None:
         """Stops Goldy Bot Pancake."""

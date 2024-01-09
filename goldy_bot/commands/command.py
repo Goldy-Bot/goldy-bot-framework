@@ -3,17 +3,18 @@ from typing import TYPE_CHECKING, cast
 from discord_typings import ApplicationCommandPayload
 
 if TYPE_CHECKING:
-    from typing import Callable, Any, Optional, Dict, List
+    from typing import Optional, Dict, List
     from discord_typings import ApplicationCommandOptionData
 
     from GoldyBot import SlashOption
 
-    from ..platter import Platter
+    from ..typings import CommandFuncT
 
 import regex
 from devgoldyutils import LoggerAdapter
 
 from .. import errors, logger
+from .types import CommandType
 
 __all__ = (
     "Command",
@@ -22,7 +23,7 @@ __all__ = (
 class Command():
     def __init__(
         self,
-        function: Callable[[object, Platter], Any],
+        function: CommandFuncT,
         name: Optional[str] = None, 
         description: Optional[str] = None, 
         slash_options: Optional[Dict[str, SlashOption]] = None, 
@@ -34,6 +35,7 @@ class Command():
         description = description or "🪹 Oopsie daisy, looks like no description was set for this command."
 
         self.payload = cast(ApplicationCommandPayload, {})
+        self.payload["type"] = CommandType.SLASH.value
         self.payload["name"] = name
         self.payload["description"] = description
         self.payload["options"] = self.__options_parser(function, slash_options)
@@ -74,7 +76,7 @@ class Command():
     # Honestly this was all just stolen from pre-pancake (legacy).
     def __options_parser(
         self, 
-        function: Callable[[object, Platter], Any], 
+        function: CommandFuncT, 
         slash_options: Optional[Dict[str, SlashOption]]
     ) -> List[ApplicationCommandOptionData]:
         """A function that converts slash command parameters to slash command payload options."""
@@ -99,7 +101,9 @@ class Command():
         for param in params:
             # Uppercase parameters are not allowed in the discord API.
             if param.isupper() or bool(chat_input_patten.match(param)) is False:
-                raise errors.InvalidParameter(self, param)
+                raise errors.GoldyBotError(
+                    f"The parameter used in the command '{self.name}' is NOT allowed >> {param}"
+                )
 
             if param in params:
                 option_data = slash_options[param]

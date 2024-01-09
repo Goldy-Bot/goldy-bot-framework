@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from typing import List
     from typing_extensions import Self
+    from discord_typings import InteractionData
 
     from ...commands import Command
     from ...typings import GoldySelfT
@@ -11,6 +12,9 @@ if TYPE_CHECKING:
 from devgoldyutils import LoggerAdapter, Colours
 
 from ...logger import goldy_bot_logger
+from ...commands import CommandType
+from ...errors import FrontEndError
+from ...objects.platter import Platter
 
 __all__ = (
     "Commands",
@@ -24,6 +28,36 @@ class Commands():
     """Brings valuable methods to the goldy class for managing loading and syncing of commands."""
     def __init__(self) -> None:
         super().__init__()
+
+    async def invoke_command(self: GoldySelfT[Self], name: str, type: CommandType, data: InteractionData = {}) -> bool: 
+        """Invokes a goldy bot command. Returns False if command is not found."""
+        for extension in self.extensions:
+
+            for _class in extension._classes:
+
+                for command in extension._commands[_class.__class__.__name__]:
+
+                    if command.name == name and command.payload["type"] == type.value:
+                        self.logger.info(
+                            f"Invoking the command '{command.name}' in extension class '{_class.__class__.__name__}'..."
+                        )
+
+                        platter = Platter(data, self)
+
+                        try:
+                            await command.function(_class, platter) # TODO: Pass slash option arguments.
+
+                        except FrontEndError as e:
+                            self.__send_front_end_error(e) # TODO: Complete these.
+                            raise e
+
+                        except Exception as e:
+                            self.__send_unknown_error(e)
+                            raise e
+
+                        return True
+
+        return False
 
     async def _sync_commands(self: GoldySelfT[Self]) -> None:
         """
