@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING, cast
 from discord_typings import ApplicationCommandPayload
 
 if TYPE_CHECKING:
-    from typing import Optional, Dict, List, Tuple
+    from typing import Optional, Dict, List
     from discord_typings import ApplicationCommandOptionData
 
     from .slash_option import SlashOption

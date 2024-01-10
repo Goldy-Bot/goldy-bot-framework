@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, overload
 
 if TYPE_CHECKING:
-    from typing import List, Dict, Optional, Literal, Callable, Type
+    from typing import List, Dict, Optional, Literal, Callable
 
     from GoldyBot.goldy.nextcore_utils.slash_options.slash_option import SlashOption
 

@@ -43,10 +43,10 @@ class Commands():
                         )
 
                         platter = Platter(data, self)
-                        params = self.__interaction_data_to_params(data, command)
+                        params = self.__interaction_options_to_kwargs(data, command)
 
                         try:
-                            await command.function(_class, platter, **params) # TODO: Pass slash option arguments.
+                            await command.function(_class, platter, **params)
 
                         except FrontEndError as e:
                             self.__send_front_end_error(e) # TODO: Complete these.
@@ -85,7 +85,7 @@ class Commands():
             Colours.GREEN.apply(str(len(registered_commands))) + " command(s) have been registered with discord!"
         )
 
-    def __interaction_data_to_params(self, data: InteractionData, command: Command) -> Dict[str, str]:
+    def __interaction_options_to_kwargs(self, data: InteractionData, command: Command) -> Dict[str, str]:
         """A method that phrases option parameters from interaction data of a command."""
         logger.debug(
             f"Phrasing interaction data options into function parameters for command '{command.name}'..."
