@@ -9,7 +9,7 @@ if TYPE_CHECKING:
     from ...commands import Command
     from ...typings import GoldySelfT
 
-from devgoldyutils import LoggerAdapter, Colours, pprint
+from devgoldyutils import LoggerAdapter, Colours
 
 from ...logger import goldy_bot_logger
 from ...commands import CommandType
