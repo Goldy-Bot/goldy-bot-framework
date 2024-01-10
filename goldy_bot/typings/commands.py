@@ -1,6 +1,6 @@
 from typing import Callable, Awaitable, Any
 
-from ..platter import Platter
+from ..objects import Platter
 
 __all__ = (
     "CommandFuncT",

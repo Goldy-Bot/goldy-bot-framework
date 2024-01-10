@@ -6,6 +6,10 @@ if TYPE_CHECKING:
 
     from GoldyBot.goldy.nextcore_utils.slash_options.slash_option import SlashOption
 
+    from ..goldy import Goldy
+
+    ExtensionClassT = Callable[[Goldy], None]
+
 from devgoldyutils import LoggerAdapter
 
 from ..logger import goldy_bot_logger
@@ -25,10 +29,10 @@ class Extension():
 
         self.logger = LoggerAdapter(goldy_bot_logger, prefix = "Extension")
 
-    def mount(self, *cls: Type[object]) -> None:
+    def mount(self, goldy: Goldy, *cls: ExtensionClassT) -> None:
         """Method to mount any classes you are using in your extension."""
         for _class in cls:
-            self._classes.append(_class()) # TODO: Initialize class here
+            self._classes.append(_class(goldy)) # TODO: Initialize class here
 
             self.logger.debug(
                 f"Mounted class '{_class.__name__}' to extension '{self.name}'."

@@ -34,6 +34,8 @@ class Cache():
         super().__init__()
 
     def get_cache(self, cache_name: str) -> Optional[Any]:
+        logger.debug(f"Getting '{cache_name}' cache...")
+
         data: Dict[str, Any] = {}
 
         with self.__get_cache_file("r") as file:
@@ -42,6 +44,8 @@ class Cache():
         return data.get(cache_name)
 
     def set_cache(self, cache_name: str, value: T) -> T:
+        logger.debug(f"Setting '{cache_name}' cache...")
+
         json_data: dict = {}
 
         with self.__get_cache_file("r") as file:

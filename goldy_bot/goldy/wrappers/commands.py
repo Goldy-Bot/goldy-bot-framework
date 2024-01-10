@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from typing import List
+    from typing import List, Dict
     from typing_extensions import Self
     from discord_typings import InteractionData
 
@@ -29,7 +29,7 @@ class Commands():
     def __init__(self) -> None:
         super().__init__()
 
-    async def invoke_command(self: GoldySelfT[Self], name: str, type: CommandType, data: InteractionData = {}) -> bool: 
+    async def invoke_command(self: GoldySelfT[Self], name: str, type: CommandType, data: InteractionData) -> bool: 
         """Invokes a goldy bot command. Returns False if command is not found."""
         for extension in self.extensions:
 
@@ -43,9 +43,10 @@ class Commands():
                         )
 
                         platter = Platter(data, self)
+                        params = self.__interaction_data_to_params(data, command)
 
                         try:
-                            await command.function(_class, platter) # TODO: Pass slash option arguments.
+                            await command.function(_class, platter, **params) # TODO: Pass slash option arguments.
 
                         except FrontEndError as e:
                             self.__send_front_end_error(e) # TODO: Complete these.
@@ -73,6 +74,8 @@ class Commands():
 
         test_guild_id = self.config.test_guild_id
 
+        # TODO: get applications commands from discord and check if all of them have been added. If not create them again.
+
         registered_commands = await self.create_application_commands(
             payload = [command.payload for command in commands_to_register], 
             guild_id = test_guild_id
@@ -81,3 +84,27 @@ class Commands():
         logger.info(
             Colours.GREEN.apply(str(len(registered_commands))) + " command(s) have been registered with discord!"
         )
+
+    def __interaction_data_to_params(self, data: InteractionData, command: Command) -> Dict[str, str]:
+        """A method that phrases option parameters from interaction data of a command."""
+        logger.debug(
+            f"Phrasing interaction data options into function parameters for command '{command.name}'..."
+        )
+
+        params = {}
+
+        for option in data["data"].get("options", []):
+
+            # Ignore sub commands and sub groups.
+            if option["type"] == 1 or option["type"] == 2: 
+                continue
+
+            for key in command._slash_options:
+                slash_option = command._slash_options[key]
+
+                if slash_option.data["name"] == option["name"]:
+                    params[key] = option["value"]
+                    logger.debug(f"Command argument '{key}' found!")
+                    break
+
+        return params

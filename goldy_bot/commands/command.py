@@ -3,11 +3,10 @@ from typing import TYPE_CHECKING, cast
 from discord_typings import ApplicationCommandPayload
 
 if TYPE_CHECKING:
-    from typing import Optional, Dict, List
+    from typing import Optional, Dict, List, Tuple
     from discord_typings import ApplicationCommandOptionData
 
-    from GoldyBot import SlashOption
-
+    from .slash_option import SlashOption
     from ..typings import CommandFuncT
 
 import regex
@@ -38,7 +37,9 @@ class Command():
         self.payload["type"] = CommandType.SLASH.value
         self.payload["name"] = name
         self.payload["description"] = description
-        self.payload["options"] = self.__options_parser(function, slash_options)
+
+        if slash_options is not None:
+            self.payload["options"] = self.__options_parser(function, slash_options)
 
         self.wait = wait
 
@@ -66,59 +67,51 @@ class Command():
             {
                 "name": command.name,
                 "description": command.description,
-                "options": self.__options_parser(command.function, command._slash_options),
+                "options": [] if command._slash_options is None else self.__options_parser(command.function, command._slash_options),
                 "type": 1
             }
         )
 
         self.logger.info(f"Added subcommand '{command.name}' to '{self.name}'.")
 
-    # Honestly this was all just stolen from pre-pancake (legacy).
     def __options_parser(
         self, 
         function: CommandFuncT, 
-        slash_options: Optional[Dict[str, SlashOption]]
+        slash_options: Dict[str, SlashOption]
     ) -> List[ApplicationCommandOptionData]:
         """A function that converts slash command parameters to slash command payload options."""
-
         options: List[ApplicationCommandOptionData] = []
-        slash_options: Dict[str, SlashOption] = slash_options or {}
 
         # Discord chat input regex as of 
         # https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-naming
         chat_input_patten = regex.compile(r"^[-_\p{L}\p{N}\p{sc=Deva}\p{sc=Thai}]{1,32}$", regex.UNICODE)
 
-        # Get command function parameters.
-        # -----------------------------------
-        params = list(function.__code__.co_varnames)
+        func_params = list(function.__code__.co_varnames)
 
-        # Removes 'self' and 'platter' argument and filters out 
-        # other variables resulting in just function parameters.
-        params = params[1:self.function.__code__.co_argcount - 2]
+        # Filters out 'self' and 'platter' arguments.
+        func_params = func_params[2:]
 
         # Get command function parameters.
         # --------------------------------------
-        for param in params:
+        for param in func_params:
             # Uppercase parameters are not allowed in the discord API.
             if param.isupper() or bool(chat_input_patten.match(param)) is False:
                 raise errors.GoldyBotError(
                     f"The parameter used in the command '{self.name}' is NOT allowed >> {param}"
                 )
 
-            if param in params:
-                option_data = slash_options[param]
-                
-                if option_data.get("name") is None:
-                    option_data["name"] = param
+            slash_option = slash_options.get(param)
 
-                options.append(
-                    option_data
-                )
+            if slash_option is not None:
+                option_name = slash_option.data["name"]
+                slash_option.data["name"] = param if option_name is None else option_name
+
+                options.append(slash_option.data)
 
             else:
                 options.append({
                     "name": param,
-                    "description": "This option has no description. Sorry about that.",
+                    "description": "🪹 Oopsie daisy, looks like no description was set for this option.",
                     "type": 3,
                     "required": True,
                 })

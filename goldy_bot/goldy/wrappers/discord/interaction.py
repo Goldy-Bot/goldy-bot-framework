@@ -41,6 +41,9 @@ class Interaction():
         if payload == [] and force is False:
             return []
 
+        if payload == self.__previous_commands_payload and force is False:
+            return []
+
         if force is False:
             payload += [x for x in self.__previous_commands_payload if x not in payload]
 
@@ -80,7 +83,6 @@ class Interaction():
             created_commands = await r.json()
 
         self.__previous_commands_payload = payload
-
         return created_commands
 
     async def get_application_commands(
