@@ -6,7 +6,7 @@ if TYPE_CHECKING:
 
     from GoldyBot import SlashOption
 
-    from ..platter import Platter
+    from ..objects.platter import Platter
 
 from devgoldyutils import LoggerAdapter
 
@@ -58,7 +58,7 @@ class GroupCommand():
     def __init__(
         self, 
         name: str, 
-        description: str = None
+        description: Optional[str] = None
     ):
         ...
 
@@ -71,8 +71,8 @@ class GroupCommand():
 
     def __init__(
         self, 
-        name: str = None, 
-        description: str = None, 
+        name: Optional[str] = None, 
+        description: Optional[str] = None, 
         command: Optional[Command] = None
     ):
         self._master_command = command
@@ -99,9 +99,9 @@ class GroupCommand():
 
     def subcommand(
         self,
-        name: str = None, 
-        description: str = None, 
-        slash_options: Dict[str, SlashOption] = None,
+        name: Optional[str] = None, 
+        description: Optional[str] = None, 
+        slash_options: Optional[Dict[str, SlashOption]] = None,
         wait: bool = False
     ):
         """

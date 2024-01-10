@@ -1,5 +1,6 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, cast
+from typing import TYPE_CHECKING
+
 from discord_typings import ApplicationCommandPayload
 
 if TYPE_CHECKING:
@@ -12,14 +13,16 @@ if TYPE_CHECKING:
 import regex
 from devgoldyutils import LoggerAdapter
 
-from .. import errors, logger
 from .types import CommandType
+from ..helper import DictHelper
+from ..errors import GoldyBotError
+from ..logger import goldy_bot_logger
 
 __all__ = (
     "Command",
 )
 
-class Command():
+class Command(DictHelper[ApplicationCommandPayload]):
     def __init__(
         self,
         function: CommandFuncT,
@@ -31,15 +34,16 @@ class Command():
         self.function = function
 
         name = name or function.__name__
-        description = description or "🪹 Oopsie daisy, looks like no description was set for this command."
+        # Even though discord docs say no, description is a required field.
+        description = description or "🪹 Oopsie daisy, looks like no description was set for this command." 
 
-        self.payload = cast(ApplicationCommandPayload, {})
-        self.payload["type"] = CommandType.SLASH.value
-        self.payload["name"] = name
-        self.payload["description"] = description
+        data = {}
+        data["type"] = CommandType.SLASH.value
+        data["name"] = name
+        data["description"] = description
 
         if slash_options is not None:
-            self.payload["options"] = self.__options_parser(function, slash_options)
+            data["options"] = self.__options_parser(function, slash_options)
 
         self.wait = wait
 
@@ -47,23 +51,25 @@ class Command():
         self._subcommands: List[Command] = []
 
         self.logger = LoggerAdapter(
-            LoggerAdapter(logger.goldy_bot_logger, prefix = "Command"), prefix = name
+            LoggerAdapter(goldy_bot_logger, prefix = "Command"), prefix = name
         )
+
+        super().__init__(data)
 
     @property
     def name(self) -> str:
         """The command's name."""
-        return self.payload["name"]
+        return self.data["name"]
 
     @property
     def description(self) -> str:
         """The command's description."""
-        return self.payload["description"]
+        return self.data["description"]
 
     def add_subcommand(self, command: Command) -> None:
         self._subcommands.append(command)
 
-        self.payload["options"].append(
+        self.data["options"].append(
             {
                 "name": command.name,
                 "description": command.description,
@@ -96,7 +102,7 @@ class Command():
         for param in func_params:
             # Uppercase parameters are not allowed in the discord API.
             if param.isupper() or bool(chat_input_patten.match(param)) is False:
-                raise errors.GoldyBotError(
+                raise GoldyBotError(
                     f"The parameter used in the command '{self.name}' is NOT allowed >> {param}"
                 )
 

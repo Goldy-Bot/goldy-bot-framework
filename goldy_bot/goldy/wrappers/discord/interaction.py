@@ -93,7 +93,7 @@ class Interaction():
         app_data = await self.get_application_data()
 
         if guild_id is not None:
-            self.logger.info("Registering guild commands...")
+            self.logger.info("Getting guild application commands...")
 
             r = await self.client.request(
                 Route(
@@ -108,7 +108,7 @@ class Interaction():
             data = await r.json()
             return data
 
-        self.logger.info("Registering global commands...")
+        self.logger.info("Getting global application commands...")
 
         r = await self.client.request(
             Route(
