@@ -62,6 +62,9 @@ class Extensions():
         except Exception as e:
             msg = f"Error occurred while executing the extension at '{shortened_path}'. Error -> {e}"
 
+            if isinstance(e, AttributeError): # Error hint for legacy extensions.
+                msg += "\n HINT: We think this might be because you are attempting to run a legacy extension with legacy mode off. Try running with '--legacy'."
+
             raise_or_error(
                 msg, 
                 condition = lambda: self.config.extensions_raise_on_load_error, 
