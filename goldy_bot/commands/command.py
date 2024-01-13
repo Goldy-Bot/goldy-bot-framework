@@ -14,7 +14,7 @@ import regex
 from devgoldyutils import LoggerAdapter
 
 from .types import CommandType
-from ..helper import DictHelper
+from ..helpers.helper import DictHelper
 from ..errors import GoldyBotError
 from ..logger import goldy_bot_logger
 

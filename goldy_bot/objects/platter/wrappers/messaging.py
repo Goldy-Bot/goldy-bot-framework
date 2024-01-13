@@ -16,9 +16,6 @@ if TYPE_CHECKING:
     from ....goldy import Goldy
 
 import asyncio
-from aiohttp import FormData
-from nextcore.http import Route
-from nextcore.common import json_dumps
 from devgoldyutils import LoggerAdapter
 
 from ...message import Message
@@ -44,11 +41,9 @@ class MessagingWrapper(PlatterWrapper):
         recipes: Optional[List[Recipe]] = None, 
         files: Optional[List[File]] = None, 
         delete_after: Optional[float] = None, 
-        hide: bool = False, 
+        hidden: bool = False, 
         **kwargs
     ) -> Message:
-
-        form_data = FormData()
         payload: InteractionMessageCallbackData = {}
 
         if text is not None:
@@ -76,44 +71,22 @@ class MessagingWrapper(PlatterWrapper):
 
             payload["components"] = [components[component] for component in components]
 
-        # Adding files to form data.
-        if files is not None:
-
-            for file in files:
-                form_data.add_field(
-                    file.name.split(".")[-2], file.contents, filename = file.name
-                )
+        if hidden: # shows the message only to the user
+            payload["flags"] = 1 << 6
 
         payload.update(kwargs)
 
         message_data: MessageData = None
 
-        if hide: # shows the message only to the user
-            payload["flags"] = 1 << 6
-
         # Callback message.
         # ------------------
         if self._interaction_responded is False:
 
-            form_data.add_field(
-                "payload_json", json_dumps(
-                    {
-                        "type": 4, 
-                        "data": payload
-                    }
-                )
-            )
-
-            # TODO: Move this into a goldy class discord wrapper.
-            await self.goldy.client.request( 
-                Route(
-                    "POST", 
-                    "/interactions/{interaction_id}/{interaction_token}/callback", 
-                    interaction_id = self.data["id"], 
-                    interaction_token = self.data["token"]
-                ),
-                rate_limit_key = self.goldy.shard_manager.authentication.rate_limit_key,
-                data = form_data
+            await self.goldy.send_interaction_callback(
+                interaction_id = self.data["id"],
+                interaction_token = self.data["token"],
+                payload = payload,
+                files = files
             )
 
             self._interaction_responded = True
@@ -127,24 +100,11 @@ class MessagingWrapper(PlatterWrapper):
         # -------------------
         # Is sent when you want to respond again after sending the original response to an interaction command.
         else:
-
-            form_data.add_field(
-                "payload_json", json_dumps(payload)
+            message_data = await self.goldy.send_interaction_follow_up(
+                interaction_token = self.data["token"],
+                payload = payload,
+                files = files
             )
-
-            # TODO: Move this into a goldy class discord wrapper.
-            r = await self.goldy.client.request(
-                Route(
-                    "POST", 
-                    "/webhooks/{application_id}/{interaction_token}", 
-                    application_id = self.goldy.application_data["id"], 
-                    interaction_token = self.data["token"]
-                ),
-                rate_limit_key = self.goldy.shard_manager.authentication.rate_limit_key,
-                data = form_data
-            )
-
-            message_data = await r.json()
 
             self.logger.debug("Interaction follow up message was sent.")
 

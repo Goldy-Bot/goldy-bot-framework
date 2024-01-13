@@ -80,7 +80,7 @@ class Goldy(
 
         # Log when shards are ready.
         self.shard_manager.event_dispatcher.add_listener(
-            lambda x: self.logger.info(
+            lambda _: self.logger.info(
                 f"Nextcore shards are {Colours.GREEN.apply('connected')} and {Colours.BLUE.apply('READY!')}"
             ), 
             event_name = "READY"

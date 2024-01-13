@@ -12,7 +12,7 @@ from devgoldyutils import short_str
 
 from GoldyBot import utils
 
-from ..helper import DictHelper
+from ..helpers.helper import DictHelper
 
 __all__ = (
     "SlashOptionTypes",

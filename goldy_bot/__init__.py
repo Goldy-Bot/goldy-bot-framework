@@ -14,5 +14,8 @@ from .extensions import *
 from .objects import *
 from .errors import *
 from .intents import *
+from .colours import *
+from .helpers import *
+from .files import *
 
 __version__ = "5.1dev1"

@@ -8,7 +8,7 @@ if TYPE_CHECKING:
 
     from ..goldy import Goldy
 
-from ..helper import DictHelper
+from ..helpers.helper import DictHelper
 
 __all__ = (
     "Message",

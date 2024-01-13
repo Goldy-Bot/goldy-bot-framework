@@ -2,18 +2,22 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from typing import List, Optional
+    from typing import List, Optional, Dict
     from typing_extensions import Self
 
     from discord_typings import (
+        InteractionMessageCallbackData,
         ApplicationCommandPayload, 
         ApplicationCommandData, 
         MessageData
     )
 
+    from ....files import File
     from ....typings import GoldySelfT
 
+from aiohttp import FormData
 from nextcore.http import Route
+from nextcore.common import json_dumps
 
 __all__ = (
     "Interaction",
@@ -138,3 +142,76 @@ class Interaction():
 
         data = await r.json()
         return data
+
+    async def send_interaction_callback(
+        self: GoldySelfT[Self], 
+        interaction_id: str, 
+        interaction_token: str, 
+        payload: InteractionMessageCallbackData, 
+        files: Optional[List[File]] = None
+    ) -> None:
+        form_data = FormData()
+
+        if files is not None:
+
+            for file in files:
+                form_data.add_field(**self.__file_to_form_field(file))
+
+        form_data.add_field(
+            "payload_json", json_dumps(
+                {
+                    "type": 4, 
+                    "data": payload
+                }
+            )
+        )
+
+        await self.client.request( 
+            Route(
+                "POST", 
+                "/interactions/{interaction_id}/{interaction_token}/callback", 
+                interaction_id = interaction_id, 
+                interaction_token = interaction_token
+            ),
+            rate_limit_key = self.key_and_headers["rate_limit_key"],
+            data = form_data
+        )
+
+    async def send_interaction_follow_up(
+        self: GoldySelfT[Self], 
+        interaction_token: str, 
+        payload: InteractionMessageCallbackData, 
+        files: Optional[List[File]] = None
+    ) -> MessageData:
+        form_data = FormData()
+        app_data = await self.get_application_data()
+
+        if files is not None:
+
+            for file in files:
+                form_data.add_field(**self.__file_to_form_field(file))
+
+        form_data.add_field(
+            "payload_json", json_dumps(payload)
+        )
+
+        r = await self.client.request( 
+            Route(
+                "POST", 
+                "/webhooks/{application_id}/{interaction_token}", 
+                application_id = app_data["id"], 
+                interaction_token = interaction_token
+            ),
+            rate_limit_key = self.key_and_headers["rate_limit_key"],
+            data = form_data
+        )
+
+        message_data = await r.json()
+        return message_data
+
+    def __file_to_form_field(self, file: File) -> Dict[str, str]:
+        return {
+            "name": file.name.split(".")[-2], 
+            "value": file.contents,
+            "filename": file.name
+        }
