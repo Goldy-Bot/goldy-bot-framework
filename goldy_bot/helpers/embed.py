@@ -153,7 +153,7 @@ class Embed(DictHelper[EmbedData]):
             for field in fields:
                 data["fields"].append(field)
 
-        if colour is not None:
+        if colour is None:
             colour = Colours.INVISIBLE
 
         data["color"] = colour.value

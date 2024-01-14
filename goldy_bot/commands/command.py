@@ -69,6 +69,9 @@ class Command(DictHelper[ApplicationCommandPayload]):
     def add_subcommand(self, command: Command) -> None:
         self._subcommands.append(command)
 
+        if self.data.get("options") is None:
+            self.data["options"] = []
+
         self.data["options"].append(
             {
                 "name": command.name,
@@ -95,7 +98,7 @@ class Command(DictHelper[ApplicationCommandPayload]):
         func_params = list(function.__code__.co_varnames)
 
         # Filters out 'self' and 'platter' arguments.
-        func_params = func_params[2:]
+        func_params = func_params[2:function.__code__.co_argcount - 2]
 
         # Get command function parameters.
         # --------------------------------------
