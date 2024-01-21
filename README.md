@@ -23,10 +23,6 @@ Goldy bot is my custom framework built from the ground up to meet my discord bot
 ### 🩶 This library is probably not for you!
 I implement what I need when I need it as I want to keep things to a minimum. The point of this project is to have a framework/library that's tuned towards my needs, so I can reduce the overhead for myself while developing discord bots. With that said you may dislike the way certain things are implemented, so I highly recommend you seek an API wrapper like [nextcord](https://github.com/nextcord/nextcord) or [discord.py](https://github.com/Rapptz/discord.py) for your discord development needs.
 
-## Table of Contents
-- [⚗️ Normal Setup](#-installset-up---normal)
-- [🐬 Docker Setup](#-installset-up---docker)
-
 ## ⚗️ *Install/Set Up* - ``Normal``
 
 These instructions assume you have a [MongoDB database](https://www.mongodb.com/), [Git](https://git-scm.com/) and [Python](https://www.python.org/) installed.
