@@ -92,7 +92,7 @@ class MessagingWrapper(PlatterWrapper):
             self._interaction_responded = True
 
             # Get and return message data of original interaction response. 
-            message_data = await self.goldy.get_interaction_message(self.data["token"])
+            message_data = await self.goldy.low_level.get_interaction_message(self.data["token"])
 
             self.logger.debug("Interaction callback message was sent.")
 
