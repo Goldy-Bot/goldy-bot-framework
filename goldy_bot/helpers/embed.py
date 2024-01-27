@@ -14,7 +14,7 @@ if TYPE_CHECKING:
 import copy
 import random
 from ..colours import Colours
-from .helper import DictHelper
+from .dict_helper import DictHelper
 
 from GoldyBot import utils as legacy_utils
 

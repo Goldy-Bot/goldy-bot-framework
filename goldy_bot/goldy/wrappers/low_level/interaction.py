@@ -2,8 +2,8 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from typing import List, Optional, Dict
     from typing_extensions import Self
+    from typing import List, Optional, Dict
 
     from discord_typings import (
         InteractionMessageCallbackData,
@@ -12,7 +12,7 @@ if TYPE_CHECKING:
         MessageData
     )
 
-    from ....files import File
+    from ....helpers import File
     from ....typings import LowLevelSelfT
 
 from aiohttp import FormData

@@ -8,7 +8,7 @@ if TYPE_CHECKING:
 import os
 import io
 from requests import Response
-from .errors import GoldyBotError
+from ..errors import GoldyBotError
 
 __all__ = (
     "File",

@@ -11,7 +11,9 @@ if TYPE_CHECKING:
         InteractionMessageCallbackData
     )
 
-    from GoldyBot import Embed, Recipe, File
+    from GoldyBot import Recipe
+
+    from ....helpers import Embed, File
 
     from ....goldy import Goldy
 
