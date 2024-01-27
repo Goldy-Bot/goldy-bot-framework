@@ -21,7 +21,7 @@ class Message(DictHelper[MessageData]):
         super().__init__(data)
 
     async def delete(self, reason: Optional[str] = None) -> Message:
-        await self.goldy.delete_message(
+        await self.goldy.low_level.delete_message(
             channel_id = self.data["channel_id"], 
             message_id = self.data["id"], 
             reason = reason

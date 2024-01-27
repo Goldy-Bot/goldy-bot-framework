@@ -74,7 +74,7 @@ class Commands():
 
         test_guild_id = self.config.test_guild_id
 
-        registered_application_commands = await self.get_application_commands(test_guild_id)
+        registered_application_commands = await self.low_level.get_application_commands(test_guild_id)
 
         commands_are_same = all(
             [
@@ -85,7 +85,7 @@ class Commands():
         )
 
         if not commands_are_same:
-            newly_registered_app_commands = await self.create_application_commands(
+            newly_registered_app_commands = await self.low_level.create_application_commands(
                 payload = commands_to_register, 
                 guild_id = test_guild_id
             )

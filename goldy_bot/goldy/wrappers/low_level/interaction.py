@@ -13,7 +13,7 @@ if TYPE_CHECKING:
     )
 
     from ....files import File
-    from ....typings import GoldySelfT
+    from ....typings import LowLevelSelfT
 
 from aiohttp import FormData
 from nextcore.http import Route
@@ -29,7 +29,7 @@ class Interaction():
         super().__init__()
 
     async def create_application_commands(
-        self: GoldySelfT[Self], 
+        self: LowLevelSelfT[Self], 
         payload: List[ApplicationCommandPayload], 
         guild_id: Optional[str] = None,
         force: bool = False
@@ -58,7 +58,7 @@ class Interaction():
         if guild_id is not None:
             self.logger.info("Registering guild commands...")
 
-            r = await self.client.request(
+            r = await self.goldy.client.request(
                 Route(
                     "PUT", 
                     "/applications/{application_id}/guilds/{guild_id}/commands",
@@ -66,7 +66,7 @@ class Interaction():
                     guild_id = guild_id
                 ),
                 json = payload,
-                **self.key_and_headers
+                **self.goldy.key_and_headers
             )
 
             created_commands = await r.json()
@@ -74,14 +74,14 @@ class Interaction():
         else:
             self.logger.info("Registering global commands...")
 
-            r = await self.client.request(
+            r = await self.goldy.client.request(
                 Route(
                     "PUT", 
                     "/applications/{application_id}/commands",
                     application_id = app_data["id"]
                 ),
                 json = payload,
-                **self.key_and_headers
+                **self.goldy.key_and_headers
             )
 
             created_commands = await r.json()
@@ -90,7 +90,7 @@ class Interaction():
         return created_commands
 
     async def get_application_commands(
-        self: GoldySelfT[Self], 
+        self: LowLevelSelfT[Self], 
         guild_id: Optional[str] = None
     ) -> List[ApplicationCommandData]:
 
@@ -99,14 +99,14 @@ class Interaction():
         if guild_id is not None:
             self.logger.info("Getting guild application commands...")
 
-            r = await self.client.request(
+            r = await self.goldy.client.request(
                 Route(
                     "GET", 
                     "/applications/{application_id}/guilds/{guild_id}/commands",
                     application_id = app_data["id"],
                     guild_id = guild_id
                 ),
-                **self.key_and_headers
+                **self.goldy.key_and_headers
             )
 
             data = await r.json()
@@ -114,37 +114,37 @@ class Interaction():
 
         self.logger.info("Getting global application commands...")
 
-        r = await self.client.request(
+        r = await self.goldy.client.request(
             Route(
                 "GET", 
                 "/applications/{application_id}/commands",
                 application_id = app_data["id"]
             ),
-            **self.key_and_headers
+            **self.goldy.key_and_headers
         )
 
         data = await r.json()
         return data
 
-    async def get_interaction_message(self: GoldySelfT[Self], interaction_token: str) -> MessageData:
+    async def get_interaction_message(self: LowLevelSelfT[Self], interaction_token: str) -> MessageData:
         """Get's the message data of the original interaction response."""
         app_data = await self.get_application_data()
 
-        r = await self.client.request(
+        r = await self.goldy.client.request(
             Route(
                 "GET", 
                 "/webhooks/{application_id}/{interaction_token}/messages/@original", 
                 application_id = app_data["id"], 
                 interaction_token = interaction_token
             ),
-            rate_limit_key = self.key_and_headers["rate_limit_key"]
+            rate_limit_key = self.goldy.key_and_headers["rate_limit_key"]
         )
 
         data = await r.json()
         return data
 
     async def send_interaction_callback(
-        self: GoldySelfT[Self], 
+        self: LowLevelSelfT[Self], 
         interaction_id: str, 
         interaction_token: str, 
         payload: InteractionMessageCallbackData, 
@@ -166,19 +166,19 @@ class Interaction():
             )
         )
 
-        await self.client.request( 
+        await self.goldy.client.request( 
             Route(
                 "POST", 
                 "/interactions/{interaction_id}/{interaction_token}/callback", 
                 interaction_id = interaction_id, 
                 interaction_token = interaction_token
             ),
-            rate_limit_key = self.key_and_headers["rate_limit_key"],
+            rate_limit_key = self.goldy.key_and_headers["rate_limit_key"],
             data = form_data
         )
 
     async def send_interaction_follow_up(
-        self: GoldySelfT[Self], 
+        self: LowLevelSelfT[Self], 
         interaction_token: str, 
         payload: InteractionMessageCallbackData, 
         files: Optional[List[File]] = None
@@ -195,14 +195,14 @@ class Interaction():
             "payload_json", json_dumps(payload)
         )
 
-        r = await self.client.request( 
+        r = await self.goldy.client.request( 
             Route(
                 "POST", 
                 "/webhooks/{application_id}/{interaction_token}", 
                 application_id = app_data["id"], 
                 interaction_token = interaction_token
             ),
-            rate_limit_key = self.key_and_headers["rate_limit_key"],
+            rate_limit_key = self.goldy.key_and_headers["rate_limit_key"],
             data = form_data
         )
 

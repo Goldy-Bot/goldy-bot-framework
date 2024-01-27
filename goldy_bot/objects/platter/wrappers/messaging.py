@@ -82,7 +82,7 @@ class MessagingWrapper(PlatterWrapper):
         # ------------------
         if self._interaction_responded is False:
 
-            await self.goldy.send_interaction_callback(
+            await self.goldy.low_level.send_interaction_callback(
                 interaction_id = self.data["id"],
                 interaction_token = self.data["token"],
                 payload = payload,
@@ -100,7 +100,7 @@ class MessagingWrapper(PlatterWrapper):
         # -------------------
         # Is sent when you want to respond again after sending the original response to an interaction command.
         else:
-            message_data = await self.goldy.send_interaction_follow_up(
+            message_data = await self.goldy.low_level.send_interaction_follow_up(
                 interaction_token = self.data["token"],
                 payload = payload,
                 files = files

@@ -17,19 +17,18 @@ from datetime import datetime
 from devgoldyutils import LoggerAdapter, Colours
 from nextcore.http import UnauthorizedError
 
+from .wrappers import FrameworkWrapper, LowLevelWrapper
+
 from .. import errors
-from .wrappers import (
-    DiscordWrapper, FrameworkWrapper
-)
-from ..logger import goldy_bot_logger
 from ..commands import CommandType
+from ..logger import goldy_bot_logger
 
 __all__ = (
     "Goldy",
 )
 
 class Goldy(
-    FrameworkWrapper, DiscordWrapper
+    FrameworkWrapper
 ):
     """
     The core class that wraps nextcore's shard manager and client. The framework's core class.
@@ -58,6 +57,7 @@ class Goldy(
         """Shorthand attribute you can use to pass rate limit keys and headers to ``nextcore.http.HTTPClient.request()``."""
 
         self.logger = LoggerAdapter(goldy_bot_logger, Colours.ORANGE.apply("Goldy"))
+        self.low_level = LowLevelWrapper(self)
 
         super().__init__()
 

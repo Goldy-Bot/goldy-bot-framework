@@ -126,7 +126,7 @@ class Legacy():
                 # Creating global commands.
                 # --------------------------
                 if testing_server is None:
-                    created_interaction_cmds += await self.create_application_commands(
+                    created_interaction_cmds += await self.low_level.create_application_commands(
                         slash_command_payloads
                     )
 
@@ -148,7 +148,7 @@ class Legacy():
 
                         payload["description"] = test_description
 
-                    created_interaction_cmds += await self.create_application_commands(
+                    created_interaction_cmds += await self.low_level.create_application_commands(
                         slash_command_payloads, guild_id = testing_server[0]
                     )
 
@@ -194,9 +194,9 @@ class Legacy():
     async def _legacy_setup(self: GoldySelfT[Self]) -> None:
         """Do not use this method! Runs legacy API setup routine."""
         if self.__legacy_goldy is not None:
-            bot_user_data = await self.get_bot_user_data(bucket_priority = 1)
+            bot_user_data = await self.low_level.get_bot_user_data(bucket_priority = 1)
 
-            self.__legacy_goldy.application_data = await self.get_application_data()
+            self.__legacy_goldy.application_data = await self.low_level.get_application_data()
             self.__legacy_goldy.bot_user = LegacyMember(bot_user_data, None, self.__legacy_goldy)
 
             await self.__legacy_goldy.setup()

@@ -2,9 +2,10 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
+    from typing_extensions import Self
     from discord_typings import UserData
 
-    from ...goldy import Goldy
+    from ....typings import LowLevelSelfT
 
 from nextcore.http import Route
 
@@ -16,15 +17,15 @@ class User():
     def __init__(self) -> None:
         super().__init__()
 
-    async def get_bot_user_data(self: Goldy, **kwargs) -> UserData:
+    async def get_bot_user_data(self: LowLevelSelfT[Self], **kwargs) -> UserData:
         self.logger.debug("Requesting bot user data...")
 
-        r = await self.client.request(
+        r = await self.goldy.client.request(
             Route(
                 "GET",
                 "/users/@me"
             ),
-            **self.key_and_headers,
+            **self.goldy.key_and_headers,
             **kwargs
         )
 

@@ -1,13 +1,11 @@
 from __future__ import annotations
 
-from . import (
-    Docker,
-    Cache,
-    Extensions,
-    Legacy,
-    Repo,
-    Commands
-)
+from .cache import Cache
+from .docker import Docker
+from .legacy import Legacy
+from .repositories import Repo
+from .commands import Commands
+from .extensions import Extensions
 
 __all__ = (
     "FrameworkWrapper",

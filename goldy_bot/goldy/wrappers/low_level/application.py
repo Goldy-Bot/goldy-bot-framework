@@ -7,7 +7,7 @@ if TYPE_CHECKING:
 
     from discord_typings import ApplicationData
 
-    from ....typings import GoldySelfT
+    from ....typings import LowLevelSelfT
 
 from nextcore.http import Route
 
@@ -21,23 +21,23 @@ class Application():
 
         super().__init__()
 
-    async def get_application_data(self: GoldySelfT[Self], **kwargs) -> ApplicationData:
+    async def get_application_data(self: LowLevelSelfT[Self], **kwargs) -> ApplicationData:
         if self.__application_data is None:
-            self.__application_data = self.get_cache("application_data")
+            self.__application_data = self.goldy.get_cache("application_data")
 
         if self.__application_data is None:
             self.logger.debug("Requesting application data as it doesn't exist...")
 
-            r = await self.client.request(
+            r = await self.goldy.client.request(
                 Route(
                     "GET",
                     "/applications/@me"
                 ),
-                **self.key_and_headers,
+                **self.goldy.key_and_headers,
                 **kwargs
             )
 
             data = await r.json()
-            self.__application_data = self.set_cache("application_data", data)
+            self.__application_data = self.goldy.set_cache("application_data", data)
 
         return self.__application_data
