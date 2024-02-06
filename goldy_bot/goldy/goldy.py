@@ -130,7 +130,13 @@ class Goldy(
             if extension is not None:
                 self.logger.info(f"The extension '{extension.name}' has been loaded!")
 
-                self.add_extension(extension)
+                if not self.is_extension_ignored(extension):
+                    self.add_extension(extension)
+
+                else:
+                    self.logger.warning(
+                        f"The extension '{extension.name}' is not being added as it's ignored!"
+                    )
 
         # Setting up nextcore client.
         await self.client.setup()

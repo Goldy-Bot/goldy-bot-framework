@@ -22,6 +22,8 @@ __all__ = (
     "Command",
 )
 
+logger = LoggerAdapter(goldy_bot_logger, prefix = "Command")
+
 class Command(DictHelper[ApplicationCommandPayload]):
     def __init__(
         self,
@@ -50,10 +52,6 @@ class Command(DictHelper[ApplicationCommandPayload]):
         self._slash_options = slash_options
         self._subcommands: List[Command] = []
 
-        self.logger = LoggerAdapter(
-            LoggerAdapter(goldy_bot_logger, prefix = "Command"), prefix = name
-        )
-
         super().__init__(data)
 
     @property
@@ -81,9 +79,9 @@ class Command(DictHelper[ApplicationCommandPayload]):
             }
         )
 
-        self.logger.info(f"Added subcommand '{command.name}' to '{self.name}'.")
+        logger.debug(f"Added subcommand '{command.name}' --> '{self.name}'.")
 
-    def __options_parser(
+    def __options_parser( # TODO: Maybe more logging in here.
         self, 
         function: CommandFuncT, 
         slash_options: Dict[str, SlashOption]

@@ -57,13 +57,13 @@ class Cache():
         return value
 
     def clear_cache(self: Goldy) -> None:
-        self.logger.info("Deleting cache file...")
+        logger.info("Deleting cache file...")
         self._cache_file.unlink(True)
 
     def __get_cache_file(self: GoldySelfT[Self], mode: str) -> TextIOWrapper:
 
         if not self._cache_file.exists():
-            self.logger.debug("Cache file didn't exist so I'm creating one...")
+            logger.debug("Cache file didn't exist so I'm creating one...")
 
             with self._cache_file.open("w") as file:
                 file.write("{}")

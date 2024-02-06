@@ -102,6 +102,7 @@ class Extension():
                     self._commands[class_name] = []
 
                 self._commands[class_name].append(command)
+                self.logger.debug(f"Added command '{command.name}' --> '{self.name}'.")
 
                 return GroupCommand(command = command) if group else func
 

@@ -21,6 +21,10 @@ __all__ = (
     "Extensions",
 )
 
+NAUGHTY_CHARACTERS = [
+    " ", "#", "%", "&", "{", "}", "<", ">", "*", "?", "/", "$", "!", "'", '"', ":", "@", "+", "`", "|", "="
+]
+
 logger = LoggerAdapter(
     goldy_bot_logger, prefix = "Extensions"
 )
@@ -39,6 +43,16 @@ class Extensions():
         logger.info(
             f"The extension '{extension.name}' has been added!"
         )
+
+    def is_extension_ignored(self: GoldySelfT[Self], extension: Extension) -> bool:
+
+        for ignored_extension in self.config.ignored_extensions:
+
+            if extension.name.lower() == ignored_extension.lower():
+                return True
+
+        return False
+
 
     def load_extension(self: GoldySelfT[Self], extension_path: Path, legacy: bool = False) -> Optional[Extension]:
         """Loads an extension from that path and returns it."""
@@ -101,7 +115,7 @@ class Extensions():
 
             logger.debug(f"Called the '{extension.name}' extension load function successfully!")
 
-            passed, reason = self.__check_extension_legibility(extension_path)
+            passed, reason = self.__check_extension_legibility(extension, extension_path)
 
             if passed is False:
                 raise_or_error(
@@ -137,11 +151,22 @@ class Extensions():
 
         return extension_path
 
-    def __check_extension_legibility(self: GoldySelfT[Self], extension_path: Path) -> Tuple[bool, Optional[str]]:
+    def __check_extension_legibility(self: GoldySelfT[Self], extension: Extension, extension_path: Path) -> Tuple[bool, Optional[str]]:
         # TODO: Make sure all pancake extensions that aren't just a file have a pyproject.toml file with the goldy bot version set.
         # TODO: If extension is depending a newer framework version raise exception, if it's pre-pancake give the user a warning that pre-pancake is deprecated.
         logger.debug(f"Checking legibility of the extension at '{shorter_path(extension_path)}'...")
 
+        # check if the name is halal...
+        for char in extension.name:
+
+            if char in NAUGHTY_CHARACTERS: # Doesn't cover every character because goldy bot isn't for DUMB USERS IT'S FOR DEVELOPERS!
+                return False, f"'{char}' is not allowed in extension name as it's a forbidden file character!"
+
+        # shout at the user if the extension directory/module name is not the same as the actual extension name.
+        if not extension_path.name == extension.name:
+            return False, "extension name has to be the same as the extension's module!"
+
+        # is there a fucking pyproject.toml file.
         files_in_dir = [path.name for path in extension_path.iterdir()]
 
         if "pyproject.toml" not in files_in_dir:

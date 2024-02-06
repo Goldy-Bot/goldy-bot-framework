@@ -38,7 +38,7 @@ class Interaction():
         Method that registers application commands with discord respecting already registered commands within the framework.
 
         If ``guild_id`` is set a guild application command will be registered instead.
-        If ``force`` is set to True previously registered commands will be wiped as standard behavior when making the request to discord yourself.
+        If ``force`` is set to True previously registered commands will be wiped as standard behavior when making this request manually to discord.
         """
         created_commands: List[ApplicationCommandData] = []
 
@@ -56,7 +56,7 @@ class Interaction():
         self.logger.debug(f"Registering these commands --> {[x['name'] for x in payload]}")
 
         if guild_id is not None:
-            self.logger.info("Registering guild commands...")
+            self.logger.debug(f"Registering guild commands for '{guild_id}'...")
 
             r = await self.goldy.client.request(
                 Route(
@@ -72,7 +72,7 @@ class Interaction():
             created_commands = await r.json()
 
         else:
-            self.logger.info("Registering global commands...")
+            self.logger.debug("Registering global commands...")
 
             r = await self.goldy.client.request(
                 Route(
@@ -97,7 +97,7 @@ class Interaction():
         app_data = await self.get_application_data()
 
         if guild_id is not None:
-            self.logger.info("Getting guild application commands...")
+            self.logger.debug("Getting guild application commands...")
 
             r = await self.goldy.client.request(
                 Route(
@@ -112,7 +112,7 @@ class Interaction():
             data = await r.json()
             return data
 
-        self.logger.info("Getting global application commands...")
+        self.logger.debug("Getting global application commands...")
 
         r = await self.goldy.client.request(
             Route(
