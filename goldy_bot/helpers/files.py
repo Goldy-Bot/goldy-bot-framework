@@ -7,7 +7,8 @@ if TYPE_CHECKING:
 
 import os
 import io
-from requests import Response
+import aiohttp
+import requests
 from ..errors import GoldyBotError
 
 __all__ = (
@@ -32,20 +33,29 @@ class File():
         """Returns the attachment url string. Useful when attaching images to Embeds."""
 
     @classmethod
-    def from_response(cls, response: Response) -> Self:
+    async def from_response(cls, response: requests.Response | aiohttp.ClientResponse) -> Self:
+        """Supports response objects from requests and aiohttp."""
         content_type = response.headers.get("Content-Type")
 
         if content_type is None:
             raise GoldyBotError("'response' does not have 'Content-Type' header!")
 
+        content = None
+
+        if isinstance(response, requests.Response):
+            content = response.content
+        elif isinstance(response, aiohttp.ClientResponse):
+            content = await response.read()
+
         return cls(
-            file = io.BytesIO(response.content), 
+            file = io.BytesIO(content), 
             file_name = f"image.{content_type.split('/')[1]}"
         )
 
     @property
     def contents(self) -> bytes:
         """Returns the contents of this file. Useful for uploading."""
+        self.file.seek(0)
         return self.file.read()
 
     def close(self) -> None:

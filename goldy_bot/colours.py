@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from GoldyBot import File
+    from goldy_bot import File
 
 from enum import Enum
 from colorthief import ColorThief
@@ -38,5 +38,5 @@ class Colours(Enum):
     @classmethod
     def from_image(cls, file: File, accuracy: int = 5) -> int:
         """Returns the dominant colour in that image."""
-        r, g, b = ColorThief(file.file_io).get_color(accuracy)
+        r, g, b = ColorThief(file.file).get_color(accuracy)
         return cls.from_rgb(r, g, b)

@@ -52,7 +52,7 @@ class MessagingWrapper(PlatterWrapper):
             payload["content"] = str(text)
 
         if embeds is not None:
-            payload["embeds"] = embeds
+            payload["embeds"] = [embed.data for embed in embeds]
 
         if recipes is not None:
             components: Dict[int, ActionRowData] = {}

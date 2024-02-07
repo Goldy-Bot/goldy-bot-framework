@@ -127,6 +127,7 @@ class SlashOption(DictHelper[ApplicationCommandOptionData]):
         if choices is not None:
             data["choices"] = choices
 
-        data["required"] = required
+        if required:
+            data["required"] = True
 
         super().__init__(data, **kwargs)

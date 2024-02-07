@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from typing import List, Dict
     from typing_extensions import Self
-    from discord_typings import InteractionData, ApplicationCommandPayload
+    from discord_typings import InteractionData, ApplicationCommandPayload, ApplicationCommandData
 
     from ...commands import Command
     from ...typings import GoldySelfT
@@ -38,6 +38,13 @@ class Commands():
                 for command in extension._commands[_class.__class__.__name__]:
 
                     if command.name == name and command.data["type"] == type.value:
+                        subcommand_name = (lambda x: x[0] if not x == [] else None)(
+                            [option["name"] for option in data["data"].get("options", []) if option["type"] == 1]
+                        )
+
+                        if subcommand_name is not None:
+                            command = command._subcommands[subcommand_name]
+
                         self.logger.info(
                             f"Invoking the command '{command.name}' in extension class '{_class.__class__.__name__}'..."
                         )
@@ -76,19 +83,15 @@ class Commands():
 
         registered_application_commands = await self.low_level.get_application_commands(test_guild_id)
 
-        commands_are_same = all(
-            [
-                all([command.get(key) == app_command.get(key) for key in ["description", "options"]]) 
-                for app_command in registered_application_commands for command in commands_to_register 
-                if command["name"] == app_command["name"] and command["type"] == app_command["type"]
-            ]
-        )
+        commands_are_same = self.__are_commands_same(commands_to_register, registered_application_commands)
 
         if not commands_are_same:
             newly_registered_app_commands = await self.low_level.create_application_commands(
                 payload = commands_to_register, 
                 guild_id = test_guild_id
             )
+
+            logger.debug(f"Commands registered -> {[(cmd['name'], cmd['type']) for cmd in newly_registered_app_commands]}")
 
             logger.info(
                 Colours.GREEN.apply(str(len(newly_registered_app_commands))) + " new command(s) have been registered with discord!"
@@ -97,6 +100,46 @@ class Commands():
         else:
             logger.info("No commands have been registered as no changes were detected.")
 
+    def __are_commands_same(
+        self, 
+        commands_to_register: List[ApplicationCommandPayload], 
+        registered_application_commands: List[ApplicationCommandData]
+    ) -> bool:
+
+        framework_commands = commands_to_register
+        discord_app_commands = registered_application_commands
+
+        if framework_commands == []:
+            return False
+
+        for command in framework_commands:
+            found = False
+
+            for app_command in discord_app_commands:
+
+                # if this app command doesn't exist in framework NUKE IT.
+                if app_command["name"] not in [command["name"] for command in framework_commands]:
+
+                    logger.debug(
+                        f"The application command '{app_command['name']}' of type '{CommandType(app_command['type']).name}' " \
+                            "isn't registered in the framework, so it will be removed."
+                    )
+
+                    return False
+
+                if command["name"] == app_command["name"] and command["type"] == app_command["type"]:
+
+                    for key in ["description", "options"]:
+
+                        if not command.get(key) == app_command.get(key):
+                            return False
+
+                    found = True
+
+            if found is False:
+                return False
+
+        return True
 
     def __interaction_options_to_kwargs(self, data: InteractionData, command: Command) -> Dict[str, str]:
         """A method that phrases option parameters from interaction data of a command."""

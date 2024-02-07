@@ -212,6 +212,6 @@ class Interaction():
     def __file_to_form_field(self, file: File) -> Dict[str, str]:
         return {
             "name": file.name.split(".")[-2], 
-            "value": file.contents,
+            "value": file.contents, 
             "filename": file.name
         }

@@ -50,7 +50,7 @@ class Command(DictHelper[ApplicationCommandPayload]):
         self.wait = wait
 
         self._slash_options = slash_options
-        self._subcommands: List[Command] = []
+        self._subcommands: Dict[str, Command] = {}
 
         super().__init__(data)
 
@@ -65,20 +65,21 @@ class Command(DictHelper[ApplicationCommandPayload]):
         return self.data["description"]
 
     def add_subcommand(self, command: Command) -> None:
-        self._subcommands.append(command)
-
         if self.data.get("options") is None:
             self.data["options"] = []
 
-        self.data["options"].append(
-            {
-                "name": command.name,
-                "description": command.description,
-                "options": [] if command._slash_options is None else self.__options_parser(command.function, command._slash_options),
-                "type": 1
-            }
-        )
+        subcommand_data = {
+            "name": command.name,
+            "description": command.description,
+            "type": 1
+        }
 
+        if command._slash_options is not None: # options key must not exist if slash options is None.
+            subcommand_data["options"] = self.__options_parser(command.function, command._slash_options)
+
+        self.data["options"].append(subcommand_data)
+
+        self._subcommands[command.name] = command
         logger.debug(f"Added subcommand '{command.name}' --> '{self.name}'.")
 
     def __options_parser( # TODO: Maybe more logging in here.
@@ -96,7 +97,7 @@ class Command(DictHelper[ApplicationCommandPayload]):
         func_params = list(function.__code__.co_varnames)
 
         # Filters out 'self' and 'platter' arguments.
-        func_params = func_params[2:function.__code__.co_argcount - 2]
+        func_params = func_params[2:-function.__code__.co_argcount]
 
         # Get command function parameters.
         # --------------------------------------

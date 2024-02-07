@@ -151,7 +151,7 @@ class Embed(DictHelper[EmbedData]):
             data["fields"] = []
 
             for field in fields:
-                data["fields"].append(field)
+                data["fields"].append(field.data)
 
         if colour is None:
             colour = Colours.INVISIBLE
@@ -159,23 +159,23 @@ class Embed(DictHelper[EmbedData]):
         data["color"] = colour.value
 
         if author is not None:
-            data["author"] = author
+            data["author"] = author.data
 
         if footer is not None:
-            data["footer"] = footer
+            data["footer"] = footer.data
 
         if image is not None:
-            data["image"] = image
+            data["image"] = image.data
 
         if thumbnail is not None:
-            data["thumbnail"] = thumbnail
+            data["thumbnail"] = thumbnail.data
 
         super().__init__(data, **kwargs)
 
     def format_title(self, **keys) -> None:
         "Just like the str.format() method but it formats the embed's title for you " \
         "so you can avoid the catastrophe at https://github.com/Goldy-Bot/Goldy-Bot-V5/issues/35."
-        data: EmbedData = dict(self)
+        data = self.data
 
         data["title"] = data["title"].format(**keys)
 
@@ -184,7 +184,7 @@ class Embed(DictHelper[EmbedData]):
     def format_description(self, **keys) -> None:
         "Just like the str.format() method but it formats the embed's description for you " \
         "so you can avoid the catastrophe at https://github.com/Goldy-Bot/Goldy-Bot-V5/issues/35."
-        data: EmbedData = dict(self)
+        data = self.data
 
         data["description"] = data["description"].format(**keys)
 
@@ -196,20 +196,26 @@ class Embed(DictHelper[EmbedData]):
         
         This was added because of https://github.com/Goldy-Bot/Goldy-Bot-V5/issues/35.
         """
-        data: EmbedData = dict(self)
+        data = self.data
 
         for index, field in enumerate(data["fields"]):
             data["fields"][index]["value"] = field["value"].format(**keys)
 
         self.data.update(data)
 
+    def set_image(self, image: EmbedImage) -> None: # NOTE: I might make this into an edit function of some sort if needed.
+        """
+        Set's an embed image.
+        """
+        self.data["image"] = image.data
+
     def set_random_footer(self, messages: List[str]) -> None:
         """
-        Method that will randomly choose to display one of those messages in the footer; it can also choose to not display anything.
+        Method that will randomly choose to display one of those messages in the footer; it can also choose to not display anything. 10% chance.
         """
-        data: EmbedData = dict(self)
+        data = self.data
 
-        if random.randint(0, 4) == 0:
+        if random.randint(0, 9) == 0:
             data["footer"] = {"text": random.choice(messages)}
 
         self.data.update(data)
