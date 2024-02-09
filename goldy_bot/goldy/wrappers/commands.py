@@ -2,9 +2,9 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from typing import List, Dict
     from typing_extensions import Self
-    from discord_typings import InteractionData, ApplicationCommandPayload, ApplicationCommandData
+    from typing import List, Dict, Optional, Tuple
+    from discord_typings import InteractionData, ApplicationCommandPayload, ApplicationCommandData, ApplicationCommandOptionInteractionData
 
     from ...commands import Command
     from ...typings import GoldySelfT
@@ -15,6 +15,7 @@ from ...logger import goldy_bot_logger
 from ...commands import CommandType
 from ...errors import FrontEndError
 from ...objects.platter import Platter
+from ...helpers import Embed
 
 __all__ = (
     "Commands",
@@ -38,20 +39,24 @@ class Commands():
                 for command in extension._commands[_class.__class__.__name__]:
 
                     if command.name == name and command.data["type"] == type.value:
-                        subcommand_name = (lambda x: x[0] if not x == [] else None)(
-                            [option["name"] for option in data["data"].get("options", []) if option["type"] == 1]
-                        )
-
-                        if subcommand_name is not None:
-                            command = command._subcommands[subcommand_name]
-
-                        self.logger.info(
+                        logger.info(
                             f"Invoking the command '{command.name}' in extension class '{_class.__class__.__name__}'..."
                         )
 
-                        platter = Platter(data, self)
-                        params = self.__interaction_options_to_kwargs(data, command)
+                        options = data["data"].get("options", [])
 
+                        # if this is a subcommand then replace the parent command object with the subcommand.
+                        subcommand, subcommand_options = self.__get_subcommand(data, command)
+
+                        if subcommand is not None:
+                            command = subcommand
+                            options = subcommand_options
+
+                        # create a platter, generate function params from interaction data options.
+                        platter = Platter(data, self)
+                        params = self.__interaction_options_to_kwargs(options, command)
+
+                        # invoke the command's function
                         try:
                             await command.function(_class, platter, **params)
 
@@ -60,7 +65,7 @@ class Commands():
                             raise e
 
                         except Exception as e:
-                            self.__send_unknown_error(e)
+                            await self.__send_unknown_error(e, platter, command)
                             raise e
 
                         return True
@@ -141,26 +146,57 @@ class Commands():
 
         return True
 
-    def __interaction_options_to_kwargs(self, data: InteractionData, command: Command) -> Dict[str, str]:
+    def __get_subcommand(self, data: InteractionData, parent_command: Command) -> Tuple[Optional[Command], List[ApplicationCommandOptionInteractionData]]:
+        # NOTE: This won't support a third layer of subcommands.
+        subcommand: Optional[Command] = None
+        subcommand_options: List[ApplicationCommandOptionInteractionData] = []
+
+        for option in data["data"].get("options", []):
+
+            if option["type"] == 1:
+                subcommand_options = option.get("options", []) 
+                subcommand = parent_command._subcommands[option["name"]]
+                break
+
+        return subcommand, subcommand_options
+
+    def __interaction_options_to_kwargs(self, options: List[ApplicationCommandOptionInteractionData], command: Command) -> Dict[str, str]:
         """A method that phrases option parameters from interaction data of a command."""
         logger.debug(
             f"Phrasing interaction data options into function parameters for command '{command.name}'..."
         )
 
-        params = {}
+        kwargs = {}
 
-        for option in data["data"].get("options", []):
+        for option in options:
 
             # Ignore sub commands and sub groups.
             if option["type"] == 1 or option["type"] == 2: 
                 continue
 
-            for key in command._slash_options:
-                slash_option = command._slash_options[key]
-
-                if slash_option.data["name"] == option["name"]:
-                    params[key] = option["value"]
-                    logger.debug(f"Command argument '{key}' found!")
+            for param in command.params:
+  
+                if option["name"] == param:
+                    kwargs[param] = option["value"]
+                    logger.debug(f"Command argument '{param}' found!")
                     break
 
-        return params
+        return kwargs
+
+    async def __send_unknown_error(self: GoldySelfT[Self], error: Exception, platter: Platter, command: Command):
+        # TODO: Add report button that dms the bot developer the full traceback from the error.
+        # Also add a guild and user black listing feature to it to mitigate spam and unwanted reports.
+        embed = Embed(
+            title = "❤️ An Error Occurred!", 
+            description = "Oopsie daisy, an internal unknown error occurred. *Sorry I'm still new to this.* 🥺", 
+            colour = Colours.RED, 
+            footer = {
+                "text": "Report button will be coming soon."
+            }
+        )
+
+        await platter.send_message(embeds = [embed], hidden = True)
+
+        logger.error(
+            f"Error occurred in the command '{command.name}' executed by '{platter.data['member']['user']['username']}'!"
+        )

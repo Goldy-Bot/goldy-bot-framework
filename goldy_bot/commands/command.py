@@ -38,14 +38,13 @@ class Command(DictHelper[ApplicationCommandPayload]):
         name = name or function.__name__
         # Even though discord docs say no, description is a required field.
         description = description or "🪹 Oopsie daisy, looks like no description was set for this command." 
+        slash_options = slash_options or {}
 
         data = {}
         data["type"] = CommandType.SLASH.value
         data["name"] = name
         data["description"] = description
-
-        if slash_options is not None:
-            data["options"] = self.__options_parser(function, slash_options)
+        data["options"] = self.__options_parser(self.params, slash_options)
 
         self.wait = wait
 
@@ -64,18 +63,21 @@ class Command(DictHelper[ApplicationCommandPayload]):
         """The command's description."""
         return self.data["description"]
 
-    def add_subcommand(self, command: Command) -> None:
-        if self.data.get("options") is None:
-            self.data["options"] = []
+    @property
+    def params(self) -> List[str]:
+        """The commands's function parameters."""
+        func_params = list(self.function.__code__.co_varnames)
 
+        # Filters out 'self' and 'platter' arguments.
+        return func_params[:self.function.__code__.co_argcount][2:]
+
+    def add_subcommand(self, command: Command) -> None:
         subcommand_data = {
-            "name": command.name,
-            "description": command.description,
+            "name": command.name, 
+            "description": command.description, 
+            "options": self.__options_parser(command.params, command._slash_options), 
             "type": 1
         }
-
-        if command._slash_options is not None: # options key must not exist if slash options is None.
-            subcommand_data["options"] = self.__options_parser(command.function, command._slash_options)
 
         self.data["options"].append(subcommand_data)
 
@@ -84,7 +86,7 @@ class Command(DictHelper[ApplicationCommandPayload]):
 
     def __options_parser( # TODO: Maybe more logging in here.
         self, 
-        function: CommandFuncT, 
+        params: List[str], 
         slash_options: Dict[str, SlashOption]
     ) -> List[ApplicationCommandOptionData]:
         """A function that converts slash command parameters to slash command payload options."""
@@ -94,14 +96,7 @@ class Command(DictHelper[ApplicationCommandPayload]):
         # https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-naming
         chat_input_patten = regex.compile(r"^[-_\p{L}\p{N}\p{sc=Deva}\p{sc=Thai}]{1,32}$", regex.UNICODE)
 
-        func_params = list(function.__code__.co_varnames)
-
-        # Filters out 'self' and 'platter' arguments.
-        func_params = func_params[2:-function.__code__.co_argcount]
-
-        # Get command function parameters.
-        # --------------------------------------
-        for param in func_params:
+        for param in params:
             # Uppercase parameters are not allowed in the discord API.
             if param.isupper() or bool(chat_input_patten.match(param)) is False:
                 raise GoldyBotError(
@@ -111,8 +106,8 @@ class Command(DictHelper[ApplicationCommandPayload]):
             slash_option = slash_options.get(param)
 
             if slash_option is not None:
-                option_name = slash_option.data["name"]
-                slash_option.data["name"] = param if option_name is None else option_name
+                option_name = slash_option.data.get("name")
+                slash_option.data["name"] = option_name if option_name is not None else param
 
                 options.append(slash_option.data)
 
