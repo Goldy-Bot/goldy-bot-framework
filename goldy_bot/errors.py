@@ -6,7 +6,7 @@ if TYPE_CHECKING:
 
     from logging import Logger
 
-    from GoldyBot import Embed # TODO: Change to pancake embed object when available.
+    from goldy_bot import Embed
 
 from GoldyBot.errors import GoldyBotError
 
@@ -25,16 +25,15 @@ class FrontEndError(GoldyBotError):
         message: str, 
         logger: Optional[Logger] = None
     ):
-
         self.embed = embed
 
         super().__init__(message, logger)
 
 def raise_or_error(
-        message: str,
-        condition: Callable[[], bool],
-        logger: Optional[Logger] = None
-    ) -> None:
+    message: str, 
+    condition: Callable[[], bool], 
+    logger: Optional[Logger] = None
+) -> None:
     if logger is None:
         logger = goldy_bot_logger
 
