@@ -36,6 +36,22 @@ class MessagingWrapper(PlatterWrapper):
 
         super().__init__(data, goldy)
 
+    async def wait(self) -> None:
+        """Informs Discord that this response will take longer than usual and it should wait."""
+
+        if self._interaction_responded:
+            self.logger.exception(
+                "You cannot wait/defer an interaction response after it's already been responded!"
+            )
+
+            return None
+
+        await self.goldy.low_level.wait(
+            interaction_id = self.data["id"], interaction_token = self.data["token"]
+        )
+
+        self._interaction_responded = True
+
     async def send_message(
         self, 
         text: Optional[str] = None, 

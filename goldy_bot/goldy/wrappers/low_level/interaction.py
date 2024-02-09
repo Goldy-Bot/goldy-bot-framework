@@ -28,6 +28,28 @@ class Interaction():
         self.__previous_commands_payload: List[ApplicationCommandPayload] = []
         super().__init__()
 
+    async def wait(
+        self: LowLevelSelfT[Self],
+        interaction_id: str, 
+        interaction_token: str
+    ) -> None:
+        """Informs Discord that this response will take longer than usual and it should wait."""
+
+        await self.goldy.client.request(
+            Route(
+                "POST", 
+                "/interactions/{interaction_id}/{interaction_token}/callback", 
+                interaction_id = interaction_id, 
+                interaction_token = interaction_token
+            ),
+            rate_limit_key = self.goldy.key_and_headers["rate_limit_key"],
+            json = {
+                "type": 5 # Defer
+            }
+        )
+
+        self.logger.debug("We told discord to wait a little longer for this interaction response.")
+
     async def create_application_commands(
         self: LowLevelSelfT[Self], 
         payload: List[ApplicationCommandPayload], 
