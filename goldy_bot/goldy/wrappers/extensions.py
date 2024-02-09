@@ -148,7 +148,6 @@ class Extensions():
         return extension_path
 
     def __check_extension_legibility(self: GoldySelfT[Self], extension: Extension, extension_path: Path) -> Tuple[bool, Optional[str]]:
-        # TODO: Make sure all pancake extensions that aren't just a file have a pyproject.toml file with the goldy bot version set.
         # TODO: If extension is depending a newer framework version raise exception, if it's pre-pancake give 
         # the user a warning that pre-pancake is deprecated.
 

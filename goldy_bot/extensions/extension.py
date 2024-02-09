@@ -32,7 +32,7 @@ class Extension():
     def mount(self, goldy: Goldy, *cls: ExtensionClassT) -> None:
         """Method to mount any classes you are using in your extension."""
         for _class in cls:
-            self._classes.append(_class(goldy)) # TODO: Initialize class here
+            self._classes.append(_class(goldy))
 
             self.logger.debug(
                 f"Mounted class '{_class.__name__}' to extension '{self.name}'."

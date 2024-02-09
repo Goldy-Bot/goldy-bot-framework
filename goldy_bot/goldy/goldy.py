@@ -58,6 +58,9 @@ class Goldy(
 
         self.logger = LoggerAdapter(goldy_bot_logger, Colours.ORANGE.apply("Goldy"))
         self.low_level = LowLevelWrapper(self)
+        """
+        WARNING: Misuse of these methods WILL result in breakage of the framework. Only use them if you know what you are doing!
+        """
 
         super().__init__()
 
