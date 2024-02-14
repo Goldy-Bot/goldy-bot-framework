@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from typing import Optional, List, Dict
+    from typing import Optional, List, Dict, NoReturn
 
     from discord_typings import (
         MessageData,
@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 
     from GoldyBot import Recipe
 
-    from ....helpers import Embed, File
+    from ....helpers import File
 
     from ....goldy import Goldy
 
@@ -23,24 +23,45 @@ from devgoldyutils import LoggerAdapter
 from ...message import Message
 from .wrapper import PlatterWrapper
 from ....logger import goldy_bot_logger
+from ....errors import FrontEndError
+from ....helpers import Embed
+from ....colours import Colours
 
 __all__ = (
     "MessagingWrapper",
 )
 
+logger = LoggerAdapter(goldy_bot_logger, prefix = "MessagingWrapper")
+
 class MessagingWrapper(PlatterWrapper):
     def __init__(self, data: InteractionData, goldy: Goldy) -> None:
         self._interaction_responded = False
 
-        self.logger = LoggerAdapter(goldy_bot_logger, prefix = "MessagingWrapper")
-
         super().__init__(data, goldy)
+
+    def error(
+        self, 
+        message: str, 
+        title: str = "🧡 An Error Occurred!", 
+        colour: Colours = Colours.AKI_ORANGE, 
+        embed: Optional[Embed] = None
+    ) -> NoReturn:
+        """Raises a frond end error to the user."""
+
+        if embed is None:
+            embed = Embed(
+                title = title,
+                description = message,
+                colour = colour
+            )
+
+        raise FrontEndError(embed, message, logger)
 
     async def wait(self) -> None:
         """Informs Discord that this response will take longer than usual and it should wait."""
 
         if self._interaction_responded:
-            self.logger.exception(
+            logger.exception(
                 "You cannot wait/defer an interaction response after it's already been responded!"
             )
 
@@ -89,8 +110,12 @@ class MessagingWrapper(PlatterWrapper):
 
             payload["components"] = [components[component] for component in components]
 
-        if hidden: # shows the message only to the user
-            payload["flags"] = 1 << 6
+        if hidden: # shows the message only to the user or deletes it after 5 seconds.
+
+            if self._interaction_responded:
+                delete_after = 5 if delete_after is None else delete_after
+            else:
+                payload["flags"] = 1 << 6
 
         payload.update(kwargs)
 
@@ -112,7 +137,7 @@ class MessagingWrapper(PlatterWrapper):
             # Get and return message data of original interaction response. 
             message_data = await self.goldy.low_level.get_interaction_message(self.data["token"])
 
-            self.logger.debug("Interaction callback message was sent.")
+            logger.debug("Interaction callback message was sent.")
 
         # Follow up message.
         # -------------------
@@ -124,7 +149,7 @@ class MessagingWrapper(PlatterWrapper):
                 files = files
             )
 
-            self.logger.debug("Interaction follow up message was sent.")
+            logger.debug("Interaction follow up message was sent.")
 
         message = Message(message_data, self.goldy)
 

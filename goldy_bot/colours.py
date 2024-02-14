@@ -7,6 +7,10 @@ if TYPE_CHECKING:
 from enum import Enum
 from colorthief import ColorThief
 
+__all__ = (
+    "Colours",
+)
+
 class Colours(Enum):
     """Colours enum class for 🥞 pancake ported over from legacy api."""
     AKI_PINK = 0xFF1493

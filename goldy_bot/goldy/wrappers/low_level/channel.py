@@ -26,7 +26,7 @@ class Channel():
     ) -> None: 
         """Deletes a single message."""
         self.logger.debug(
-            f"Deleting message '{message_id}' in channel '{channel_id}'..." + "" if reason is None else f" (Reason: {reason})"
+            f"Deleting message '{message_id}' in channel '{channel_id}'..." + ("" if reason is None else f" (Reason: {reason})")
         )
 
         await self.goldy.client.request(
@@ -36,5 +36,5 @@ class Channel():
                 channel_id = channel_id, 
                 message_id = message_id
             ),
-            rate_limit_key = self.goldy.key_and_headers["rate_limit_key"]
+            **self.goldy.key_and_headers
         )

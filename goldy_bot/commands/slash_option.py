@@ -101,7 +101,8 @@ class SlashOption(DictHelper[ApplicationCommandOptionData]):
             if isinstance(choices[0], str):
                 choices = [SlashOptionChoice(x, x) for x in choices]
 
-            utils.choices_value_check(choices)
+            # TODO: Add legibility test for commands.
+            #utils.choices_value_check(choices) 
 
         if type is not None:
             data["type"] = type.value
@@ -114,10 +115,10 @@ class SlashOption(DictHelper[ApplicationCommandOptionData]):
         # I didn't want to FUCKING have two separate SlashOption classes just for string choices and integer choices FUCK that, so I'm settling with this solution.
         if choices is not None:
 
-            if isinstance(choices[0]["value"], int):
+            if isinstance(choices[0].data["value"], int):
                 data["type"] = 4
 
-            elif isinstance(choices[0]["value"], bool): # TODO: Try this, idk if this is how it is suppose to work.
+            elif isinstance(choices[0].data["value"], bool): # TODO: Try this, idk if this is how it is suppose to work.
                 data["type"] = 5
 
 
@@ -125,7 +126,7 @@ class SlashOption(DictHelper[ApplicationCommandOptionData]):
         data["description"] = description
 
         if choices is not None:
-            data["choices"] = choices
+            data["choices"] = DictHelper.strip(choices)
 
         if required:
             data["required"] = True

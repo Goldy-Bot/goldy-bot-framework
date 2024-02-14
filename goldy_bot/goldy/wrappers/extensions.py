@@ -149,19 +149,30 @@ class Extensions():
 
     def __check_extension_legibility(self: GoldySelfT[Self], extension: Extension, extension_path: Path) -> Tuple[bool, Optional[str]]:
         # TODO: If extension is depending a newer framework version raise exception, if it's pre-pancake give 
-        # the user a warning that pre-pancake is deprecated.
+        # the developer a warning that pre-pancake is deprecated.
 
         logger.debug(f"Checking legibility of the extension at '{shorter_path(extension_path)}'...")
 
-        # shout at the user if the extension directory/module name is not the same as the actual extension name.
+        # shout at the developer if the extension directory/module name is not the same as the actual extension name.
+        # -------------------------------------------------------------------------------------------------------------
         if not extension_path.name == extension.name:
             return False, "extension name has to be the same as the extension's module! " \
                 "E.g. 'extensions/owo_extension/__init__.py' -> 'owo_extension'."
 
         # is there a fucking pyproject.toml file.
+        # ----------------------------------------
         files_in_dir = [path.name for path in extension_path.iterdir()]
 
         if "pyproject.toml" not in files_in_dir:
             return False, "pyproject.toml file is missing! In pancake extensions must contain at least a minimized pyproject.toml."
+
+        # warn the developer if they forget to mount a class housing commands.
+        # ----------------------------------------------------------------------
+        classes_mounted: List[str] = [x.__class__.__name__ for x in extension._classes]
+
+        for class_name in extension._commands:
+
+            if class_name not in classes_mounted:
+                return False, f"The class '{class_name}()' in '{extension.name}' needs to be mounted as it houses goldy bot commands!"
 
         return True, None

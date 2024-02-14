@@ -15,7 +15,8 @@ from ...logger import goldy_bot_logger
 from ...commands import CommandType
 from ...errors import FrontEndError
 from ...objects.platter import Platter
-from ...helpers import Embed
+from ...helpers import Embed, EmbedFooter
+from ...colours import Colours as GBotColours
 
 __all__ = (
     "Commands",
@@ -61,8 +62,8 @@ class Commands():
                             await command.function(_class, platter, **params)
 
                         except FrontEndError as e:
-                            self.__send_front_end_error(e) # TODO: Complete these.
-                            raise e
+                            await self.__send_front_end_error(e, platter, command) # TODO: Complete these.
+                            # if it's a front end error it's anticipated so we don't need to raise it.
 
                         except Exception as e:
                             await self.__send_unknown_error(e, platter, command)
@@ -183,16 +184,25 @@ class Commands():
 
         return kwargs
 
+    async def __send_front_end_error(self: GoldySelfT[Self], error: FrontEndError, platter: Platter, command: Command):
+        # TODO: Add report button that dms the bot developer the full traceback from the error.
+        # Also add a guild and user black listing feature to it to mitigate spam and unwanted reports.
+ 
+        await platter.send_message(embeds = [error.embed], hidden = True)
+
+        logger.info(
+            f"Front end error raised for command '{command.name}' executed by '{platter.data['member']['user']['username']}'." \
+                f" Cause: {error.embed.data['description']}"
+        )
+
     async def __send_unknown_error(self: GoldySelfT[Self], error: Exception, platter: Platter, command: Command):
         # TODO: Add report button that dms the bot developer the full traceback from the error.
         # Also add a guild and user black listing feature to it to mitigate spam and unwanted reports.
         embed = Embed(
             title = "❤️ An Error Occurred!", 
             description = "Oopsie daisy, an internal unknown error occurred. *Sorry I'm still new to this.* 🥺", 
-            colour = Colours.RED, 
-            footer = {
-                "text": "Report button will be coming soon."
-            }
+            colour = GBotColours.RED, 
+            footer = EmbedFooter(text = "Report button will be coming soon.")
         )
 
         await platter.send_message(embeds = [embed], hidden = True)
