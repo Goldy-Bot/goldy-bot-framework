@@ -10,9 +10,9 @@ if TYPE_CHECKING:
 from enum import Enum
 from devgoldyutils import short_str
 
-from GoldyBot import utils
+# from GoldyBot import utils
 
-from ..helpers.dict_helper import DictHelper
+from ...helpers.dict_helper import DictHelper
 
 __all__ = (
     "SlashOptionTypes",
@@ -24,6 +24,9 @@ SlashOptionChoiceT = Union[StrCommandOptionChoiceData, IntCommandOptionChoiceDat
 
 class SlashOptionTypes(Enum):
     """An enum class containing some of the slash option types."""
+    STRING = 3
+    INT = 4
+    BOOL = 5
     USER = 6
     CHANNEL = 7
     ROLE = 8

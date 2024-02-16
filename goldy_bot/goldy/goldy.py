@@ -150,7 +150,7 @@ class Goldy(
         # Set command listener.
         self.shard_manager.event_dispatcher.add_listener(
             lambda x: self.invoke_command(
-                x["data"]["name"], CommandType(x["data"]["type"]), x
+                x["data"]["name"], CommandType(x["type"]), x
             ),
             event_name = "INTERACTION_CREATE"
         )

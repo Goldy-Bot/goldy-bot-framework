@@ -4,7 +4,13 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from typing_extensions import Self
     from typing import List, Dict, Optional, Tuple
-    from discord_typings import InteractionData, ApplicationCommandPayload, ApplicationCommandData, ApplicationCommandOptionInteractionData
+    from discord_typings import (
+        InteractionData, 
+        ApplicationCommandPayload, 
+        ApplicationCommandData, 
+        ApplicationCommandOptionInteractionData, 
+        InteractionCreateData
+    )
 
     from ...commands import Command
     from ...typings import GoldySelfT
@@ -12,7 +18,7 @@ if TYPE_CHECKING:
 from devgoldyutils import LoggerAdapter, Colours
 
 from ...logger import goldy_bot_logger
-from ...commands import CommandType
+from ...commands import CommandType, SlashOptionAutoComplete
 from ...errors import FrontEndError
 from ...objects.platter import Platter
 from ...helpers import Embed, EmbedFooter
@@ -26,12 +32,14 @@ logger = LoggerAdapter(
     goldy_bot_logger, prefix = "Commands"
 )
 
+_type = type
+
 class Commands():
     """Brings valuable methods to the goldy class for managing loading and syncing of commands."""
     def __init__(self) -> None:
         super().__init__()
 
-    async def invoke_command(self: GoldySelfT[Self], name: str, type: CommandType, data: InteractionData) -> bool: 
+    async def invoke_command(self: GoldySelfT[Self], name: str, type: CommandType, data: InteractionCreateData) -> bool: 
         """Invokes a goldy bot command. Returns False if command is not found."""
         for extension in self.extensions:
 
@@ -39,7 +47,33 @@ class Commands():
 
                 for command in extension._commands[_class.__class__.__name__]:
 
-                    if command.name == name and command.data["type"] == type.value:
+                    if command.name == name and type == CommandType.AUTO_COMPLETE:
+                        options = data["data"]["options"]
+
+                        subcommand, subcommand_options = self.__get_subcommand(data, command)
+
+                        if subcommand is not None:
+                            command = subcommand
+                            options = subcommand_options
+
+                        auto_complete_option = options[0]
+                        params = self.__interaction_options_to_kwargs(options, command)
+
+                        for slash_option in command._slash_options.values():
+
+                            if isinstance(slash_option, SlashOptionAutoComplete):
+
+                                if slash_option.data["name"] == auto_complete_option["name"]:
+                                    await slash_option.send_auto_complete(
+                                        data, auto_complete_option["value"], params, _class, self
+                                    )
+
+                                    break # I don't think you can even get two auto complete slash options at the 
+                                    # same time, if we do welp... this shit is blowing up!
+
+                        return True
+
+                    elif command.name == name and type == CommandType.SLASH:
                         logger.info(
                             f"Invoking the command '{command.name}' in extension class '{_class.__class__.__name__}'..."
                         )
@@ -52,6 +86,8 @@ class Commands():
                         if subcommand is not None:
                             command = subcommand
                             options = subcommand_options
+
+                        print(">>", options)
 
                         # create a platter, generate function params from interaction data options.
                         platter = Platter(data, self)

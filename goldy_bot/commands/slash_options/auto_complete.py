@@ -2,29 +2,26 @@ from __future__ import annotations
 from typing import List, TYPE_CHECKING, overload
 
 if TYPE_CHECKING:
-    from typing import Optional, Union, Callable, Dict
-    #from discord_typings import AutocompleteOptionData, AutocompleteInteractionData
+    from typing import Optional, Callable, Dict
+    from discord_typings import AutocompleteInteractionData
 
-    #from ..goldy import Goldy
-    #from .command import Command
+    from ...goldy import Goldy
 
-    from .slash_option import SlashOptionChoice
-
-    AutoCompleteCallbackT = Callable[[object, str, Dict[str, str]], List[Union[SlashOptionChoice, str]]]
+    AutoCompleteCallbackT = Callable[[object, str, Dict[str, str]], List[SlashOptionChoice]]
 
 from devgoldyutils import LoggerAdapter, Colours
 
-#from nextcore.http import Route
+from nextcore.http import Route
 
-from .slash_option import SlashOption
-from ..logger import goldy_bot_logger
+from ...logger import goldy_bot_logger
+from .slash_option import SlashOption, SlashOptionTypes, SlashOptionChoice
 
 __all__ = (
     "SlashOptionAutoComplete",
 )
 
 logger = LoggerAdapter(
-    goldy_bot_logger, prefix = Colours.PURPLE.apply("SlashOptionAutoComplete")
+    goldy_bot_logger, prefix = Colours.BLUE.apply("SlashOptionAutoComplete")
 )
 
 class SlashOptionAutoComplete(SlashOption):
@@ -99,69 +96,62 @@ class SlashOptionAutoComplete(SlashOption):
         **kwargs
     ) -> None:
 
-        if recommendations is None:
-            recommendations = []
+        if callback is None and recommendations is None:
+            raise ValueError("wait what, you didn't assign a value to callback or recommendations.")
+
+        if recommendations is not None:
+            recommendations = [SlashOptionChoice(x, x) if isinstance(x, str) else x for x in recommendations]
 
         self.callback = callback
-        self.recommendations = recommendations
-
-        
+        self.recommendations: Optional[List[SlashOptionChoice]] = recommendations
 
         super().__init__(
             name = name, 
             description = description, 
             required = required, 
-
+            type = SlashOptionTypes.STRING,
             autocomplete = True,
             **kwargs
         )
 
-# TODO: Finish this.
-""" 
     async def send_auto_complete(
-        self,
-        data: AutocompleteInteractionData,
-        current_typing_value: str,
-        params: Dict[str, str],
-        command: Command,
-        goldy: Goldy, 
+        self, 
+        data: AutocompleteInteractionData, 
+        typing_value: str, 
+        params: Dict[str, str], 
+        command_class: object,
+        goldy: Goldy
     ) -> None:
 
         payload = {}
         payload["choices"] = []
 
-        choices: List[SlashOptionChoice | str] = []
+        choices: List[SlashOptionChoice] = []
 
-        member = Member(data["member"]["user"], goldy.guild_manager.get_guild(data["guild_id"]), goldy)
+        author_name = data['member']['user']['username']
 
-        self.logger.debug(f"We got --> '{current_typing_value}' from {member}")
+        logger.debug(f"We got --> '{typing_value}' from '{author_name}'.")
 
         if self.callback is not None:
-            choices = await self.callback(command.extension, current_typing_value, **params)
+            choices = await self.callback(command_class, typing_value, **params)
+        else:
+            # Some shit fuzzy searching. I'll improve it later :L
+            choices = [choice for choice in self.recommendations if typing_value.lower() in choice.data["name"].lower()]
 
-        else: # If no callback was given then default to recommendations list.
-            for choice in self.recommendations: # Some shit fuzzy searching. I'll improve it later :L
-                if isinstance(choice, str):
-                    choice = SlashOptionChoice(choice, choice)
+        payload["choices"] = SlashOptionChoice.strip(choices)[:24] # Discord only allows max of 25 choices.
 
-                if current_typing_value.lower() in choice["name"].lower():
-                    choices.append(choice)
-
-        choices = [SlashOptionChoice(x, x) if isinstance(x, str) else x for x in choices]
-        payload["choices"] = choices[:24] # Discord only allows max of 25 choices.
-
-        self.logger.debug(
-            f"Sending auto complete '{payload['choices']}' to --> slash command '{command.name}'."
+        logger.debug(
+            f"Sending auto complete '{payload['choices']}' to --> command invoked by '{author_name}'..."
         )
 
-        await goldy.http_client.request(
+        await goldy.client.request(
             Route(
                 "POST", 
                 "/interactions/{interaction_id}/{interaction_token}/callback", 
                 interaction_id = data["id"], 
                 interaction_token = data["token"]
             ),
-            rate_limit_key = goldy.nc_authentication.rate_limit_key,
+            rate_limit_key = goldy.key_and_headers["rate_limit_key"],
             json = {
                 "type": 8, 
                 "data": payload
@@ -169,4 +159,3 @@ class SlashOptionAutoComplete(SlashOption):
         )
 
         return None
-"""

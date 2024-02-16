@@ -7,13 +7,11 @@ if TYPE_CHECKING:
     from typing import Optional, Dict, List
     from discord_typings import ApplicationCommandOptionData
 
-    from .slash_option import SlashOption
-    from ..typings import CommandFuncT
+    from ..typings import CommandFuncT, SlashOptionsT
 
 import regex
 from devgoldyutils import LoggerAdapter
 
-from .types import CommandType
 from ..helpers.dict_helper import DictHelper
 from ..errors import GoldyBotError
 from ..logger import goldy_bot_logger
@@ -30,7 +28,7 @@ class Command(DictHelper[ApplicationCommandPayload]):
         function: CommandFuncT,
         name: Optional[str] = None, 
         description: Optional[str] = None, 
-        slash_options: Optional[Dict[str, SlashOption]] = None, 
+        slash_options: Optional[Dict[str, SlashOptionsT]] = None, 
         wait: bool = False
     ) -> None:
         self.function = function
@@ -41,7 +39,7 @@ class Command(DictHelper[ApplicationCommandPayload]):
         slash_options = slash_options or {}
 
         data = {}
-        data["type"] = CommandType.SLASH.value
+        data["type"] = 1
         data["name"] = name
         data["description"] = description
         data["options"] = self.__options_parser(self.params, slash_options)
@@ -57,6 +55,11 @@ class Command(DictHelper[ApplicationCommandPayload]):
     def name(self) -> str:
         """The command's name."""
         return self.data["name"]
+
+    @property
+    def class_name(self) -> str:
+        """The name of class this command is housed in."""
+        return self.function.__qualname__.split(".")[0]
 
     @property
     def description(self) -> str:
@@ -87,7 +90,7 @@ class Command(DictHelper[ApplicationCommandPayload]):
     def __options_parser( # TODO: Maybe more logging in here.
         self, 
         params: List[str], 
-        slash_options: Dict[str, SlashOption]
+        slash_options: Dict[str, SlashOptionsT]
     ) -> List[ApplicationCommandOptionData]:
         """A function that converts slash command parameters to slash command payload options."""
         options: List[ApplicationCommandOptionData] = []
@@ -107,16 +110,16 @@ class Command(DictHelper[ApplicationCommandPayload]):
 
             if slash_option is not None:
                 option_name = slash_option.data.get("name")
-                slash_option.data["name"] = option_name if option_name is not None else param
+                slash_option.data["name"] = option_name if option_name is not None else param # get's real slash option name
 
                 options.append(slash_option.data)
 
             else:
                 options.append({
-                    "name": param,
-                    "description": "🪹 Oopsie daisy, looks like no description was set for this option.",
-                    "type": 3,
-                    "required": True,
+                    "name": param, 
+                    "description": "🪹 Oopsie daisy, looks like no description was set for this option.", 
+                    "type": 3, 
+                    "required": True
                 })
 
         return options

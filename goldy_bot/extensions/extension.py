@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING, overload
 if TYPE_CHECKING:
     from typing import List, Dict, Optional, Literal, Callable
 
-    from GoldyBot.goldy.nextcore_utils.slash_options.slash_option import SlashOption
+    from ..typings import SlashOptionsT
 
     from ..goldy import Goldy
 
@@ -43,7 +43,7 @@ class Extension():
         self,
         name: Optional[str] = None, 
         description: Optional[str] = None, 
-        slash_options: Dict[str, SlashOption] = None,
+        slash_options: Dict[str, SlashOptionsT] = None,
         group: Literal[False] = False,
         wait: bool = False
     ) -> Callable[..., Callable]:
@@ -63,7 +63,7 @@ class Extension():
         self,
         name: Optional[str] = None, 
         description: Optional[str] = None, 
-        slash_options: Dict[str, SlashOption] = None,
+        slash_options: Dict[str, SlashOptionsT] = None,
         group: bool = False,
         wait: bool = False
     ) -> Callable[..., GroupCommand] | Callable[..., Callable]:
@@ -96,7 +96,7 @@ class Extension():
                     wait = wait
                 )
 
-                class_name = command.function.__qualname__.split(".")[0]
+                class_name = command.class_name
 
                 if class_name not in self._commands:
                     self._commands[class_name] = []
