@@ -87,8 +87,6 @@ class Commands():
                             command = subcommand
                             options = subcommand_options
 
-                        print(">>", options)
-
                         # create a platter, generate function params from interaction data options.
                         platter = Platter(data, self)
                         params = self.__interaction_options_to_kwargs(options, command)
@@ -163,7 +161,7 @@ class Commands():
                 if app_command["name"] not in [command["name"] for command in framework_commands]:
 
                     logger.debug(
-                        f"The application command '{app_command['name']}' of type '{CommandType(app_command['type']).name}' " \
+                        f"The application command '{app_command['name']}' of type '{app_command['type']}' " \
                             "isn't registered in the framework, so it will be removed."
                     )
 

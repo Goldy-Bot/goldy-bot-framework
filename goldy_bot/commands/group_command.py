@@ -17,28 +17,30 @@ __all__ = (
     "GroupCommand",
 )
 
+logger = LoggerAdapter(goldy_bot_logger, prefix = "GroupCommand")
+
 class GroupCommand():
     """
-    The group command allows for the grouping of commands together like sub commands and ect.
-    
+    A group command allows you to group commands together to make sub commands.
+
     ---------------
-    
+
     ⭐ Example:
     -------------
     You can group commands like so::
 
-        group = GoldyBot.GroupCommand("game")
+        group = goldy_bot.GroupCommand("game")
 
-        @group.sub_command()
+        @group.subcommand()
         async def start(self, platter: GoldyBot.GoldPlatter):
             await platter.send_message("✅ Game has started!", reply=True)
 
     If you would like a parent command you can do this::
-    
-        group = GoldyBot.GroupCommand("game")
+
+        group = goldy_bot.GroupCommand("game")
 
         @group.master_command()
-        async def game(self, platter: GoldyBot.GoldPlatter):
+        async def game(self, platter: goldy_bot.Platter):
             if platter.author.id == "332592361307897856":
                 return True
 
@@ -49,8 +51,8 @@ class GroupCommand():
             await platter.send_message("You are not the game master! So you may not start the game.", reply=True)
             return False
 
-        @group.sub_command()
-        async def start(self, platter: GoldyBot.GoldPlatter):
+        @group.subcommand()
+        async def start(self, platter: goldy_bot.Platter):
             await platter.send_message("✅ Game has started!", reply=True)
 
     """
@@ -77,31 +79,32 @@ class GroupCommand():
     ):
         self._master_command = command
 
+        if self._master_command is None and name is None:
+            raise ValueError("You must give the group command a name if you're not passing a command object!")
+
         if self._master_command is None:
             self._master_command = Command( 
-                function = lambda x, y: self.__dummy__(),
-                name = name,
+                function = None, 
+                name = name, 
                 description = description
             )
-
-        self.logger = LoggerAdapter(goldy_bot_logger, prefix = "GroupCommand")
 
     def master_command(self):
         def decorate(func):
             def inner(func: Callable) -> None:
                 self._master_command.function = func
 
-                self.logger.debug(f"The function '{func.__name__}' was made a master command.")
+                logger.debug(f"The function '{func.__name__}' was made a master command.")
 
             return inner(func)
 
         return decorate
 
     def subcommand(
-        self,
+        self, 
         name: Optional[str] = None, 
         description: Optional[str] = None, 
-        slash_options: Optional[Dict[str, SlashOption]] = None,
+        slash_options: Optional[Dict[str, SlashOption]] = None, 
         wait: bool = False
     ):
         """
@@ -187,6 +190,3 @@ class GroupCommand():
             return inner(func)
 
         return decorate
-
-    async def __dummy__(self):
-        ...

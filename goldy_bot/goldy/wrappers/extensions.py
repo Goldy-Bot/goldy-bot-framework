@@ -173,6 +173,6 @@ class Extensions():
         for class_name in extension._commands:
 
             if class_name not in classes_mounted:
-                return False, f"The class '{class_name}()' in '{extension.name}' needs to be mounted as it houses goldy bot commands!"
+                return False, f"The class '{class_name}' in '{extension.name}' needs to be mounted as it houses goldy bot commands!"
 
         return True, None

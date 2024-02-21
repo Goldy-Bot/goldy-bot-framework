@@ -24,14 +24,14 @@ logger = LoggerAdapter(goldy_bot_logger, prefix = "Command")
 
 class Command(DictHelper[ApplicationCommandPayload]):
     def __init__(
-        self,
-        function: CommandFuncT,
+        self, 
+        function: Optional[CommandFuncT], 
         name: Optional[str] = None, 
         description: Optional[str] = None, 
         slash_options: Optional[Dict[str, SlashOptionsT]] = None, 
         wait: bool = False
     ) -> None:
-        self.function = function
+        self.function = function or (lambda x, y: self.__dummy__()) # TODO: Change this. Find a better alternative.
 
         name = name or function.__name__
         # Even though discord docs say no, description is a required field.
@@ -55,11 +55,6 @@ class Command(DictHelper[ApplicationCommandPayload]):
     def name(self) -> str:
         """The command's name."""
         return self.data["name"]
-
-    @property
-    def class_name(self) -> str:
-        """The name of class this command is housed in."""
-        return self.function.__qualname__.split(".")[0]
 
     @property
     def description(self) -> str:
@@ -123,3 +118,6 @@ class Command(DictHelper[ApplicationCommandPayload]):
                 })
 
         return options
+
+    async def __dummy__(self):
+        ...
