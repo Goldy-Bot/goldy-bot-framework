@@ -169,6 +169,8 @@ class Legacy():
 
                             break
 
+                await self._sync_commands() # so there's a bit of a bug with legacy where it won't respect already existing commands so we 
+                # need to run sync commands a second time. (this may cause some rate limits but come on it's legacy switch to pancake API already)
                 return None
 
             LegacyCommandLoader._CommandLoader__batch_create_interactions = __batch_create_interactions
