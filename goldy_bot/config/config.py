@@ -1,10 +1,10 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, cast
-from .typing import ConfigData
+from ..typings.config import ConfigData
 
 if TYPE_CHECKING:
     from typing import List, Optional
-    from .typing import VersionT
+    from ..typings.config import VersionT
 
 import toml
 from dataclasses import dataclass, field

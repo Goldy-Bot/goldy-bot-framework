@@ -6,13 +6,13 @@ if TYPE_CHECKING:
 
     from discord_typings import InteractionData
 
-from .wrappers import MessagingWrapper
+from .wrappers import MessagingWrapper, AuthorWrapper
 
 __all__ = ("Platter",)
 
-class Platter(MessagingWrapper):
+class Platter(MessagingWrapper, AuthorWrapper):
     def __init__(self, data: InteractionData, goldy: Goldy) -> None:
         self.data = data
         self.goldy = goldy
 
-        super().__init__(data, goldy)
+        super().__init__()

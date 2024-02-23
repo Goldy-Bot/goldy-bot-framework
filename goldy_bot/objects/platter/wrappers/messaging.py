@@ -2,12 +2,12 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
+    from typing_extensions import Self
     from typing import Optional, List, Dict, NoReturn
 
     from discord_typings import (
-        MessageData,
-        ActionRowData,
-        InteractionData, 
+        MessageData, 
+        ActionRowData, 
         InteractionMessageCallbackData
     )
 
@@ -15,17 +15,16 @@ if TYPE_CHECKING:
 
     from ....helpers import File
 
-    from ....goldy import Goldy
+    from ....typings.objects import PlatterSelfT
 
 import asyncio
 from devgoldyutils import LoggerAdapter
 
+from ....helpers import Embed
 from ...message import Message
-from .wrapper import PlatterWrapper
+from ....colours import Colours
 from ....logger import goldy_bot_logger
 from ....errors import FrontEndError
-from ....helpers import Embed
-from ....colours import Colours
 
 __all__ = (
     "MessagingWrapper",
@@ -33,11 +32,11 @@ __all__ = (
 
 logger = LoggerAdapter(goldy_bot_logger, prefix = "MessagingWrapper")
 
-class MessagingWrapper(PlatterWrapper):
-    def __init__(self, data: InteractionData, goldy: Goldy) -> None:
+class MessagingWrapper():
+    def __init__(self) -> None:
         self._interaction_responded = False
 
-        super().__init__(data, goldy)
+        super().__init__()
 
     def error(
         self, 
@@ -57,7 +56,7 @@ class MessagingWrapper(PlatterWrapper):
 
         raise FrontEndError(embed, message, logger)
 
-    async def wait(self) -> None:
+    async def wait(self: PlatterSelfT[Self]) -> None:
         """Informs Discord that this response will take longer than usual and it should wait."""
 
         if self._interaction_responded:
@@ -74,7 +73,7 @@ class MessagingWrapper(PlatterWrapper):
         self._interaction_responded = True
 
     async def send_message(
-        self, 
+        self: PlatterSelfT[Self], 
         text: Optional[str] = None, 
         embeds: Optional[List[Embed]] = None, 
         recipes: Optional[List[Recipe]] = None, 

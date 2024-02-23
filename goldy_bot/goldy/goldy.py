@@ -10,7 +10,7 @@ if TYPE_CHECKING:
     from ..config import Config
     from ..database import Database
 
-    KeyAndHeaders = TypedDict("KeyAndHeaders", {"rate_limit_key": str, "headers": Dict[str, str]})
+    KeyAndHeadersT = TypedDict("KeyAndHeaders", {"rate_limit_key": str, "headers": Dict[str, str]})
 
 from pathlib import Path
 from datetime import datetime
@@ -50,7 +50,7 @@ class Goldy(
         self.boot_datetime: Optional[datetime] = None
         """The time and date the framework spun up."""
 
-        self.key_and_headers: KeyAndHeaders = {
+        self.key_and_headers: KeyAndHeadersT = {
             "rate_limit_key": self.shard_manager.authentication.rate_limit_key, 
             "headers": self.shard_manager.authentication.headers
         }

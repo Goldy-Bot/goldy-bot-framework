@@ -221,7 +221,7 @@ class Commands():
     async def __send_front_end_error(self: GoldySelfT[Self], error: FrontEndError, platter: Platter, command: Command):
         # TODO: Add report button that dms the bot developer the full traceback from the error.
         # Also add a guild and user black listing feature to it to mitigate spam and unwanted reports.
- 
+
         await platter.send_message(embeds = [error.embed], hidden = True)
 
         logger.info(
