@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from typing_extensions import Self
-    from typing import List, Dict, Optional, Tuple
+    from typing import List, Dict, Optional, Tuple, Generator, Any
     from discord_typings import (
         InteractionData, 
         ApplicationCommandPayload, 
@@ -14,6 +14,7 @@ if TYPE_CHECKING:
 
     from ...commands import Command
     from ...typings import GoldySelfT
+    from ...extensions import Extension
 
 from devgoldyutils import LoggerAdapter, Colours
 
@@ -39,71 +40,78 @@ class Commands():
     def __init__(self) -> None:
         super().__init__()
 
-    async def invoke_command(self: GoldySelfT[Self], name: str, type: CommandType, data: InteractionCreateData) -> bool: 
-        """Invokes a goldy bot command. Returns False if command is not found."""
+    def get_commands(self: GoldySelfT[Self]) -> Generator[Tuple[Command, object, Extension], Any, None]:
+        """Get framework commands."""
+
         for extension in self.extensions:
 
             for _class in extension._classes:
 
                 for command in extension._commands[_class.__class__.__name__]:
 
-                    if command.name == name and type == CommandType.AUTO_COMPLETE:
-                        options = data["data"]["options"]
+                    yield command, _class, extension
 
-                        subcommand, subcommand_options = self.__get_subcommand(data, command)
+    async def invoke_command(self: GoldySelfT[Self], name: str, type: CommandType, data: InteractionCreateData) -> bool: 
+        """Invokes a goldy bot command. Returns False if command is not found."""
+        for command, _class, _ in self.get_commands():
 
-                        if subcommand is not None:
-                            command = subcommand
-                            options = subcommand_options
+            if command.name == name and type == CommandType.AUTO_COMPLETE:
+                options = data["data"]["options"]
 
-                        auto_complete_option = options[0]
-                        params = self.__interaction_options_to_kwargs(options, command)
+                subcommand, subcommand_options = self.__get_subcommand(data, command)
 
-                        for slash_option in command._slash_options.values():
+                if subcommand is not None:
+                    command = subcommand
+                    options = subcommand_options
 
-                            if isinstance(slash_option, SlashOptionAutoComplete):
+                auto_complete_option = options[0]
+                params = self.__interaction_options_to_kwargs(options, command)
 
-                                if slash_option.data["name"] == auto_complete_option["name"]:
-                                    await slash_option.send_auto_complete(
-                                        data, auto_complete_option["value"], params, _class, self
-                                    )
+                for slash_option in command._slash_options.values():
 
-                                    break # I don't think you can even get two auto complete slash options at the 
-                                    # same time, if we do welp... this shit is blowing up!
+                    if isinstance(slash_option, SlashOptionAutoComplete):
 
-                        return True
+                        if slash_option.data["name"] == auto_complete_option["name"]:
+                            await slash_option.send_auto_complete(
+                                data, auto_complete_option["value"], params, _class, self
+                            )
 
-                    elif command.name == name and type == CommandType.SLASH:
-                        logger.info(
-                            f"Invoking the command '{command.name}' in extension class '{_class.__class__.__name__}'..."
-                        )
+                            break # I don't think you can even get two auto complete slash options at the 
+                            # same time, if we do welp... this shit is blowing up!
 
-                        options = data["data"].get("options", [])
+                return True
 
-                        # if this is a subcommand then replace the parent command object with the subcommand.
-                        subcommand, subcommand_options = self.__get_subcommand(data, command)
+            elif command.name == name and type == CommandType.SLASH:
+                logger.info(
+                    f"Invoking the command '{command.name}' in extension class '{_class.__class__.__name__}'..."
+                )
 
-                        if subcommand is not None:
-                            command = subcommand
-                            options = subcommand_options
+                options = data["data"].get("options", [])
 
-                        # create a platter, generate function params from interaction data options.
-                        platter = Platter(data, self)
-                        params = self.__interaction_options_to_kwargs(options, command)
+                # if this is a subcommand then replace the parent command object with the subcommand.
+                subcommand, subcommand_options = self.__get_subcommand(data, command)
 
-                        # invoke the command's function
-                        try:
-                            await command.function(_class, platter, **params)
+                if subcommand is not None:
+                    command = subcommand
+                    options = subcommand_options
 
-                        except FrontEndError as e:
-                            await self.__send_front_end_error(e, platter, command) # TODO: Complete these.
-                            # if it's a front end error it's anticipated so we don't need to raise it.
+                # create a platter, generate function params from interaction data options.
+                platter = Platter(data, self)
+                params = self.__interaction_options_to_kwargs(options, command)
 
-                        except Exception as e:
-                            await self.__send_unknown_error(e, platter, command)
-                            raise e
+                # invoke the command's function
+                try:
+                    await command.function(_class, platter, **params)
 
-                        return True
+                except FrontEndError as e:
+                    await self.__send_front_end_error(e, platter, command) # TODO: Complete these.
+                    # if it's a front end error it's anticipated so we don't need to raise it.
+
+                except Exception as e:
+                    await self.__send_unknown_error(e, platter, command)
+                    raise e
+
+                return True
 
         return False
 
