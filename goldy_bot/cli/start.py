@@ -36,6 +36,9 @@ def start(
     legacy: Optional[bool] = typer.Option(
         None, help = "Launches goldy bot pancake setup in legacy mode to support older extensions that are still using the old legacy API."
     ),
+    database_check: Optional[bool] = typer.Option(
+        True, help = "Checks if the database is okay during setup."
+    ),
     bot_token: Optional[str] = typer.Option(
         None, help = "Your discord bot token."
     ),
@@ -80,7 +83,7 @@ def start(
         goldy.clear_cache()
 
     async def main():
-        await goldy.setup(legacy)
+        await goldy.setup(legacy, database_check)
         await goldy.start()
 
     asyncio.run(main())

@@ -98,7 +98,7 @@ class Goldy(
             f"Nextcore gateway has closed for the reason '{error[0]}'.")
         )
 
-    async def setup(self, legacy: bool = False) -> None:
+    async def setup(self, legacy: bool = False, database_check: bool = True) -> None:
         """
         Does the setup for you if you would not like to handle it yourself. 
         Pulling extensions, loading extensions, registering commands and etc.
@@ -146,6 +146,15 @@ class Goldy(
 
         # Registering commands.
         await self._sync_commands()
+
+        # Check if database is ok.
+        if database_check:
+            is_okay, msg = await self.database._is_connection_ok()
+
+            if is_okay:
+                self.logger.info("AsyncIOMotorClient (Database) " + Colours.GREEN.apply_to_string("Connected!"))
+            else:
+                self.logger.critical(msg)
 
         # Set command listener.
         self.shard_manager.event_dispatcher.add_listener(

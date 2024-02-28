@@ -2,12 +2,12 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from typing import List, Optional
+    from typing import List, Optional, Tuple
 
     from .enums import DatabaseEnums
     from motor.core import AgnosticDatabase, AgnosticCollection
 
-from devgoldyutils import LoggerAdapter, Colours
+from devgoldyutils import LoggerAdapter
 from motor.motor_asyncio import AsyncIOMotorClient
 from pymongo.errors import ServerSelectionTimeoutError
 
@@ -30,24 +30,18 @@ class Database():
 
         self._client = AsyncIOMotorClient(url, serverSelectionTimeoutMS = 2000)
 
-    async def _is_connection_ok(self) -> bool:
+    async def _is_connection_ok(self) -> Tuple[bool, str]:
         try:
             await self._client.server_info()
-            logger.info("AsyncIOMotorClient " + Colours.GREEN.apply_to_string("Connected!"))
 
         except ServerSelectionTimeoutError as e:
-            logger.error(
-                f"Couldn't connect to Database! Check if the database URL you entered is correct. Error received from motor >>> {e}"
-            )
-            return False
+            return False, "Couldn't connect to Database! " \
+                f"Check if the database URL you entered is correct. Error received from motor >>> {e}"
 
         except Exception as e:
-            logger.error(
-                f"Couldn't connect to Database! Error received from motor >>> {e}"
-            )
-            return False
+            return False, f"Couldn't connect to Database! Error received from motor >>> {e}"
 
-        return True
+        return True, "Connection is OK!"
 
     def get_database(self, database_name: DatabaseEnums) -> AgnosticDatabase:
         """Returns a :py:meth:`~motor.core.AgnosticDatabase` database connection."""
