@@ -9,7 +9,7 @@ import typer
 from decouple import AutoConfig
 from devgoldyutils import Colours, LoggerAdapter
 
-from goldy_bot import GoldyBotError
+from goldy_bot import GoldyBotError, __version__
 from goldy_bot.logger import goldy_bot_logger
 
 __all__ = (
@@ -20,6 +20,20 @@ INSTALL_SETUP_LINK = "https://github.com/Goldy-Bot/Goldy-Bot-Framework?tab=readm
 
 app = typer.Typer(pretty_exceptions_show_locals = False)
 app.logger = LoggerAdapter(goldy_bot_logger, prefix = "cli")
+
+@app.callback(invoke_without_command = True)
+def no_command(
+    ctx: typer.Context, 
+    version: Optional[bool] = typer.Option(
+        False, help = "Displays the current version of the goldy bot framework."
+    )
+):
+    if ctx.invoked_subcommand is None:
+
+        if version:
+            print(f"  {Colours.CLAY}--> {Colours.ORANGE.apply('v' + __version__)}")
+        else:
+            print("Check me out senpai: "+ f"{Colours.ORANGE}goldy-bot {Colours.CLAY.apply('--help')}")
 
 env_config = AutoConfig(os.getcwd())
 
