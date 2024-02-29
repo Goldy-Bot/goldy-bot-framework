@@ -1,10 +1,10 @@
 import sys; sys.path.insert(0, '.')
 
 import os
-from GoldyBot.info import VERSION
+from goldy_bot import __version__
 
 os.system(
-    f"docker build -t devgoldy/goldybot:{VERSION} --build-arg ARCH=amd64 ."
+    f"docker build -t devgoldy/goldybot:{__version__} --build-arg ARCH=amd64 ."
 )
 
 os.system(
