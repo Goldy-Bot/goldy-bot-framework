@@ -12,7 +12,7 @@ ignore = [] # e.g. ignore = ["music.sharing"] <-- {extension}.{module/command}
 [extensions.load]
 directory = "./extensions"
 raise_on_error = true
-legacy_mode = true
+legacy_mode = false
 
 # It's extremely recommended you include a test guild id 
 # if you are testing/developing, otherwise global commands will be 
