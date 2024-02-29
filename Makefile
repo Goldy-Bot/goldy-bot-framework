@@ -25,9 +25,6 @@ test-v:
 docker-build:
 	${python} scripts/docker_build.py
 
-docker-compose:
-	docker compose --env-file ./demo/.env up
-
 build-clean-docs:
 	cd docs && make clean && make html
 
