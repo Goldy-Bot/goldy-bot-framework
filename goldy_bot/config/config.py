@@ -7,6 +7,7 @@ if TYPE_CHECKING:
     from ..typings.config import VersionT
 
 import toml
+from decouple import config as env_config
 from dataclasses import dataclass, field
 
 __all__ = (
@@ -61,9 +62,9 @@ class Config():
         self.repos = MAIN_REPOS + extensions_data.get("repos", [])
         # I set the main repos first so repos added by the user are sure to override the main repos.
         self.ignored_extensions = extensions_data.get("ignore", [])
-        self.extensions_directory = extensions_load_data.get("directory", "./extensions")
-        self.extensions_raise_on_load_error = extensions_load_data.get("raise_on_error", True)
-        self.legacy_mode = extensions_load_data.get("legacy_mode", True)
-        self.test_guild_id = development_data.get("test_guild_id")
-        self.developer_id = development_data.get("developer_id")
+        self.extensions_directory = extensions_load_data.get("directory", env_config("GBOT_EXTENSIONS_DIR", "./extensions"))
+        self.extensions_raise_on_load_error = extensions_load_data.get("raise_on_error", env_config("GBOT_RAISE_ON_LOAD_ERROR", True))
+        self.legacy_mode = extensions_load_data.get("legacy_mode", env_config("GBOT_LEGACY_MODE", False))
+        self.test_guild_id = development_data.get("test_guild_id", env_config("GBOT_TEST_GUILD_ID", None))
+        self.developer_id = development_data.get("developer_id", env_config("GBOT_DEVELOPER_ID", None))
         """The discord id of the bot developer."""
