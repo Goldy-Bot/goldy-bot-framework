@@ -69,8 +69,11 @@ version = { attr = "GoldyBot.info.VERSION" }
 requires = ["setuptools", "setuptools-scm"]
 build-backend = "setuptools.build_meta"
 
-[tool.setuptools]
-packages = ["GoldyBot", "goldy_bot"]
+[tool.setuptools.packages.find]
+include = ["GoldyBot*", "goldy_bot*"]
+
+[tool.setuptools.package-data]
+"goldy_bot" = ["goldy.template.toml"]
 
 [project.scripts]
 goldy-bot = "goldy_bot.cli:app"
