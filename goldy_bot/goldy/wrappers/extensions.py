@@ -9,10 +9,14 @@ if TYPE_CHECKING:
 
 import sys
 import toml
+import subprocess
 import importlib.util
 from pathlib import Path
+import importlib_metadata
+from packaging import version
 from devgoldyutils import shorter_path, LoggerAdapter
 
+import goldy_bot
 from ...errors import raise_or_error
 from ...extensions import Extension
 from ...logger import goldy_bot_logger
@@ -29,6 +33,8 @@ class Extensions():
     """Brings valuable methods to the goldy class for managing extensions."""
     def __init__(self) -> None:
         self.extensions: List[Extension] = []
+
+        self.__installed_dependencies: List[str] = [x.name for x in importlib_metadata.distributions()]
 
         super().__init__()
 
@@ -49,12 +55,11 @@ class Extensions():
 
         return False
 
-
-    def load_extension(self: GoldySelfT[Self], extension_path: Path, legacy: bool = False) -> Optional[Extension]:
+    def _load_extension(self: GoldySelfT[Self], extension_path: Path, legacy: bool = False) -> Optional[Extension]:
         """Loads an extension from that path and returns it."""
         extension: Extension = None
 
-        path = self.__get_extension_module(extension_path)
+        path = self.__get_extension_module_path(extension_path)
         shortened_path = shorter_path(path)
 
         logger.debug(f"Loading the extension at '{path}'...")
@@ -126,29 +131,88 @@ class Extensions():
         return extension
 
     def _get_extension_metadata(self: GoldySelfT[Self], extension_path: Path) -> Optional[ExtensionMetadataData]:
-        root_path = extension_path.parent
+        pyproject_toml = None
 
-        if "pyproject.toml" not in root_path.iterdir():
-            logger.info(
-                f"Couldn't grab metadata from pyproject.toml for the extension at '{extension_path}' " \
-                    "as it does not have a pyproject.toml file."
-            )
-            return None
+        root_path = self.__get_extension_module_path(extension_path).parent
 
-        pyproject_toml = toml.load(
-            root_path.joinpath("pyproject.toml"), encoding="UTF-8"
-        )
+        for path in root_path.iterdir():
+
+            if "pyproject.toml" == path.name:
+                pyproject_toml = toml.load(path)["project"]
+
+                if pyproject_toml.get("name") is None:
+                    pyproject_toml["name"] = root_path.name
+
+                break
 
         return pyproject_toml
 
-    def __get_extension_module(self, extension_path: Path):
+    def _install_missing_extension_deps(
+        self: GoldySelfT[Self], 
+        extension_metadata: ExtensionMetadataData, 
+        raise_on_framework_mismatch: bool
+    ) -> None:
+        dependencies_to_install = self.__get_missing_dependencies(
+            extension_metadata, raise_on_framework_mismatch
+        )
+
+        if not dependencies_to_install == []:
+            logger.info(f"Installing missing dependencies for extension '{extension_metadata['name']}'...")
+
+            popen = subprocess.Popen( # TODO: We'll probably need to make the "pip" binary call configurable here.
+                [sys.executable, "-m", "pip", "install"] + [dependency_version_tag for _, dependency_version_tag in dependencies_to_install] + ["-U"]
+            )
+
+            popen.wait()
+
+    def __get_missing_dependencies(self, extension_metadata: ExtensionMetadataData, raise_on_framework_mismatch: bool) -> List[Tuple[str, str]]:
+        """Returns list of missing dependencies needed to execute the extension."""
+        missing_dependencies = []
+
+        extension_dependencies: List[str] = extension_metadata.get("dependencies", [])
+
+        for dependency in extension_dependencies:
+            dependency_name = dependency
+            dependency_version = dependency
+
+            for character in [">", "=", "^", "<", "@git+"]:
+                dependency_name = dependency_name.split(character)[0]
+                dependency_version = dependency_version.split(character)[-1]
+
+            if dependency_name == "GoldyBot":
+                dependency_version = None if dependency_version == dependency_name or "http" in dependency_version else dependency_version
+
+                if dependency_version is not None and version.parse(dependency_version) > version.parse(goldy_bot.__version__):
+                    msg = f"Extension is expecting a newer version ({dependency_version}) of the Goldy Bot Framework. " \
+                            f"We are currently running '{goldy_bot.__version__}'."
+
+                    raise_or_error(
+                        msg, 
+                        condition = lambda: raise_on_framework_mismatch, 
+                        logger = logger
+                    )
+
+                continue
+
+            if dependency_name not in self.__installed_dependencies:
+                logger.debug(f"Missing the dependency '{dependency_name}'.")
+                missing_dependencies.append(
+                    (dependency_name, dependency)
+                )
+
+            else:
+                logger.debug(f"'{dependency_name}' dependency found.")
+
+        return missing_dependencies
+
+    def __get_extension_module_path(self, extension_path: Path):
         if not extension_path.is_file():
             extension_path = extension_path.joinpath("__init__.py")
 
         return extension_path
 
     def __check_extension_legibility(self: GoldySelfT[Self], extension: Extension, extension_path: Path) -> Tuple[bool, Optional[str]]:
-        # TODO: If extension is depending a newer framework version raise exception, if it's pre-pancake give 
+        # TODO: If extension is depending on a newer framework version raise exception, if it's pre-pancake give 
         # the developer a warning that pre-pancake is deprecated.
 
         logger.debug(f"Checking legibility of the extension at '{shorter_path(extension_path)}'...")
@@ -164,7 +228,7 @@ class Extensions():
         files_in_dir = [path.name for path in extension_path.iterdir()]
 
         if "pyproject.toml" not in files_in_dir:
-            return False, "pyproject.toml file is missing! In pancake extensions must contain at least a minimized pyproject.toml."
+            return False, "pyproject.toml file is missing! In pancake extensions must contain at least a minimal pyproject.toml."
 
         # warn the developer if they forget to mount a class housing commands.
         # ----------------------------------------------------------------------

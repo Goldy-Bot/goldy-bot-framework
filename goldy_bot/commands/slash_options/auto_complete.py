@@ -7,6 +7,8 @@ if TYPE_CHECKING:
 
     from ...goldy import Goldy
 
+    from .slash_option import SlashOptionChoice
+
     AutoCompleteCallbackT = Callable[[object, str, Dict[str, str]], List[SlashOptionChoice]]
 
 from devgoldyutils import LoggerAdapter, Colours

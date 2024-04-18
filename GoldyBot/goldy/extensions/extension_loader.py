@@ -328,7 +328,7 @@ class ExtensionLoader():
                     self.logger.debug(f"'{dependency_name}' dependency found.")
 
         return missing_dependencies
-    
+
     def __find_external_extension_path(self) -> str:
         if self.path_to_extensions_folder is not None:
             return self.path_to_extensions_folder

@@ -128,7 +128,21 @@ class Goldy(
         # Loading extensions.
         self.logger.info("Loading extensions...")
         for path in extensions_dir.iterdir():
-            extension = self.load_extension(path, legacy = legacy)
+            extension_metadata = self._get_extension_metadata(path)
+
+            if extension_metadata is None:
+                self.logger.warn(
+                    f"Couldn't grab metadata from pyproject.toml for the extension at '{path}' " \
+                        "as it does not have a pyproject.toml file. Dependency installer will cease to function " \
+                            "causing missing dependencies."
+                )
+
+            else:
+                self._install_missing_extension_deps(
+                    extension_metadata, self.config.extensions_raise_on_load_error
+                )
+
+            extension = self._load_extension(path, legacy = legacy)
 
             if extension is not None:
                 self.logger.info(f"The extension '{extension.name}' has been loaded!")
