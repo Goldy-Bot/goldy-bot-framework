@@ -203,12 +203,6 @@ class Embed(DictHelper[EmbedData]):
 
         self.data.update(data)
 
-    def set_image(self, image: EmbedImage) -> None: # NOTE: I might make this into an edit function of some sort if needed.
-        """
-        Set's an embed image.
-        """
-        self.data["image"] = image.data
-
     def set_random_footer(self, messages: List[str]) -> None:
         """
         Method that will randomly choose to display one of those messages in the footer; it can also choose to not display anything. 10% chance.
@@ -222,4 +216,7 @@ class Embed(DictHelper[EmbedData]):
 
     def copy(self) -> Embed: # TODO: Check if this works correctly. Might be safer to just pass the new dict to the embed's data attribute.
         """Returns copy of embed."""
-        return Embed(**copy.deepcopy(self.data))
+        embed = Embed()
+        embed.data = copy.deepcopy(self.data)
+
+        return embed

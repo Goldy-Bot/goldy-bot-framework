@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from .stats import Stats
 from .cache import Cache
 from .docker import Docker
 from .legacy import Legacy
@@ -11,6 +12,6 @@ __all__ = (
     "FrameworkWrapper",
 )
 
-class FrameworkWrapper(Docker, Cache, Extensions, Legacy, Repo, Commands):
+class FrameworkWrapper(Docker, Cache, Extensions, Legacy, Repo, Commands, Stats):
     def __init__(self) -> None:
         super().__init__()

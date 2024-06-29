@@ -1,0 +1,6 @@
+[project]
+name = "guild-config"
+dependencies = [
+    "GoldyBot>=5.1dev1",
+]
+version = "1"

@@ -1,19 +1,19 @@
 .PHONY: build
 
-pip = pip
-python = python
+PIP = pip
+PYTHON = python
 
 build:
-	${python} -m build
+	${PYTHON} -m build
 
 install:
-	${pip} install . -U
+	${PIP} install . -U
 
 install-dev:
-	${pip} install .[dev] -U
+	${PIP} install .[dev] -U
 
 install-editable:
-	${pip} install -e . --config-settings editable_mode=compat
+	${PIP} install -e .[dev] --config-settings editable_mode=compat
 
 test:
 	ruff check .
@@ -23,7 +23,7 @@ test-v:
 	cd tests && pytest -vv
 
 docker-build:
-	${python} scripts/docker_build.py
+	${PYTHON} scripts/docker_build.py
 
 build-clean-docs:
 	cd docs && make clean && make html
@@ -35,4 +35,4 @@ pull-submodules:
 	git submodule update --init --recursive
 
 pip-update:
-	${python} -m pip install --upgrade pip
+	${PYTHON} -m pip install --upgrade pip

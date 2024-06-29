@@ -155,6 +155,17 @@ class Goldy(
                         f"The extension '{extension.name}' is not being added as it's ignored!"
                     )
 
+        # Load goldy bot internal extensions.
+        internal_extensions_dir = Path(__file__).parent.parent.joinpath("internal-extensions")
+
+        for path in internal_extensions_dir.iterdir():
+            extension = self._load_extension(path, legacy = legacy)
+
+            if extension is not None:
+                self.logger.info(f"Internal extension '{extension.name}' has been loaded!")
+
+                self.add_extension(extension)
+
         # Setting up nextcore client.
         await self.client.setup()
 

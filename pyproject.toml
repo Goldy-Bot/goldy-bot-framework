@@ -54,7 +54,8 @@ dev = [
     "pytest",
     "pytest-cov",
     "ruff",
-    "build"
+    "build",
+    "devgoldyutils[pprint]==2.5.8"
 ]
 
 [project.urls]
@@ -63,7 +64,7 @@ BugTracker = "https://github.com/Goldy-Bot/Goldy-Bot-V5/issues"
 ChangeLog = "https://github.com/Goldy-Bot/Goldy-Bot-V5/master/CHANGELOG.md"
 
 [tool.setuptools.dynamic]
-version = { attr = "GoldyBot.info.VERSION" }
+version = { attr = "goldy_bot.__version__" }
 
 [build-system]
 requires = ["setuptools", "setuptools-scm"]
