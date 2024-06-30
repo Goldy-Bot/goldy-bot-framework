@@ -32,15 +32,6 @@ class DatabaseWrapper(ABC):
         """Update the wrapper with the greatest and latest data from the database."""
         ...
 
-        """ # TODO: Remove this when guild database wrapper is implemented.
-        if isinstance(self.goldy, Guild):
-            database = self.goldy.database.get_goldy_database(DatabaseEnums.GOLDY_MAIN)
-
-            #self.data = await database.find_one("guild_configs", query = {"_id": self.id})
-
-            # TODO: Move guild database stuff to this wrapper.
-        """
-
     def get(self, key: str, default: Optional[Any] = None) -> Optional[Any]:
         """Retrieve data."""
         if self.data is None:

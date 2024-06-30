@@ -21,7 +21,7 @@ logger = LoggerAdapter(goldy_bot_logger, prefix = "MemberDBWrapper")
 class MemberDBWrapper(DatabaseWrapper):
     """A database wrapper for goldy bot members."""
     def __init__(self, database: Database, member: Member) -> None:
-        self.member = member
+        self.__member = member
 
         super().__init__(database)
 
@@ -34,15 +34,15 @@ class MemberDBWrapper(DatabaseWrapper):
         if guild_id is not None:
             doc_id = guild_id
 
-        member_collection = database.get_collection(self.member.data["id"])
+        member_collection = database.get_collection(self.__member.data["id"])
 
         await Database.edit(member_collection, {"_id": doc_id}, data)
 
     async def update(self, guild_id: Optional[str] = None) -> None:
-        logger.info(f"Pulling updated member data for '{self.member.data['username']}'...")
+        logger.info(f"Pulling updated member data for '{self.__member.data['username']}'...")
 
         database = self.database.get_database(DatabaseEnums.GOLDY_MEMBER_DATA)
-        member_collection = database.get_collection(self.member.data["id"])
+        member_collection = database.get_collection(self.__member.data["id"])
 
         query = {"_id": "1"}
 

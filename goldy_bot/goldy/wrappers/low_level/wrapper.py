@@ -12,12 +12,13 @@ from .user import User
 from .channel import Channel
 from .application import Application
 from .interaction import Interaction
+from .guild import Guild
 
 __all__ = (
     "LowLevelWrapper",
 )
 
-class LowLevelWrapper(Application, User, Interaction, Channel):
+class LowLevelWrapper(Application, User, Interaction, Channel, Guild):
     """A class that wraps common discord HTTP routes for the framework."""
     def __init__(self, goldy: Goldy) -> None:
         self.goldy = goldy
