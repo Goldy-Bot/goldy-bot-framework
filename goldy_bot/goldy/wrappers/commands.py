@@ -201,6 +201,7 @@ class Commands():
 
     def __get_subcommand(self, data: InteractionData, parent_command: Command) -> Tuple[Optional[Command], List[ApplicationCommandOptionInteractionData]]:
         # NOTE: This won't support a third layer of subcommands.
+        # TODO: Add support for more layers of subcommands.
         subcommand: Optional[Command] = None
         subcommand_options: List[ApplicationCommandOptionInteractionData] = []
 

@@ -2,9 +2,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from typing import Optional
     from typing_extensions import Self
-    from discord_typings import GuildData
     from ....typings.objects import PlatterSelfT
 
 from devgoldyutils import LoggerAdapter
@@ -20,16 +18,12 @@ logger = LoggerAdapter(goldy_bot_logger, prefix = "GuildWrapper")
 
 class GuildWrapper():
     def __init__(self: PlatterSelfT[Self]) -> None:
-        self.__guild_data: Optional[GuildData] = None
-
         super().__init__()
 
     @property
     async def guild(self: PlatterSelfT[Self]) -> Guild:
-        if self.__guild_data is None:
-            self.__guild_data = await self.goldy.low_level.get_guild(id = self.data["guild_id"])
+        # The guild id we pass here to get_guild will always exits 
+        # so we can safely infer that it will return a guild object.
+        guild_class: Guild = await self.goldy.get_guild(guild_id = self.data["guild_id"])
 
-        return Guild(
-            data = self.__guild_data, 
-            goldy = self.goldy
-        )
+        return guild_class

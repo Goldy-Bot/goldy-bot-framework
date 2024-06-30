@@ -100,7 +100,7 @@ class GroupCommand():
 
         return decorate
 
-    def subcommand(
+    def sub_command(
         self, 
         name: Optional[str] = None, 
         description: Optional[str] = None, 
@@ -190,3 +190,17 @@ class GroupCommand():
             return inner(func)
 
         return decorate
+
+    def group_command(
+        self, 
+        name: str, 
+        description: Optional[str] = None
+    ) -> GroupCommand:
+        group = GroupCommand(
+            name = name, 
+            description = description
+        )
+
+        self._master_command.add_subcommand(group._master_command)
+
+        return group

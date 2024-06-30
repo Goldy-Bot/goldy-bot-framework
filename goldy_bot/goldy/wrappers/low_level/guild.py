@@ -17,7 +17,7 @@ class Guild():
     def __init__(self) -> None:
         super().__init__()
 
-    async def get_guild(self: LowLevelSelfT[Self], id: str, **kwargs) -> GuildData:
+    async def get_guild_data(self: LowLevelSelfT[Self], id: str, **kwargs) -> GuildData:
         self.logger.debug(f"Requesting data of guild '{id}'...")
 
         r = await self.goldy.client.request(

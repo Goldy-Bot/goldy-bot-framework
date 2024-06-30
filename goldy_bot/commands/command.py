@@ -90,6 +90,8 @@ class Command(DictHelper[ApplicationCommandPayload]):
         """A function that converts slash command parameters to slash command payload options."""
         options: List[ApplicationCommandOptionData] = []
 
+        # TODO: Make options parser handle nested sub commands.
+
         # Discord chat input regex as of 
         # https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-naming
         chat_input_patten = regex.compile(r"^[-_\p{L}\p{N}\p{sc=Deva}\p{sc=Thai}]{1,32}$", regex.UNICODE)

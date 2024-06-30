@@ -13,19 +13,23 @@ class GuildConfig():
         description = "🧰 Tune the goldy bot framework to your guild's needs."
     )
 
-    @group.subcommand() # TODO: Separate this into two sub commands.
-    async def enable_extension(self, platter: Platter, id: str):
-        ...
+    #enable_group = group.group_command(
+    #    name = "enable"
+    #)
 
-    @group.subcommand()
+    #@enable_group.sub_command() # TODO: Separate this into two sub commands.
+    #async def extension(self, platter: Platter, id: str):
+    #    ...
+
+    @group.sub_command()
     async def enable_all_extension(self, platter: Platter, id: str):
         ...
 
-    @group.subcommand() # TODO: Separate this into two sub commands.
+    @group.sub_command() # TODO: Separate this into two sub commands.
     async def disable_extension(self, platter: Platter, id: str):
         ...
 
-    @group.subcommand()
+    @group.sub_command()
     async def disable_all_extension(self, platter: Platter, id: str):
         ...
 
