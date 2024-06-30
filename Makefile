@@ -16,7 +16,7 @@ install-editable:
 	${PIP} install -e .[dev] --config-settings editable_mode=compat
 
 test:
-	ruff check .
+	ruff check --target-version=py38 .
 	cd tests && pytest -v
 
 test-v:
