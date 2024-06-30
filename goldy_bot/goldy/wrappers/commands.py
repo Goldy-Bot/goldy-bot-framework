@@ -170,7 +170,7 @@ class Commands():
 
                     logger.debug(
                         f"The application command '{app_command['name']}' of type '{app_command['type']}' " \
-                            "isn't registered in the framework, so it will be removed."
+                            "isn't registered in the framework, so it will be removed and re-synced alongside others."
                     )
 
                     return False
@@ -178,8 +178,18 @@ class Commands():
                 if command["name"] == app_command["name"] and command["type"] == app_command["type"]:
 
                     for key in ["description", "options"]:
+                        value = command.get(key)
+                        app_value = app_command.get(key)
 
-                        if not command.get(key) == app_command.get(key):
+                        if value == []:
+                            value = None
+
+                        if not value == app_value:
+                            logger.debug(
+                                f"The application command '{app_command['name']}' of type '{app_command['type']}' " \
+                                    "was not identical to it's clone in the framework, so it will be removed and re-synced alongside others." \
+                                        f"\nKey: '{key}' \nValues (fw | app): {value} | {app_value}"
+                            )
                             return False
 
                     found = True
