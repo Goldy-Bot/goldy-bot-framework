@@ -1,10 +1,6 @@
-import os
-import psutil
 import platform
 import nextcore
 import goldy_bot
-
-from devgoldyutils import pprint
 
 from GoldyBot.goldy import nextcore_utils as legacy_nextcore_utils
 
@@ -14,7 +10,6 @@ from goldy_bot import (
     Colours, 
     Embed, 
     EmbedField, 
-    EmbedFooter, 
     EmbedImage
 )
 
@@ -49,18 +44,15 @@ class Debug():
                 EmbedField(
                     name = "⚡ __Version:__",
                     value = """
-                    **- GoldyBot: [``{version}``](https://github.com/Goldy-Bot/Goldy-Bot-V5)
+                    **- GoldyBot: {icon} [``{version}``](https://github.com/Goldy-Bot/Goldy-Bot-Framework)
                     - Nextcore: [``{nc_version}``](https://github.com/nextsnake/nextcore)
                     - Python: [``{py_version}``](https://www.python.org/)**
                     """,
                     inline = True
                 )
             ],
-            footer = EmbedFooter("TODO: GIVE THIS COMMAND A MAKEOVER!!!! 🤬"),
             colour = Colours.BLACK
         )
-
-        self.process = psutil.Process(os.getpid())
 
     @extension.command(
         description = "🖤 Command for debugging the goldy bot framework."
@@ -72,9 +64,11 @@ class Debug():
         bot_avatar_url = bot_user.get("avatar")
 
         if bot_avatar_url is not None:
-            embed.data["thumbnail"] = EmbedImage(
+            embed_image = EmbedImage(
                 url = legacy_nextcore_utils.DISCORD_CDN + f"avatars/{bot_user['id']}/{bot_avatar_url}.png?size=4096"
-            ).data
+            )
+
+            embed.data["thumbnail"] = embed_image.data
 
         embed.format_fields(
             version = goldy_bot.__version__, 
@@ -82,20 +76,16 @@ class Debug():
             py_version = platform.python_version(), 
             ping = (lambda x: "(Not Available Yet)" if x is None else f"{round(x * 1000, 2)}ms")(self.goldy.latency),
             os = (lambda x: x[:22] + "..." if len(x) >= 26 else x)(f"{platform.system()} {platform.release()}"), 
-            cpu = self.process.cpu_percent(0) / psutil.cpu_count(), 
-            ram = self.__convert_to_MB(self.process.memory_info().rss), 
-            disk = "N/A", # TODO: Add this!
+            cpu = self.goldy.cpu_usage, 
+            ram = self.goldy.ram_usage, 
+            disk = self.goldy.disk_usage, 
             up_time = f"<t:{int(self.goldy.boot_datetime.timestamp())}:R>", 
             guild_count = "N/A", # TODO: Add this!
 
-            heart = "🥞"
+            icon = "🥞"
         )
 
         await platter.send_message(embeds = [embed], reply = True)
-
-    def __convert_to_MB(self, size):
-        return (f"{size/float(1<<20):,.2f}")
-
 
 def load(goldy: Goldy):
     extension.mount(goldy, Debug)
