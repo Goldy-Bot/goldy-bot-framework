@@ -13,25 +13,28 @@ class GuildConfig():
         description = "🧰 Tune the goldy bot framework to your guild's needs."
     )
 
-    #enable_group = group.group_command(
-    #    name = "enable"
-    #)
+    enable_group = group.group_command("enable")
+    disable_group = group.group_command("disable")
 
-    #@enable_group.sub_command() # TODO: Separate this into two sub commands.
-    #async def extension(self, platter: Platter, id: str):
-    #    ...
+    @enable_group.subcommand()
+    @disable_group.subcommand()
+    async def extension(self, platter: Platter, id: str):
+        """Oh my god, I can't believe it."""
+        await platter.send_message(f"👀 I see you, {platter.author.data['username']}!")
 
-    @group.sub_command()
+    @group.subcommand()
     async def enable_all_extension(self, platter: Platter, id: str):
         ...
 
-    @group.sub_command() # TODO: Separate this into two sub commands.
+    @group.subcommand() # TODO: Separate this into two sub commands.
     async def disable_extension(self, platter: Platter, id: str):
         ...
 
-    @group.sub_command()
+    @group.subcommand()
     async def disable_all_extension(self, platter: Platter, id: str):
         ...
+
+    print(">>>", enable_group._master_command.data)
 
 
 def load(goldy: Goldy):

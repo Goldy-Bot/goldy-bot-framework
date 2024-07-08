@@ -1,6 +1,5 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
-
 from discord_typings import ApplicationCommandPayload
 
 if TYPE_CHECKING:
@@ -12,9 +11,9 @@ if TYPE_CHECKING:
 import regex
 from devgoldyutils import LoggerAdapter
 
-from ..helpers.dict_helper import DictHelper
 from ..errors import GoldyBotError
 from ..logger import goldy_bot_logger
+from ..helpers.dict_helper import DictHelper
 
 __all__ = (
     "Command",
@@ -35,7 +34,7 @@ class Command(DictHelper[ApplicationCommandPayload]):
 
         name = name or function.__name__
         # Even though discord docs say no, description is a required field.
-        description = description or "🪹 Oopsie daisy, looks like no description was set for this command." 
+        description = description or function.__doc__ or "🪹 Oopsie daisy, looks like no description was set for this command." 
         slash_options = slash_options or {}
 
         data = {}
@@ -70,14 +69,7 @@ class Command(DictHelper[ApplicationCommandPayload]):
         return func_params[:self.function.__code__.co_argcount][2:]
 
     def add_subcommand(self, command: Command) -> None:
-        subcommand_data = {
-            "name": command.name, 
-            "description": command.description, 
-            "options": self.__options_parser(command.params, command._slash_options), 
-            "type": 1
-        }
-
-        self.data["options"].append(subcommand_data)
+        self.data["options"].append(command.data)
 
         self._subcommands[command.name] = command
         logger.debug(f"Added subcommand '{command.name}' --> '{self.name}'.")

@@ -186,7 +186,7 @@ class Embed(DictHelper[EmbedData]):
         "so you can avoid the catastrophe at https://github.com/Goldy-Bot/Goldy-Bot-V5/issues/35."
         data = self.data
 
-        data["description"] = data["description"].format(**keys)
+        data["description"] = legacy_utils.line_fix(data["description"].format(**keys))
 
         self.data.update(data)
 

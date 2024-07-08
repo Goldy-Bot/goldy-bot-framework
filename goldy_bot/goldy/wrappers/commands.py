@@ -3,19 +3,23 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from typing_extensions import Self
-    from typing import List, Dict, Optional, Tuple, Generator, Any
+    from typing import List, Dict, Optional, Tuple, Generator, Any, Union
     from discord_typings import (
-        InteractionData, 
         ApplicationCommandPayload, 
         ApplicationCommandData, 
         ApplicationCommandOptionInteractionData, 
         InteractionCreateData
+    )
+    from discord_typings.interactions.receiving import (
+        SubcommandOptionInteractionData, 
+        SubcommandGroupOptionInteractionData
     )
 
     from ...commands import Command
     from ...typings import GoldySelfT
     from ...extensions import Extension
 
+from prettyprinter import pformat
 from devgoldyutils import LoggerAdapter, Colours
 
 from ...logger import goldy_bot_logger
@@ -86,10 +90,12 @@ class Commands():
                     f"Invoking the command '{command.name}' in extension class '{_class.__class__.__name__}'..."
                 )
 
+                logger.debug(f"Interaction data = {pformat(data)}")
+
                 options = data["data"].get("options", [])
 
                 # if this is a subcommand then replace the parent command object with the subcommand.
-                subcommand, subcommand_options = self.__get_subcommand(data, command)
+                subcommand, subcommand_options = self.__get_subcommand(data["data"].get("options", []), command)
 
                 if subcommand is not None:
                     command = subcommand
@@ -188,7 +194,7 @@ class Commands():
                             logger.debug(
                                 f"The application command '{app_command['name']}' of type '{app_command['type']}' " \
                                     "was not identical to it's clone in the framework, so it will be removed and re-synced alongside others." \
-                                        f"\nKey: '{key}' \nValues (fw | app): {value} | {app_value}"
+                                        f"\nKey: '{key}' \nValues (fw | app): \n{pformat(value)} | \n{pformat(app_value)}"
                             )
                             return False
 
@@ -199,17 +205,35 @@ class Commands():
 
         return True
 
-    def __get_subcommand(self, data: InteractionData, parent_command: Command) -> Tuple[Optional[Command], List[ApplicationCommandOptionInteractionData]]:
+    def __get_subcommand(
+        self, 
+        options: Union[SubcommandOptionInteractionData, SubcommandGroupOptionInteractionData, ApplicationCommandOptionInteractionData], 
+        parent_command: Command
+    ) -> Tuple[Optional[Command], List[ApplicationCommandOptionInteractionData]]:
         # NOTE: This won't support a third layer of subcommands.
         # TODO: Add support for more layers of subcommands.
         subcommand: Optional[Command] = None
         subcommand_options: List[ApplicationCommandOptionInteractionData] = []
 
-        for option in data["data"].get("options", []):
+        logger.debug(f"Finding subcommand in '{parent_command.name}' parent command...")
+
+        for option in options:
+
+            if option["type"] == 2: # we got to handle sub command groups differently
+                subgroup_command_options = option.get("options", [])
+                subgroup_master_command = parent_command._subcommands[option["name"]]
+
+                return self.__get_subcommand(subgroup_command_options, subgroup_master_command)
 
             if option["type"] == 1:
-                subcommand_options = option.get("options", []) 
+                subcommand_options = option.get("options", [])
                 subcommand = parent_command._subcommands[option["name"]]
+
+                inner_subcommand, inner_subcommand_options = self.__get_subcommand(subcommand_options, subcommand)
+
+                if inner_subcommand is not None:
+                    return inner_subcommand, inner_subcommand_options
+
                 break
 
         return subcommand, subcommand_options

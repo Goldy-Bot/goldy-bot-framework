@@ -38,7 +38,8 @@ dependencies = [
     "get-annotations",
     "packaging",
     "typer[all]",
-    "snakeviz"
+    "snakeviz",
+    "prettyprinter"
 ]
 
 dynamic = ["version"]
