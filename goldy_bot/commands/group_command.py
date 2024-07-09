@@ -206,6 +206,12 @@ class GroupCommand():
         name: str, 
         description: Optional[str] = None
     ) -> GroupCommand:
+
+        if self._parent_group is not None:
+            raise TypeError(
+                "You cannot nest a group command in a group command twice! This is a discord limitation."
+            )
+
         group = GroupCommand(
             name = name, 
             description = description, 
