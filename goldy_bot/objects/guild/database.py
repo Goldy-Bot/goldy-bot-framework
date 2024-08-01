@@ -8,7 +8,7 @@ from devgoldyutils import LoggerAdapter
 
 from ...logger import goldy_bot_logger
 from ...database import Database, DatabaseEnums
-from ...database.database_wrapper import DatabaseWrapper
+from ...database.database_wrapper import DatabaseWrapper, DatabaseWrapperDataT
 
 __all__ = (
     "GuildDBWrapper",
@@ -16,7 +16,7 @@ __all__ = (
 
 logger = LoggerAdapter(goldy_bot_logger, prefix = "GuildDBWrapper")
 
-class GuildDBWrapper(DatabaseWrapper):
+class GuildDBWrapper(DatabaseWrapper[DatabaseWrapperDataT]):
     """A database wrapper for goldy bot guilds."""
     def __init__(self, database: Database, guild: Guild) -> None:
         self.__guild = guild

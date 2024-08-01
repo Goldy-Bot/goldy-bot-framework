@@ -15,7 +15,7 @@ __all__ = (
 
 class Guilds():
     def __init__(self) -> None:
-        self._guilds: Dict[str, Guild] = []
+        self._guilds: Dict[str, Guild] = {}
 
         super().__init__()
 

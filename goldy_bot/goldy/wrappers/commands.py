@@ -62,7 +62,7 @@ class Commands():
             if command.name == name and type == CommandType.AUTO_COMPLETE:
                 options = data["data"]["options"]
 
-                subcommand, subcommand_options = self.__get_subcommand(data, command)
+                subcommand, subcommand_options = self.__get_subcommand(data["data"].get("options", []), command)
 
                 if subcommand is not None:
                     command = subcommand
@@ -79,6 +79,8 @@ class Commands():
                             await slash_option.send_auto_complete(
                                 data, auto_complete_option["value"], params, _class, self
                             )
+
+                            # TODO: FIX THIS NOW (01/08/2024)
 
                             break # I don't think you can even get two auto complete slash options at the 
                             # same time, if we do welp... this shit is blowing up!

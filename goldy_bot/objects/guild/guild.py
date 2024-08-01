@@ -22,9 +22,9 @@ class Guild(DictHelper[GuildData]):
         super().__init__(data)
 
     @property
-    async def database(self) -> GuildDBWrapper:
+    async def database(self) -> GuildDBWrapper[dict]:
         """Get guild's database wrapper."""
-        if self.database_wrapper.data is not None:
+        if self.database_wrapper.data is None:
             await self.database_wrapper.update()
 
         return self.database_wrapper
