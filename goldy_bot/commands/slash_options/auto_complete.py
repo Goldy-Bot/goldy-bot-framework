@@ -6,6 +6,7 @@ if TYPE_CHECKING:
     from discord_typings import AutocompleteInteractionData
 
     from ...goldy import Goldy
+    from .slash_option import SlashOptionChoice
 
     AutoCompleteCallbackT = Callable[[object, str, Dict[str, str]], List[SlashOptionChoice]]
 

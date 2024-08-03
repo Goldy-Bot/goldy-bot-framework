@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from typing import List, Tuple, Optional, TypeVar
 
-    T = TypeVar("T")
+    T = TypeVar("T", str)
 
 import goldy_bot
 from goldy_bot import Goldy, Platter, SlashOptionAutoComplete, SlashOptionChoice
@@ -73,7 +73,7 @@ class GuildConfig():
 
         guild_configs: dict = guild_database_wrapper.get("configs", {})
 
-        value = self.__phrase_bool_or_pass(value)
+        value = self.__parse_value_or_error(platter, value, key)
 
         guild_configs[key] = value
 
@@ -119,11 +119,26 @@ class GuildConfig():
 
         return self.list_of_config_keys
 
-    def __phrase_bool_or_pass(self, value: T) -> bool | T:
-        if value == "true":
-            value = True
-        elif value == "false":
-            value = False
+    def __parse_value_or_error(self, platter: Platter, value: T, key: str) -> T | bool:
+        _type = None
+
+        for config_key, config_type in self.__get_config_keys():
+
+            if config_key == key:
+                _type = config_type
+                break
+
+        if _type is bool:
+
+            if value.lower() == "true":
+                value = True
+            elif value.lower() == "false":
+                value = False
+            else:
+                platter.error(
+                    message = "The value you've entered is not a boolean!",
+                    title = "🧡 Incorrect value entered!"
+                )
 
         return value
 
