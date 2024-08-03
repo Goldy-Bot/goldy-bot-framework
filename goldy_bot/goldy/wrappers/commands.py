@@ -68,12 +68,15 @@ class Commands():
                     command = subcommand
                     options = subcommand_options
 
-                auto_complete_option = options[0]
                 params = self.__interaction_options_to_kwargs(options, command)
 
-                for slash_option in command._slash_options.values():
+                for index, slash_option in enumerate(command._slash_options.values()):
 
                     if isinstance(slash_option, SlashOptionAutoComplete):
+                        auto_complete_option = options[index]
+
+                        if auto_complete_option.get("focused", False) is not True:
+                            continue
 
                         if slash_option.data["name"] == auto_complete_option["name"]:
                             await slash_option.send_auto_complete(
@@ -99,7 +102,10 @@ class Commands():
                 # if this is a subcommand then replace the parent command object with the subcommand.
                 subcommand, subcommand_options = self.__get_subcommand(data["data"].get("options", []), command)
 
+                master_command = None
+
                 if subcommand is not None:
+                    master_command = command
                     command = subcommand
                     options = subcommand_options
 
@@ -109,6 +115,9 @@ class Commands():
 
                 # invoke the command's function
                 try:
+                    if master_command is not None:
+                        await master_command.function(_class, platter, **params)
+
                     await command.function(_class, platter, **params)
 
                 except FrontEndError as e:

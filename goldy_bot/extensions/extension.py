@@ -64,7 +64,8 @@ class Extension():
         self,
         name: Optional[str] = None, 
         description: Optional[str] = None, 
-        slash_options: Dict[str, SlashOptionsT] = None,
+        slash_options: Dict[str, SlashOptionsT] = None, # TODO: When a command legibility checker 
+        # is added check to see whether 'slash_options' is matching with the actual command args. 
         group: bool = False,
         wait: bool = False
     ) -> Callable[..., GroupCommand] | Callable[..., Callable]:

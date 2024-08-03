@@ -7,8 +7,6 @@ if TYPE_CHECKING:
 
     from ...goldy import Goldy
 
-    from .slash_option import SlashOptionChoice
-
     AutoCompleteCallbackT = Callable[[object, str, Dict[str, str]], List[SlashOptionChoice]]
 
 from devgoldyutils import LoggerAdapter, Colours
@@ -138,7 +136,9 @@ class SlashOptionAutoComplete(SlashOption):
             choices = await self.callback(command_class, typing_value, **params)
         else:
             # Some shit fuzzy searching. I'll improve it later :L
-            choices = [choice for choice in self.recommendations if typing_value.lower() in choice.data["name"].lower()]
+            choices = [
+                choice for choice in self.recommendations if typing_value.lower() in choice.data["name"].lower()
+            ]
 
         payload["choices"] = SlashOptionChoice.strip(choices)[:24] # Discord only allows max of 25 choices.
 

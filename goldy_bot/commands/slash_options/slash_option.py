@@ -39,7 +39,7 @@ class SlashOptionChoice(DictHelper[SlashOptionChoiceT]):
         data: SlashOptionChoiceT = {}
 
         data["name"] = short_str(name, 99)
-        data["value"] = value
+        data["value"] = value # TODO: Check the discord docs if the value can be set to an int or bool.
 
         super().__init__(data, **kwargs)
 
