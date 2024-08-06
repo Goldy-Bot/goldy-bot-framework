@@ -8,6 +8,7 @@ if TYPE_CHECKING:
 
 import goldy_bot
 from goldy_bot import Goldy, Platter, SlashOptionAutoComplete, SlashOptionChoice
+from goldy_bot.requirements import  is_guild_owner
 
 extension = goldy_bot.Extension("guild-config")
 
@@ -65,7 +66,8 @@ class GuildConfig():
             "value": SlashOptionAutoComplete(
                 callback = get_values
             )
-        }
+        },
+        requirements = [is_guild_owner()]
     )
     async def set_guild_config(self, platter: Platter, key: str, value: str):
         guild = await platter.guild
@@ -95,7 +97,8 @@ class GuildConfig():
             "key": SlashOptionAutoComplete(
                 callback = get_keys
             )
-        }
+        },
+        requirements = [is_guild_owner()]
     )
     async def view_guild_config(self, platter: Platter, key: str):
         guild = await platter.guild

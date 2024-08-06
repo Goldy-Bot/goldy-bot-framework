@@ -16,18 +16,18 @@ if TYPE_CHECKING:
     )
 
     from ...commands import Command
-    from ...typings import GoldySelfT
     from ...extensions import Extension
+    from ...typings import GoldySelfT
 
 from prettyprinter import pformat
 from devgoldyutils import LoggerAdapter, Colours
 
-from ...logger import goldy_bot_logger
-from ...commands import CommandType, SlashOptionAutoComplete
 from ...errors import FrontEndError
 from ...objects.platter import Platter
+from ...logger import goldy_bot_logger
 from ...helpers import Embed, EmbedFooter
 from ...colours import Colours as GBotColours
+from ...commands import CommandType, SlashOptionAutoComplete
 
 __all__ = (
     "Commands",
@@ -112,11 +112,37 @@ class Commands():
                 # create a platter, generate function params from interaction data options.
                 platter = Platter(data, self)
                 params = self.__interaction_options_to_kwargs(options, command)
+                requirements = command.requirements or []
 
                 # invoke the command's function
                 try:
                     if master_command is not None:
                         await master_command.function(_class, platter, **params)
+
+                    for requirement in requirements:
+                        result = await requirement(_class, platter, **params)
+
+                        if not isinstance(result, tuple) or not len(result) == 2:
+                            raise TypeError(
+                                "A requirement must only return a Tuple type in the format --> (bool, str)!"
+                            )
+
+                        has_been_met, reason = result
+
+                        if has_been_met is False:
+
+                            if isinstance(reason, Embed):
+                                platter.error(
+                                    "Command requirement not met!", 
+                                    embed = reason
+                                )
+
+                            platter.error(
+                                title = "❤️ Requirement not met!",
+                                message = "One of the requirements for this " \
+                                    f"command has not been met because ***{reason}***.",
+                                colour = GBotColours.RED
+                            )
 
                     await command.function(_class, platter, **params)
 

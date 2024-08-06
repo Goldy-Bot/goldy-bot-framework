@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING, overload
 if TYPE_CHECKING:
     from typing import List, Dict, Optional, Literal, Callable
 
-    from ..typings import SlashOptionsT
+    from ..typings import SlashOptionsT, RequirementFunctionT
 
     from ..goldy import Goldy
 
@@ -42,9 +42,10 @@ class Extension():
     @overload
     def command(
         self,
-        name: Optional[str] = None, 
-        description: Optional[str] = None, 
+        name: Optional[str] = None,
+        description: Optional[str] = None,
         slash_options: Dict[str, SlashOptionsT] = None,
+        requirements: Optional[List[RequirementFunctionT]] = None,
         group: Literal[False] = False,
         wait: bool = False
     ) -> Callable[..., Callable]:
@@ -53,8 +54,9 @@ class Extension():
     @overload
     def command(
         self,
-        name: Optional[str] = None, 
-        description: Optional[str] = None, 
+        name: Optional[str] = None,
+        description: Optional[str] = None,
+        requirements: Optional[List[RequirementFunctionT]] = None,
         group: Literal[True] = False,
         wait: bool = False
     ) -> Callable[..., GroupCommand]:
@@ -65,7 +67,8 @@ class Extension():
         name: Optional[str] = None, 
         description: Optional[str] = None, 
         slash_options: Dict[str, SlashOptionsT] = None, # TODO: When a command legibility checker 
-        # is added check to see whether 'slash_options' is matching with the actual command args. 
+        # is added check to see whether 'slash_options' is matching with the actual command args.
+        requirements: Optional[List[RequirementFunctionT]] = None,
         group: bool = False,
         wait: bool = False
     ) -> Callable[..., GroupCommand] | Callable[..., Callable]:
@@ -91,10 +94,11 @@ class Extension():
         def decorate(func):
             def inner(func):
                 command = Command(
-                    function = func, 
-                    name = name, 
-                    description = description, 
+                    function = func,
+                    name = name,
+                    description = description,
                     slash_options = slash_options,
+                    requirements = requirements,
                     wait = wait
                 )
 

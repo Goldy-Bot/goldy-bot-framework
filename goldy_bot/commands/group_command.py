@@ -2,11 +2,12 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, overload
 
 if TYPE_CHECKING:
-    from typing import Optional, Callable, Dict
+    from typing import Optional, Callable, Dict, List
 
     from GoldyBot import SlashOption
 
     from ..objects.platter import Platter
+    from ..typings import RequirementFunctionT
 
 from devgoldyutils import LoggerAdapter
 
@@ -108,10 +109,11 @@ class GroupCommand():
         return decorate
 
     def subcommand(
-        self, 
-        name: Optional[str] = None, 
-        description: Optional[str] = None, 
-        slash_options: Optional[Dict[str, SlashOption]] = None, 
+        self,
+        name: Optional[str] = None,
+        description: Optional[str] = None,
+        slash_options: Optional[Dict[str, SlashOption]] = None,
+        requirements: Optional[List[RequirementFunctionT]] = None,
         wait: bool = False
     ):
         """
@@ -187,6 +189,7 @@ class GroupCommand():
                         name = name,
                         description = description,
                         slash_options = slash_options,
+                        requirements = requirements,
                         wait = wait
                     )
                 )

@@ -6,7 +6,7 @@ if TYPE_CHECKING:
     from typing import Optional, Dict, List
     from discord_typings import ApplicationCommandOptionData
 
-    from ..typings import CommandFuncT, SlashOptionsT
+    from ..typings import CommandFuncT, SlashOptionsT, RequirementFunctionT
 
 import regex
 from devgoldyutils import LoggerAdapter
@@ -23,14 +23,15 @@ logger = LoggerAdapter(goldy_bot_logger, prefix = "Command")
 
 class Command(DictHelper[ApplicationCommandPayload]):
     def __init__(
-        self, 
-        function: Optional[CommandFuncT], 
-        name: Optional[str] = None, 
-        description: Optional[str] = None, 
-        slash_options: Optional[Dict[str, SlashOptionsT]] = None, 
+        self,
+        function: Optional[CommandFuncT],
+        name: Optional[str] = None,
+        description: Optional[str] = None,
+        slash_options: Optional[Dict[str, SlashOptionsT]] = None,
+        requirements: Optional[List[RequirementFunctionT]] = None,
         wait: bool = False
     ) -> None:
-        self.function = function or (lambda x, y: self.__dummy__()) # TODO: Change this. Find a better alternative.
+        self.function = function or (lambda *a, **k: self.__async_dummy__()) # TODO: Change this. Find a better alternative.
 
         name = name or function.__name__
         # Even though discord docs say no, description is a required field.
@@ -43,7 +44,8 @@ class Command(DictHelper[ApplicationCommandPayload]):
         data["description"] = description
         data["options"] = self.__options_parser(self.params, slash_options)
 
-        self.wait = wait
+        self.requirements = requirements
+        self.wait = wait # TODO: Actually use this.
 
         self._slash_options = slash_options
         self._subcommands: Dict[str, Command] = {}
@@ -113,5 +115,5 @@ class Command(DictHelper[ApplicationCommandPayload]):
 
         return options
 
-    async def __dummy__(self):
+    async def __async_dummy__(self):
         ...
