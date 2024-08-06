@@ -156,7 +156,7 @@ class Goldy(
                     )
 
         # Load goldy bot internal extensions.
-        internal_extensions_dir = Path(__file__).parent.parent.joinpath("internal-extensions")
+        internal_extensions_dir = Path(__file__).parent.parent.joinpath("internal_extensions")
 
         for path in internal_extensions_dir.iterdir():
             extension = self._load_extension(path, legacy = legacy)

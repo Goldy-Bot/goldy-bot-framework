@@ -32,6 +32,8 @@ dependencies = [
     "regex",
     "psutil",
     "dateparser",
+
+    # Pancake dependecies
     "toml",
     "colorthief",
     "get-annotations",
