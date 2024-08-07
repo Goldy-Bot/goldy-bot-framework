@@ -177,14 +177,14 @@ class Goldy(
             is_okay, msg = await self.database._is_connection_ok()
 
             if is_okay:
-                self.logger.info("AsyncIOMotorClient (Database) " + Colours.GREEN.apply_to_string("Connected!"))
+                self.logger.info("AsyncIOMotorClient (Database) " + Colours.GREEN.apply_to_string("Is Okay!"))
             else:
                 self.logger.critical(msg)
 
         # Set command listener.
         self.shard_manager.event_dispatcher.add_listener(
             lambda x: self.invoke_command(
-                x["data"]["name"], CommandType(x["type"]), x
+                x["data"].get("name", x["data"].get("custom_id")), CommandType(x["type"]), x
             ),
             event_name = "INTERACTION_CREATE"
         )

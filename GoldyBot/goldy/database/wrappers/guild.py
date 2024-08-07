@@ -38,29 +38,29 @@ class GuildDBWrapper(DatabaseWrapper):
     def prefix(self) -> str:
         """The prefix the guild uses."""
         return self.get("prefix")
-    
+
     @property
     def roles(self):
         return self.get("roles")
-    
+
     @property
     def channels(self):
         return self.get("channels")
-    
+
     @property
     def allowed_extensions(self) -> List[str]:
         """Returns the allowed extensions from this guild."""
-        return self.get("extensions", "allowed")
-    
+        return self.get("extensions", "allowed", default = [])
+
     @property
     def disallowed_extensions(self) -> List[str]:
         """Returns the disallowed extensions from this guild."""
-        return self.get("extensions", "disallowed")
+        return self.get("extensions", "disallowed", default = [])
 
     @property
     def extension_restrictions(self) -> List[str]:
         """Returns the extension restrictions from this guild."""
-        return self.get("extensions", "restrictions")
+        return self.get("extensions", "restrictions", default = [])
 
     async def push(self, data: dict) -> None:
         self.logger.info("Pushing guild config to the database...")
