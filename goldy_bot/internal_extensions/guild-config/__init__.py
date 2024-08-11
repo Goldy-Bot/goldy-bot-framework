@@ -58,7 +58,7 @@ class GuildConfig():
 
     @group.subcommand(
         name = "set", 
-        description = "Change / Set guild configuration.", 
+        description = "Change / set guild configuration.", 
         slash_options = {
             "key": SlashOptionAutoComplete(
                 callback = get_keys
@@ -92,7 +92,7 @@ class GuildConfig():
 
     @group.subcommand(
         name = "view", 
-        description = "Change / Set guild configuration.", 
+        description = "View guild configuration.", 
         slash_options = {
             "key": SlashOptionAutoComplete(
                 callback = get_keys
@@ -108,6 +108,35 @@ class GuildConfig():
 
         await platter.send_message(
             f"➡️ `{key}` is set to **`{guild_configs.get(key, 'None')}`**.", 
+            hidden = True
+        )
+
+    @group.subcommand(
+        name = "reset", 
+        description = "Reset guild configuration.", 
+        slash_options = {
+            "key": SlashOptionAutoComplete(
+                callback = get_keys
+            )
+        },
+        requirements = [is_guild_owner()]
+    )
+    async def reset_guild_config(self, platter: Platter, key: str):
+        guild = await platter.guild
+        guild_db = await guild.database
+
+        guild_configs = guild_db.get("configs", {})
+
+        del guild_configs[key]
+
+        await guild_db.push(
+            data = {
+                "configs": guild_configs
+            }
+        )
+
+        await platter.send_message(
+            f"🆕 `{key}` has been **reset**.", 
             hidden = True
         )
 
