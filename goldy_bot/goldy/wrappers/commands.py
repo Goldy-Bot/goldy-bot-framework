@@ -16,6 +16,7 @@ if TYPE_CHECKING:
     )
 
     from ...commands import Command
+    from ...objects.guild import Guild
     from ...extensions import Extension
     from ...typings import GoldySelfT
 
@@ -37,8 +38,6 @@ logger = LoggerAdapter(
     goldy_bot_logger, prefix = "Commands"
 )
 
-_type = type
-
 class Commands():
     """Brings valuable methods to the goldy class for managing loading and syncing of commands."""
     def __init__(self) -> None:
@@ -57,7 +56,7 @@ class Commands():
 
     async def invoke_command(self: GoldySelfT[Self], name: str, type: CommandType, data: InteractionCreateData) -> bool: 
         """Invokes a goldy bot command. Returns False if command is not found."""
-        for command, _class, _ in self.get_commands():
+        for command, _class, extension in self.get_commands():
 
             if command.name == name and type == CommandType.AUTO_COMPLETE:
                 options = data["data"]["options"]
@@ -83,10 +82,7 @@ class Commands():
                                 data, auto_complete_option["value"], params, _class, self
                             )
 
-                            # TODO: FIX THIS NOW (01/08/2024)
-
-                            break # I don't think you can even get two auto complete slash options at the 
-                            # same time, if we do welp... this shit is blowing up!
+                            break
 
                 return True
 
@@ -116,6 +112,27 @@ class Commands():
 
                 # invoke the command's function
                 try:
+                    guild = await platter.guild
+
+                    allowed_in_guild = await self.__is_extension_allowed_in_guild(
+                        extension = extension, 
+                        guild = guild
+                    )
+
+                    if not allowed_in_guild:
+                        embed = Embed(
+                            title = "❤️ Extension is disabled!",
+                            description = "This extension is not enabled in this guild. " \
+                                "Contact your guild owner if you would like it enabled or if " \
+                                "you are the owner check out the ``/guild-config`` command."
+                        )
+
+                        raise FrontEndError(
+                            embed, 
+                            message = f"The extension '{extension.name}' is disabled in the '{guild.data['name']}' guild.",
+                            logger = logger
+                        )
+
                     if master_command is not None:
                         await master_command.function(_class, platter, **params)
 
@@ -190,6 +207,17 @@ class Commands():
 
         else:
             logger.info("No commands have been registered as no changes were detected.")
+
+    async def __is_extension_allowed_in_guild(self, extension: Extension, guild: Guild) -> bool:
+        guild_db = await guild.database
+        guild_configs: dict = guild_db.get("configs", default = {})
+
+        if extension.internal:
+            return True
+
+        return guild_configs.get(f"extensions.{extension.name}.allow", False) 
+        # TODO: Make database wrapper method for this
+        # then one to set the extension to be allowed.
 
     def __are_commands_same(
         self, 

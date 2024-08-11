@@ -159,12 +159,12 @@ class Goldy(
         internal_extensions_dir = Path(__file__).parent.parent.joinpath("internal_extensions")
 
         for path in internal_extensions_dir.iterdir():
-            extension = self._load_extension(path, legacy = legacy)
+            extension = self._load_extension(path)
 
             if extension is not None:
-                self.logger.info(f"Internal extension '{extension.name}' has been loaded!")
+                self.logger.debug(f"Internal extension '{extension.name}' has been loaded!")
 
-                self.add_extension(extension)
+                self.add_extension(extension, internal = True)
 
         # Setting up nextcore client.
         await self.client.setup()

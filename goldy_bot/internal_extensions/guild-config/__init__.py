@@ -116,6 +116,9 @@ class GuildConfig():
             list_of_keys = []
 
             for extension in self.goldy.extensions:
+                if extension.internal:
+                    continue
+
                 list_of_keys.append((f"extensions.{extension.name}.allow", bool))
 
             self.list_of_config_keys = list_of_keys

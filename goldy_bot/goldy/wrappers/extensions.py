@@ -38,9 +38,11 @@ class Extensions():
 
         super().__init__()
 
-    def add_extension(self: GoldySelfT[Self], extension: Extension) -> None:
+    def add_extension(self: GoldySelfT[Self], extension: Extension, internal: bool = False) -> None:
         """Adds an extension to goldy bot's internal state."""
         self.extensions.append(extension)
+
+        extension.internal = internal
 
         logger.info(
             f"The extension '{extension.name}' has been added!"
