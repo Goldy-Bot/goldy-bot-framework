@@ -71,15 +71,15 @@ class GuildConfig():
     )
     async def set_guild_config(self, platter: Platter, key: str, value: str):
         guild = await platter.guild
-        guild_database_wrapper = await guild.database
+        guild_db = await guild.database
 
-        guild_configs: dict = guild_database_wrapper.get("configs", {})
+        guild_configs: dict = guild_db.get("configs", {})
 
-        value = self.__parse_value_or_error(platter, value, key)
+        value: bool | str = self.__parse_value_or_error(platter, value, key)
 
         guild_configs[key] = value
 
-        await guild_database_wrapper.push(
+        await guild_db.push(
             data = {
                 "configs": guild_configs
             }
@@ -102,9 +102,9 @@ class GuildConfig():
     )
     async def view_guild_config(self, platter: Platter, key: str):
         guild = await platter.guild
-        guild_database_wrapper = await guild.database
+        guild_db = await guild.database
 
-        guild_configs: dict = guild_database_wrapper.get("configs", {})
+        guild_configs = guild_db.get("configs", {})
 
         await platter.send_message(
             f"➡️ `{key}` is set to **`{guild_configs.get(key, 'None')}`**.", 

@@ -5,6 +5,8 @@ from discord_typings import GuildData
 
 if TYPE_CHECKING:
     from ...goldy import Goldy
+    
+    from ...extensions.extension import Extension
 
 from .database import GuildDBWrapper
 from ...helpers.dict_helper import DictHelper
@@ -28,3 +30,12 @@ class Guild(DictHelper[GuildData]):
             await self.database_wrapper.update()
 
         return self.database_wrapper
+    
+    async def is_extension_allowed(self, extension: Extension) -> bool:
+        guild_db = await self.database
+        guild_configs: dict = guild_db.get("configs", default = {})
+
+        if extension.internal:
+            return True
+
+        return guild_configs.get(f"extensions.{extension.name}.allow", False) 

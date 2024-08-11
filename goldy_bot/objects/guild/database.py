@@ -4,6 +4,8 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from .guild import Guild
 
+    SupportedValuesT = str | bool
+
 from devgoldyutils import LoggerAdapter
 
 from ...logger import goldy_bot_logger
@@ -38,3 +40,24 @@ class GuildDBWrapper(DatabaseWrapper[DatabaseWrapperDataT]):
         guild_configs_collection = database.get_collection("guild_configs")
 
         self.data = await guild_configs_collection.find_one({"_id": self.__guild.data["id"]})
+
+    def get_extension_allowed(self, extension_name: str) -> bool:
+        guild_configs: dict = self.get("configs", default = {})
+
+        return guild_configs.get(f"extensions.{extension_name}.allow", False) 
+
+    async def set_config(self, config_key: str, value: SupportedValuesT) -> None:
+        if not isinstance(value, (bool, str)):
+            raise TypeError(
+                f"The value '{value}' ({type(value)}) is not supported on guild configs!"
+            )
+
+        guild_configs: dict = self.get("configs", {})
+
+        guild_configs[config_key] = value
+
+        await self.push(
+            data = {
+                "configs": guild_configs
+            }
+        )

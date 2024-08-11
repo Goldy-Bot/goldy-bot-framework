@@ -18,7 +18,7 @@ if TYPE_CHECKING:
     from ...commands import Command
     from ...objects.guild import Guild
     from ...extensions import Extension
-    from ...typings import GoldySelfT
+    from ...typings import GoldySelfT, RequirementFunctionT
 
 from prettyprinter import pformat
 from devgoldyutils import LoggerAdapter, Colours
@@ -136,30 +136,7 @@ class Commands():
                     if master_command is not None:
                         await master_command.function(_class, platter, **params)
 
-                    for requirement in requirements:
-                        result = await requirement(_class, platter, **params)
-
-                        if not isinstance(result, tuple) or not len(result) == 2:
-                            raise TypeError(
-                                "A requirement must only return a Tuple type in the format --> (bool, str)!"
-                            )
-
-                        has_been_met, reason = result
-
-                        if has_been_met is False:
-
-                            if isinstance(reason, Embed):
-                                platter.error(
-                                    "Command requirement not met!", 
-                                    embed = reason
-                                )
-
-                            platter.error(
-                                title = "❤️ Requirement not met!",
-                                message = "One of the requirements for this " \
-                                    f"command has not been met because ***{reason}***.",
-                                colour = GBotColours.RED
-                            )
+                    await self.__error_when_requirements_not_met(requirements, _class, platter, params = params)
 
                     await command.function(_class, platter, **params)
 
@@ -209,15 +186,45 @@ class Commands():
             logger.info("No commands have been registered as no changes were detected.")
 
     async def __is_extension_allowed_in_guild(self, extension: Extension, guild: Guild) -> bool:
-        guild_db = await guild.database
-        guild_configs: dict = guild_db.get("configs", default = {})
-
         if extension.internal:
             return True
 
-        return guild_configs.get(f"extensions.{extension.name}.allow", False) 
-        # TODO: Make database wrapper method for this
-        # then one to set the extension to be allowed.
+        guild_db = await guild.database
+
+        return guild_db.get_extension_allowed(extension.name)
+
+    async def __error_when_requirements_not_met(
+        self, 
+        requirements: List[RequirementFunctionT], 
+        _class: object, 
+        platter: Platter, 
+        params: Dict[str, Any]
+    ) -> None:
+
+        for requirement in requirements:
+            result = await requirement(_class, platter, **params)
+
+            if not isinstance(result, tuple) or not len(result) == 2:
+                raise TypeError(
+                    "A requirement must only return a Tuple type in the format --> (bool, str)!"
+                )
+
+            has_been_met, reason = result
+
+            if has_been_met is False:
+
+                if isinstance(reason, Embed):
+                    platter.error(
+                        "Command requirement not met!", 
+                        embed = reason
+                    )
+
+                platter.error(
+                    title = "❤️ Requirement not met!",
+                    message = "One of the requirements for this " \
+                        f"command has not been met because ***{reason}***.",
+                    colour = GBotColours.RED
+                )
 
     def __are_commands_same(
         self, 
