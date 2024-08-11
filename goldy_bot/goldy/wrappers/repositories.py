@@ -35,7 +35,7 @@ class Repo():
 
     def pull_extension(self: GoldySelfT[Self], extension_name: str, destination_folder: Path, repos: Optional[List[str]] = None) -> None:
         """
-        Pulls down the extension that you specified from the official goldy bot repo into the destination folder if it doesn't already exist.
+        Pulls down the extension that you specified from the repos specified into the destination folder if it doesn't already exist.
         """
         extension_name = extension_name.lower()
 

@@ -17,7 +17,12 @@ class ExtensionMetadataData(TypedDict):
     dependencies: str
     version: str
 
-ExtensionRepoData = TypedDict("ExtensionRepoData", {"git_url": str})
+ExtensionRepoData = TypedDict(
+    "ExtensionRepoData", 
+    {
+        "git_url": str,
+    }
+)
 
 class RepoData(TypedDict):
     version: int
