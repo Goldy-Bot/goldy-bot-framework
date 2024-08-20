@@ -42,7 +42,11 @@ class Command(DictHelper[ApplicationCommandPayload]):
         data["type"] = 1
         data["name"] = name
         data["description"] = description
-        data["options"] = self.__options_parser(self.params, slash_options)
+
+        options = self.__options_parser(self.params, slash_options)
+
+        if not options == []:
+            data["options"] = options
 
         self.requirements = requirements
         self.wait = wait # TODO: Actually use this.
@@ -71,6 +75,9 @@ class Command(DictHelper[ApplicationCommandPayload]):
         return func_params[:self.function.__code__.co_argcount][2:]
 
     def add_subcommand(self, command: Command) -> None:
+        if self.data.get("options") is None:
+            self.data["options"] = []
+
         self.data["options"].append(command.data)
 
         self._subcommands[command.name] = command

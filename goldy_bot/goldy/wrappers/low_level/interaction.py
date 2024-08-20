@@ -60,7 +60,7 @@ class Interaction():
         Method that registers application commands with discord respecting already registered commands within the framework.
 
         If ``guild_id`` is set a guild application command will be registered instead.
-        If ``force`` is set to True previously registered commands will be wiped as standard behavior when making this request manually to discord.
+        If ``force`` is set to True previously registered commands will be wiped as standard behaviour when making this request manually to discord.
         """
         created_commands: List[ApplicationCommandData] = []
 

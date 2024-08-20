@@ -224,27 +224,3 @@ class GroupCommand():
         self._master_command.add_subcommand(group._master_command)
 
         return group
-
-    def __sync_with_parent_master_command(self) -> None:
-
-        if self._parent_group is not None:
-            master_command = self._master_command
-            parent_master_command = self._parent_group._master_command
-
-            for subcommand in parent_master_command._subcommands:
-
-                if subcommand == master_command.name:
-                    del parent_master_command._subcommands[master_command.name]
-                    break
-
-            for index, option in enumerate(parent_master_command.data["options"]):
-
-                if option["name"] == master_command.name:
-                    parent_master_command.data["options"].pop(index)
-                    break
-
-            parent_master_command.add_subcommand(master_command)
-
-            logger.debug(
-                f"Synced group master command '{master_command.name}' with parent group master command '{parent_master_command.name}'."
-            )

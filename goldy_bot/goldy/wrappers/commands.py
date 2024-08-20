@@ -59,9 +59,12 @@ class Commands():
         for command, _class, extension in self.get_commands():
 
             if command.name == name and type == CommandType.AUTO_COMPLETE:
-                options = data["data"]["options"]
+                options = data["data"].get("options", [])
 
-                subcommand, subcommand_options = self.__get_subcommand(data["data"].get("options", []), command)
+                subcommand, subcommand_options = self.__get_subcommand(
+                    data["data"].get("options", []), 
+                    command
+                )
 
                 if subcommand is not None:
                     command = subcommand
@@ -238,7 +241,7 @@ class Commands():
         if framework_commands == []:
             return False
 
-        for command in framework_commands:
+        for framework_command in framework_commands:
             found = False
 
             for app_command in discord_app_commands:
@@ -253,10 +256,10 @@ class Commands():
 
                     return False
 
-                if command["name"] == app_command["name"] and command["type"] == app_command["type"]:
+                if framework_command["name"] == app_command["name"] and framework_command["type"] == app_command["type"]:
 
                     for key in ["description", "options"]:
-                        value = command.get(key)
+                        value = framework_command.get(key)
                         app_value = app_command.get(key)
 
                         if value == []:
@@ -266,7 +269,7 @@ class Commands():
                             logger.debug(
                                 f"The application command '{app_command['name']}' of type '{app_command['type']}' " \
                                     "was not identical to it's clone in the framework, so it will be removed and re-synced alongside others." \
-                                        f"\nKey: '{key}' \nValues (fw | app): \n{pformat(value)} | \n{pformat(app_value)}"
+                                        f"\nThe key in question --> '{key}' \nValues (fw | app): \n{pformat(value)} | \n{pformat(app_value)}"
                             )
                             return False
 
