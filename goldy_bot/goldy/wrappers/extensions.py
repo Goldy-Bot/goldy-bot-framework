@@ -112,9 +112,16 @@ class Extensions():
             if not isinstance(extension, Extension):
                 extension = None # some legacy extensions are using lambda expressions so they tend to return a class instead of None.
 
-            logger.debug("Called the extension load function successfully!")
+            logger.debug("Called the legacy extension load function successfully!")
 
         else:
+
+            if extension is None:
+                logger.debug(
+                    f"That load function at '{shortened_path}' returned no extension object! " \
+                        "The extension will not be loaded!"
+                )
+                return None
 
             logger.debug(f"Called the '{extension.name}' extension load function successfully!")
 

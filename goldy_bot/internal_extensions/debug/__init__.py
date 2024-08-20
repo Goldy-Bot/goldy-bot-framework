@@ -1,6 +1,7 @@
 import platform
 import nextcore
 import goldy_bot
+from devgoldyutils import LoggerAdapter
 
 from GoldyBot.goldy import nextcore_utils as legacy_nextcore_utils
 
@@ -12,6 +13,10 @@ from goldy_bot import (
     EmbedField, 
     EmbedImage
 )
+
+from goldy_bot.logger import goldy_bot_logger
+
+logger = LoggerAdapter(goldy_bot_logger, prefix = "Debug")
 
 extension = goldy_bot.Extension("debug")
 
@@ -88,5 +93,10 @@ class Debug():
         await platter.send_message(embeds = [embed], reply = True)
 
 def load(goldy: Goldy):
+    # Don't load debug extension if not in dev mode present.
+    if goldy.config.test_guild_id is None:
+        logger.info("Debug extension will be disabled as you are not running in dev mode.")
+        return None
+
     extension.mount(goldy, Debug)
     return extension
