@@ -15,6 +15,12 @@
 > 
 > *GoldyBot is in very deep development right now so some utils and code will be incomplete and breaking changes will occur.*
 
+# ⚠️ This version is DEPRECATED!
+This version of the codebase has seized development since December 20th of 2023, so it's insanely out of date.
+I advise you to only look at the [pancake rewrite](https://github.com/Goldy-Bot/goldy-bot-framework/tree/v5.1dev1) if you wanna view the project.
+
+**v5.1 Rewrite (pancake):** https://github.com/Goldy-Bot/goldy-bot-framework/tree/v5.1dev1
+
 ## Table of Contents
 
 1. [Why Version 5?](#why-version-5)
