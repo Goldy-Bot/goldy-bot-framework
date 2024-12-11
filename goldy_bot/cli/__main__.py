@@ -33,7 +33,7 @@ def no_command(
         if version:
             print(f"  {Colours.CLAY}--> {Colours.ORANGE.apply('v' + __version__)}")
         else:
-            print("Check me out senpai: "+ f"{Colours.ORANGE}goldy-bot {Colours.CLAY.apply('--help')}")
+            print("Check me out: "+ f"{Colours.ORANGE}goldy-bot {Colours.CLAY.apply('--help')}")
 
 env_config = AutoConfig(os.getcwd())
 
